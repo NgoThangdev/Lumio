@@ -1,0 +1,402 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MembershipRole {
+  ADMIN
+  MEMBER
+}
+
+enum InventoryActionType {
+  USE
+  RESTOCK
+  INITIAL_STOCK
+  OPEN
+  FINISH_OPENED
+}
+
+enum TrackingMode {
+  QUANTITY
+  FIVE_LEVEL
+  PRESENCE_BACKUP
+}
+
+enum StockLevel {
+  FULL
+  THREE_QUARTERS
+  HALF
+  QUARTER
+  EMPTY
+}
+
+enum InventoryStateActionType {
+  INITIALIZE
+  UPDATE_LEVEL
+  ADD_BACKUP
+  OPEN_REFILL
+  SET_PRESENCE
+}
+
+enum ShoppingTripStatus {
+  DRAFT
+  SHOPPING
+  RESTOCKED
+}
+
+enum ShoppingEntryStatus {
+  PENDING
+  PURCHASED
+  SKIPPED
+  MOVED
+}
+
+enum ShoppingEntrySource {
+  SUGGESTED
+  MANUAL
+}
+
+enum ShoppingEntryPriority {
+  MUST_BUY
+  SHOULD_BUY
+  OPTIONAL
+}
+
+model User {
+  id                  String                @id @default(uuid())
+  email               String                @unique
+  passwordHash        String
+  memberships         Membership[]
+  createdInvitations  HouseholdInvitation[] @relation("InvitationCreator")
+  acceptedInvitations HouseholdInvitation[] @relation("InvitationAcceptor")
+  inventoryActions    InventoryAction[]
+  inventoryStateActions InventoryStateAction[]
+  inventoryUndos InventoryUndo[]
+  sessions            UserSession[]
+  createdShoppingTrips ShoppingTrip[] @relation("ShoppingTripCreator")
+  completedShoppingTrips ShoppingTrip[] @relation("ShoppingTripFinisher")
+  stockChecks TripStockCheck[]
+  locationStockChecks LocationStockCheck[]
+}
+
+model UserSession {
+  tokenHash String   @id @db.VarChar(64)
+  userId    String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Household {
+  id               String                @id @default(uuid())
+  name             String
+  memberships      Membership[]
+  invitations      HouseholdInvitation[]
+  inventoryItems   InventoryItem[]
+  inventoryActions InventoryAction[]
+  inventoryStateActions InventoryStateAction[]
+  inventoryUndos InventoryUndo[]
+  shoppingTrips    ShoppingTrip[]
+  categories Category[]
+  locations Location[]
+  locationStockChecks LocationStockCheck[]
+  tags Tag[]
+}
+
+model Category {
+  id String @id @default(uuid())
+  householdId String
+  name String
+  nameKey String
+  household Household @relation(fields: [householdId], references: [id])
+  items InventoryItem[]
+
+  @@unique([householdId, nameKey])
+}
+
+model Location {
+  id String @id @default(uuid())
+  householdId String
+  name String
+  nameKey String
+  household Household @relation(fields: [householdId], references: [id])
+  batches StockBatch[]
+  currentItems InventoryItem[] @relation("CurrentLocation")
+  backupItems InventoryItem[] @relation("BackupLocation")
+  preferredItems InventoryItem[] @relation("PreferredRestockLocation")
+  stockChecks LocationStockCheck[]
+  shoppingEntries ShoppingEntry[]
+
+  @@unique([householdId, nameKey])
+}
+
+model Tag {
+  id String @id @default(uuid())
+  householdId String
+  name String
+  nameKey String
+  household Household @relation(fields: [householdId], references: [id])
+  itemLinks InventoryItemTag[]
+
+  @@unique([householdId, nameKey])
+}
+
+model Membership {
+  userId      String
+  householdId String
+  role        MembershipRole
+  user        User           @relation(fields: [userId], references: [id])
+  household   Household      @relation(fields: [householdId], references: [id])
+
+  @@id([userId, householdId])
+}
+
+model HouseholdInvitation {
+  id               String    @id @default(uuid())
+  householdId      String
+  createdByUserId  String
+  secretHash       String    @unique
+  createdAt        DateTime  @default(now())
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  acceptedAt       DateTime?
+  acceptedByUserId String?
+  household        Household @relation(fields: [householdId], references: [id])
+  createdBy        User      @relation("InvitationCreator", fields: [createdByUserId], references: [id])
+  acceptedBy       User?     @relation("InvitationAcceptor", fields: [acceptedByUserId], references: [id])
+}
+
+model InventoryItem {
+  id          String            @id @default(uuid())
+  householdId String
+  name        String
+  primaryUnit String
+  categoryId String?
+  currentLocationId String?
+  backupLocationId String?
+  preferredRestockLocationId String?
+  trackingMode TrackingMode @default(QUANTITY)
+  currentLevel StockLevel?
+  isPresent Boolean?
+  backupCount Int @default(0)
+  lowAtLevel StockLevel @default(HALF)
+  buyAtLevel StockLevel @default(QUARTER)
+  minimumStock      Decimal? @db.Decimal(18, 6)
+  lowStockThreshold Decimal? @db.Decimal(18, 6)
+  buyThreshold      Decimal? @db.Decimal(18, 6)
+  targetStock       Decimal? @db.Decimal(18, 6)
+  neverRunOut       Boolean  @default(false)
+  predictionEnabled Boolean  @default(false)
+  stockRevision Int @default(0)
+  openedTrackingEnabled Boolean @default(false)
+  recommendedDaysAfterOpening Int?
+  household   Household         @relation(fields: [householdId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
+  currentLocation Location? @relation("CurrentLocation", fields: [currentLocationId], references: [id])
+  backupLocation Location? @relation("BackupLocation", fields: [backupLocationId], references: [id])
+  preferredRestockLocation Location? @relation("PreferredRestockLocation", fields: [preferredRestockLocationId], references: [id])
+  tagLinks InventoryItemTag[]
+  batches     StockBatch[]
+  actions     InventoryAction[]
+  stateActions InventoryStateAction[]
+  undos InventoryUndo[]
+  shoppingEntries ShoppingEntry[]
+  stockChecks TripStockCheck[]
+  locationStockChecks LocationStockCheck[]
+}
+
+model InventoryItemTag {
+  itemId String
+  tagId String
+  item InventoryItem @relation(fields: [itemId], references: [id])
+  tag Tag @relation(fields: [tagId], references: [id])
+
+  @@id([itemId, tagId])
+  @@index([tagId])
+}
+
+model InventoryStateAction {
+  id String @id @default(uuid())
+  householdId String
+  itemId String
+  userId String
+  type InventoryStateActionType
+  beforeLevel StockLevel?
+  afterLevel StockLevel?
+  beforePresent Boolean?
+  afterPresent Boolean?
+  beforeBackupCount Int
+  afterBackupCount Int
+  postStockRevision Int?
+  createdAt DateTime @default(now())
+  household Household @relation(fields: [householdId], references: [id])
+  item InventoryItem @relation(fields: [itemId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  undo InventoryUndo? @relation("StateActionUndo")
+
+  @@index([itemId, createdAt])
+}
+
+model ShoppingTrip {
+  id              String             @id @default(uuid())
+  householdId     String
+  createdByUserId String
+  completedByUserId String?
+  store           String
+  plannedDate     DateTime           @db.Date
+  status          ShoppingTripStatus @default(DRAFT)
+  createdAt       DateTime           @default(now())
+  completedAt     DateTime?
+  suggestionsImportedAt DateTime?
+  household       Household          @relation(fields: [householdId], references: [id])
+  createdBy       User               @relation("ShoppingTripCreator", fields: [createdByUserId], references: [id])
+  completedBy     User?              @relation("ShoppingTripFinisher", fields: [completedByUserId], references: [id])
+  entries         ShoppingEntry[]
+  incomingMoves   ShoppingEntry[] @relation("MoveDestination")
+  stockChecks     TripStockCheck[]
+
+  @@index([householdId, createdAt])
+}
+
+model ShoppingEntry {
+  id                String                @id @default(uuid())
+  tripId            String
+  itemId            String
+  status            ShoppingEntryStatus   @default(PENDING)
+  source            ShoppingEntrySource
+  priority          ShoppingEntryPriority
+  suggestedQuantity Decimal?              @db.Decimal(18, 6)
+  suggestedReason   String?
+  actualQuantity    Decimal?              @db.Decimal(18, 6)
+  expiryDate        DateTime?             @db.Date
+  locationId        String?
+  moveToTripId      String?
+  trip              ShoppingTrip          @relation(fields: [tripId], references: [id])
+  moveToTrip        ShoppingTrip?         @relation("MoveDestination", fields: [moveToTripId], references: [id], onDelete: Restrict)
+  item              InventoryItem         @relation(fields: [itemId], references: [id])
+  location          Location?             @relation(fields: [locationId], references: [id])
+
+  @@unique([tripId, itemId])
+  @@index([itemId])
+  @@index([moveToTripId])
+}
+
+model TripStockCheck {
+  tripId String
+  itemId String
+  userId String?
+  decision String @default("PENDING")
+  revision Int
+  before Json?
+  after Json?
+  history Json @default("[]")
+  checkedAt DateTime?
+  trip ShoppingTrip @relation(fields: [tripId], references: [id])
+  item InventoryItem @relation(fields: [itemId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
+
+  @@id([tripId, itemId])
+  @@index([itemId, checkedAt])
+}
+
+model LocationStockCheck {
+  locationId String
+  itemId String
+  householdId String
+  userId String?
+  decision String @default("PENDING")
+  revision Int
+  before Json?
+  after Json?
+  history Json @default("[]")
+  checkedAt DateTime?
+  location Location @relation(fields: [locationId], references: [id])
+  item InventoryItem @relation(fields: [itemId], references: [id])
+  household Household @relation(fields: [householdId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
+
+  @@id([locationId, itemId])
+  @@index([itemId, checkedAt])
+  @@index([householdId, locationId])
+}
+
+model StockBatch {
+  id          String                  @id @default(uuid())
+  itemId      String
+  locationId String?
+  quantity    Decimal                 @db.Decimal(18, 6)
+  expiryDate  DateTime?               @db.Date
+  openedAt DateTime?
+  openedUseByDate DateTime? @db.Date
+  createdAt   DateTime                @default(now())
+  item        InventoryItem           @relation(fields: [itemId], references: [id])
+  location Location? @relation(fields: [locationId], references: [id])
+  allocations ActionBatchAllocation[]
+  openSources OpenTransfer[] @relation("OpenSource")
+  openTargets OpenTransfer[] @relation("OpenTarget")
+}
+
+model InventoryAction {
+  id          String                  @id @default(uuid())
+  householdId String
+  itemId      String
+  userId      String
+  type        InventoryActionType
+  quantity    Decimal                 @db.Decimal(18, 6)
+  postStockRevision Int?
+  createdAt   DateTime                @default(now())
+  household   Household               @relation(fields: [householdId], references: [id])
+  item        InventoryItem           @relation(fields: [itemId], references: [id])
+  user        User                    @relation(fields: [userId], references: [id])
+  allocations ActionBatchAllocation[]
+  openTransfer OpenTransfer?
+  undo InventoryUndo? @relation("InventoryActionUndo")
+}
+
+model InventoryUndo {
+  id String @id @default(uuid())
+  householdId String
+  itemId String
+  userId String
+  inventoryActionId String? @unique
+  stateActionId String? @unique
+  postStockRevision Int
+  createdAt DateTime @default(now())
+  household Household @relation(fields: [householdId], references: [id])
+  item InventoryItem @relation(fields: [itemId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  inventoryAction InventoryAction? @relation("InventoryActionUndo", fields: [inventoryActionId], references: [id], onDelete: Restrict)
+  stateAction InventoryStateAction? @relation("StateActionUndo", fields: [stateActionId], references: [id], onDelete: Restrict)
+
+  @@index([itemId, createdAt])
+}
+
+model OpenTransfer {
+  actionId String @id
+  sourceBatchId String
+  openedBatchId String @unique
+  quantity Decimal @db.Decimal(18, 6)
+  action InventoryAction @relation(fields: [actionId], references: [id])
+  sourceBatch StockBatch @relation("OpenSource", fields: [sourceBatchId], references: [id])
+  openedBatch StockBatch @relation("OpenTarget", fields: [openedBatchId], references: [id])
+
+  @@index([sourceBatchId])
+}
+
+model ActionBatchAllocation {
+  actionId String
+  batchId  String
+  quantity Decimal         @db.Decimal(18, 6)
+  quantityAfter Decimal? @db.Decimal(18, 6)
+  action   InventoryAction @relation(fields: [actionId], references: [id])
+  batch    StockBatch      @relation(fields: [batchId], references: [id])
+
+  @@id([actionId, batchId])
+}

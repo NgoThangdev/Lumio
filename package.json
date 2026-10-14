@@ -1,0 +1,8 @@
+{
+  "name": "lumio",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
+  <title>Lumio friendly jar placeholder</title>
+  <ellipse cx="80" cy="143" rx="53" ry="8" fill="#eae8d9" opacity=".7"/>
+  <g stroke="#657865" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M53 38h54v16q14 9 14 25v48q0 12-15 13H53q-14-1-14-13V79q0-16 14-25Z" fill="#f8f6e9"/>
+    <path d="M42 107q18-7 35 0t42 0v19q0 11-13 11H54q-12 0-12-11Z" fill="#dce7c9" stroke="none"/>
+    <rect x="48" y="25" width="64" height="22" rx="8" fill="#a9bea0"/>
+    <path d="M57 33h47M49 67v22" stroke="#fffefa" stroke-width="5"/>
+    <path d="M67 87v2m26-2v2M75 96q5 7 10 0" stroke="#354b3d"/>
+    <ellipse cx="60" cy="96" rx="5" ry="3" fill="#edc5b6" stroke="none"/>
+    <ellipse cx="100" cy="96" rx="5" ry="3" fill="#edc5b6" stroke="none"/>
+  </g>
+</svg>

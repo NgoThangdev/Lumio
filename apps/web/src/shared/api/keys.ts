@@ -1,0 +1,23 @@
+export const keys = {
+  session: ["session"] as const,
+  households: ["households"] as const,
+  household: (householdId: string) => ["household", householdId] as const,
+  catalog: (householdId: string, kind: "categories" | "locations" | "tags") =>
+    ["household", householdId, "catalog", kind] as const,
+  items: (householdId: string) => ["household", householdId, "items"] as const,
+  inventoryRead: (householdId: string, query: string) =>
+    [...keys.items(householdId), "read", query] as const,
+  needsAttention: (householdId: string) =>
+    ["household", householdId, "needs-attention"] as const,
+  recentActivity: (householdId: string) =>
+    ["household", householdId, "recent-activity"] as const,
+  item: (householdId: string, itemId: string) =>
+    ["household", householdId, "item", itemId] as const,
+  intelligence: (householdId: string, date: string) =>
+    ["household", householdId, "intelligence", date] as const,
+  locationStockCheck: (householdId: string, locationId: string) =>
+    ["household", householdId, "location-stock-check", locationId] as const,
+  trips: (householdId: string) => ["household", householdId, "trips"] as const,
+  trip: (householdId: string, tripId: string) =>
+    ["household", householdId, "trip", tripId] as const,
+};
