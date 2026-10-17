@@ -10,6 +10,10 @@
  */
 export type * from './models/User.js'
 export type * from './models/UserSession.js'
+export type * from './models/NotificationPreference.js'
+export type * from './models/PushSubscription.js'
+export type * from './models/NotificationIntent.js'
+export type * from './models/NotificationDelivery.js'
 export type * from './models/Household.js'
 export type * from './models/Category.js'
 export type * from './models/Location.js'

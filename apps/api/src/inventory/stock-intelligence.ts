@@ -50,6 +50,7 @@ export function assessItem(
   let physical = ZERO;
   let eligible = ZERO;
   let expiring = ZERO;
+  let useToday = ZERO;
   let expired = ZERO;
   let opened = ZERO;
   let unopened = ZERO;
@@ -65,6 +66,7 @@ export function assessItem(
       eligible = eligible.plus(batch.quantity);
       if (expiry && expiry <= useSoonThrough) {
         expiring = expiring.plus(batch.quantity);
+        if (expiry === today) useToday = useToday.plus(batch.quantity);
       }
     }
   }
@@ -163,6 +165,7 @@ export function assessItem(
 
   return {
     itemId: item.id,
+    neverRunOut: item.neverRunOut,
     name: item.name,
     primaryUnit: item.primaryUnit,
     physicalStock: physical.toString(),
@@ -171,6 +174,7 @@ export function assessItem(
     eligibleStock: eligible.toString(),
     expiredStock: expired.toString(),
     useSoonQuantity: expiring.toString(),
+    useTodayQuantity: useToday.toString(),
     expiryRisk: expiring.gt(0) ? 'USE_SOON' : 'NONE',
     expiryReason,
     lowStockRisk: health,

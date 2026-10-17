@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { HouseholdsModule } from './households/households.module.js';
 import { ShoppingModule } from './shopping/shopping.module.js';
+import { NotificationsModule } from './notifications/notifications.module.js';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ShoppingModule } from './shopping/shopping.module.js';
     HouseholdsModule,
     InventoryModule,
     ShoppingModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

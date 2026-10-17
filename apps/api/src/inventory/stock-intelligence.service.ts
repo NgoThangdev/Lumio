@@ -17,12 +17,14 @@ export class StockIntelligenceService {
     actorId: string,
     householdId: string,
     shoppingDateInput?: string,
+    at = new Date(),
   ) {
     return this.assessWithClient(
       this.prisma,
       actorId,
       householdId,
       shoppingDateInput,
+      at,
     );
   }
 
@@ -31,8 +33,15 @@ export class StockIntelligenceService {
     actorId: string,
     householdId: string,
     shoppingDateInput?: string,
+    at = new Date(),
   ) {
-    return this.assessWithClient(tx, actorId, householdId, shoppingDateInput);
+    return this.assessWithClient(
+      tx,
+      actorId,
+      householdId,
+      shoppingDateInput,
+      at,
+    );
   }
 
   private async assessWithClient(
@@ -40,6 +49,7 @@ export class StockIntelligenceService {
     actorId: string,
     householdId: string,
     shoppingDateInput?: string,
+    at = new Date(),
   ) {
     const membership = await client.membership.findUnique({
       where: { userId_householdId: { userId: actorId, householdId } },
@@ -50,7 +60,7 @@ export class StockIntelligenceService {
         'Household membership is required to view stock intelligence.',
       );
     }
-    const now = new Date();
+    const now = at;
     const today = localCalendarDate(now);
     const shoppingDate = shoppingDateInput ?? addCalendarDays(today, 7);
     if (

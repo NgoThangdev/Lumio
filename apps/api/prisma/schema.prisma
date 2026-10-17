@@ -66,6 +66,26 @@ enum ShoppingEntryPriority {
   OPTIONAL
 }
 
+enum NotificationIntentKind {
+  IMMEDIATE_ITEM
+  DAILY_DIGEST
+}
+
+enum NotificationIntentStatus {
+  PENDING
+  DEFERRED
+}
+
+enum NotificationDeliveryStatus {
+  PENDING
+  CLAIMED
+  RETRY
+  ACCEPTED
+  SKIPPED
+  UNKNOWN
+  FAILED
+}
+
 model User {
   id                  String                @id @default(uuid())
   email               String                @unique
@@ -81,6 +101,8 @@ model User {
   completedShoppingTrips ShoppingTrip[] @relation("ShoppingTripFinisher")
   stockChecks TripStockCheck[]
   locationStockChecks LocationStockCheck[]
+  notificationPreference NotificationPreference?
+  notificationIntents NotificationIntent[]
 }
 
 model UserSession {
@@ -89,9 +111,72 @@ model UserSession {
   createdAt DateTime @default(now())
   expiresAt DateTime
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pushSubscriptions PushSubscription[]
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+model NotificationPreference {
+  userId String @id
+  expiryAlertsEnabled Boolean @default(false)
+  lowStockAlertsEnabled Boolean @default(false)
+  shoppingRemindersEnabled Boolean @default(false)
+  dailyDigestEnabled Boolean @default(false)
+  householdEventsEnabled Boolean @default(false)
+  quietHoursStart String? @db.VarChar(5)
+  quietHoursEnd String? @db.VarChar(5)
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PushSubscription {
+  endpoint String @id @db.VarChar(2048)
+  p256dh String @db.VarChar(512)
+  auth String @db.VarChar(128)
+  sessionTokenHash String @db.VarChar(64)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  session UserSession @relation(fields: [sessionTokenHash], references: [tokenHash], onDelete: Cascade)
+
+  @@index([sessionTokenHash])
+}
+
+model NotificationIntent {
+  id String @id @default(uuid())
+  userId String
+  kind NotificationIntentKind
+  status NotificationIntentStatus
+  localDay String @db.VarChar(10)
+  subjectKey String @db.VarChar(80)
+  householdId String?
+  itemId String?
+  content Json
+  dueAt DateTime
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries NotificationDelivery[]
+
+  @@unique([userId, kind, localDay, subjectKey])
+  @@index([status, dueAt])
+}
+
+model NotificationDelivery {
+  id String @id @default(uuid())
+  intentId String
+  subscriptionKey String @db.VarChar(64)
+  status NotificationDeliveryStatus @default(PENDING)
+  attemptCount Int @default(0)
+  claimedAt DateTime?
+  nextAttemptAt DateTime?
+  acceptedAt DateTime?
+  lastErrorCode String? @db.VarChar(40)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  intent NotificationIntent @relation(fields: [intentId], references: [id], onDelete: Cascade)
+
+  @@unique([intentId, subscriptionKey])
+  @@index([status, nextAttemptAt])
 }
 
 model Household {

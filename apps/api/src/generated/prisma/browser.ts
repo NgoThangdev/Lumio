@@ -28,6 +28,26 @@ export type User = Prisma.UserModel
  */
 export type UserSession = Prisma.UserSessionModel
 /**
+ * Model NotificationPreference
+ * 
+ */
+export type NotificationPreference = Prisma.NotificationPreferenceModel
+/**
+ * Model PushSubscription
+ * 
+ */
+export type PushSubscription = Prisma.PushSubscriptionModel
+/**
+ * Model NotificationIntent
+ * 
+ */
+export type NotificationIntent = Prisma.NotificationIntentModel
+/**
+ * Model NotificationDelivery
+ * 
+ */
+export type NotificationDelivery = Prisma.NotificationDeliveryModel
+/**
  * Model Household
  * 
  */

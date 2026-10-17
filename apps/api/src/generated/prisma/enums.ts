@@ -93,3 +93,32 @@ export const ShoppingEntryPriority = {
 } as const
 
 export type ShoppingEntryPriority = (typeof ShoppingEntryPriority)[keyof typeof ShoppingEntryPriority]
+
+
+export const NotificationIntentKind = {
+  IMMEDIATE_ITEM: 'IMMEDIATE_ITEM',
+  DAILY_DIGEST: 'DAILY_DIGEST'
+} as const
+
+export type NotificationIntentKind = (typeof NotificationIntentKind)[keyof typeof NotificationIntentKind]
+
+
+export const NotificationIntentStatus = {
+  PENDING: 'PENDING',
+  DEFERRED: 'DEFERRED'
+} as const
+
+export type NotificationIntentStatus = (typeof NotificationIntentStatus)[keyof typeof NotificationIntentStatus]
+
+
+export const NotificationDeliveryStatus = {
+  PENDING: 'PENDING',
+  CLAIMED: 'CLAIMED',
+  RETRY: 'RETRY',
+  ACCEPTED: 'ACCEPTED',
+  SKIPPED: 'SKIPPED',
+  UNKNOWN: 'UNKNOWN',
+  FAILED: 'FAILED'
+} as const
+
+export type NotificationDeliveryStatus = (typeof NotificationDeliveryStatus)[keyof typeof NotificationDeliveryStatus]

@@ -24,6 +24,28 @@ function item(overrides: Partial<IntelligenceItem> = {}): IntelligenceItem {
 }
 
 describe('quantity stock intelligence', () => {
+  it('counts only usable stock with effective expiry today for immediate attention', () => {
+    const result = assessItem(
+      item({
+        batches: [
+          { quantity: d('1'), expiryDate: date('2026-10-09') },
+          {
+            quantity: d('2'),
+            expiryDate: date('2026-10-12'),
+            openedAt: at,
+            openedUseByDate: date('2026-10-09'),
+          },
+          { quantity: d('3'), expiryDate: date('2026-10-11') },
+          { quantity: d('4'), expiryDate: date('2026-10-08') },
+        ],
+      }),
+      at,
+      '2026-10-15',
+    );
+    expect(result.useTodayQuantity).toBe('3');
+    expect(result.useSoonQuantity).toBe('6');
+    expect(result.expiredStock).toBe('4');
+  });
   it('counts Finish opened as consumption and uses opening expiry for Use Soon', () => {
     const result = assessItem(
       item({

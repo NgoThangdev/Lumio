@@ -61,6 +61,7 @@ export function assessStateItem(item: StateAssessmentItem) {
           : 'Current stock and backups do not require a purchase.';
   return {
     itemId: item.id,
+    neverRunOut: item.neverRunOut,
     name: item.name,
     primaryUnit: item.primaryUnit,
     trackingMode: item.trackingMode,
@@ -71,6 +72,7 @@ export function assessStateItem(item: StateAssessmentItem) {
     eligibleStock: null,
     expiredStock: null,
     useSoonQuantity: null,
+    useTodayQuantity: null,
     expiryRisk: 'NONE' as const,
     expiryReason: null,
     lowStockRisk,

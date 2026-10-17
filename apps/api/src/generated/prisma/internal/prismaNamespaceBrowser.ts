@@ -53,6 +53,10 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   UserSession: 'UserSession',
+  NotificationPreference: 'NotificationPreference',
+  PushSubscription: 'PushSubscription',
+  NotificationIntent: 'NotificationIntent',
+  NotificationDelivery: 'NotificationDelivery',
   Household: 'Household',
   Category: 'Category',
   Location: 'Location',
@@ -106,6 +110,67 @@ export const UserSessionScalarFieldEnum = {
 } as const
 
 export type UserSessionScalarFieldEnum = (typeof UserSessionScalarFieldEnum)[keyof typeof UserSessionScalarFieldEnum]
+
+
+export const NotificationPreferenceScalarFieldEnum = {
+  userId: 'userId',
+  expiryAlertsEnabled: 'expiryAlertsEnabled',
+  lowStockAlertsEnabled: 'lowStockAlertsEnabled',
+  shoppingRemindersEnabled: 'shoppingRemindersEnabled',
+  dailyDigestEnabled: 'dailyDigestEnabled',
+  householdEventsEnabled: 'householdEventsEnabled',
+  quietHoursStart: 'quietHoursStart',
+  quietHoursEnd: 'quietHoursEnd',
+  updatedAt: 'updatedAt'
+} as const
+
+export type NotificationPreferenceScalarFieldEnum = (typeof NotificationPreferenceScalarFieldEnum)[keyof typeof NotificationPreferenceScalarFieldEnum]
+
+
+export const PushSubscriptionScalarFieldEnum = {
+  endpoint: 'endpoint',
+  p256dh: 'p256dh',
+  auth: 'auth',
+  sessionTokenHash: 'sessionTokenHash',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PushSubscriptionScalarFieldEnum = (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum]
+
+
+export const NotificationIntentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  kind: 'kind',
+  status: 'status',
+  localDay: 'localDay',
+  subjectKey: 'subjectKey',
+  householdId: 'householdId',
+  itemId: 'itemId',
+  content: 'content',
+  dueAt: 'dueAt',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationIntentScalarFieldEnum = (typeof NotificationIntentScalarFieldEnum)[keyof typeof NotificationIntentScalarFieldEnum]
+
+
+export const NotificationDeliveryScalarFieldEnum = {
+  id: 'id',
+  intentId: 'intentId',
+  subscriptionKey: 'subscriptionKey',
+  status: 'status',
+  attemptCount: 'attemptCount',
+  claimedAt: 'claimedAt',
+  nextAttemptAt: 'nextAttemptAt',
+  acceptedAt: 'acceptedAt',
+  lastErrorCode: 'lastErrorCode',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type NotificationDeliveryScalarFieldEnum = (typeof NotificationDeliveryScalarFieldEnum)[keyof typeof NotificationDeliveryScalarFieldEnum]
 
 
 export const HouseholdScalarFieldEnum = {
@@ -361,19 +426,19 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const NullableJsonNullValueInput = {
   DbNull: DbNull,
   JsonNull: JsonNull
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
-
-
-export const JsonNullValueInput = {
-  JsonNull: JsonNull
-} as const
-
-export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {

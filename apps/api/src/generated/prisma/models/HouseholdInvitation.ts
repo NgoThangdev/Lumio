@@ -535,14 +535,6 @@ export type HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput = 
   deleteMany?: Prisma.HouseholdInvitationScalarWhereInput | Prisma.HouseholdInvitationScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type HouseholdInvitationCreateWithoutCreatedByInput = {
   id?: string
   secretHash: string

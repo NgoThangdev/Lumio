@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "React: Debug Frontend",
+            "type": "pwa-chrome",
+            "request": "launch",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}/apps/web",
+            "sourceMaps": true,
+            "sourceMapPathOverrides": {
+                "/src/*": "${workspaceFolder}/apps/web/src/*",
+                "webpack:///./*": "${workspaceFolder}/apps/web/*"
+            }
+        }
+    ]
+}

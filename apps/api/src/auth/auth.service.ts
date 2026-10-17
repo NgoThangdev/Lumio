@@ -18,8 +18,18 @@ const scrypt = promisify(scryptCallback);
 export const SESSION_COOKIE = 'lumio_session';
 export const SESSION_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 
-function tokenHash(token: string): string {
+export function tokenHash(token: string): string {
   return createHash('sha256').update(token).digest('hex');
+}
+
+export function sessionTokenFromCookieHeader(
+  header: string | undefined,
+): string {
+  const cookie = header
+    ?.split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${SESSION_COOKIE}=`));
+  return cookie?.slice(SESSION_COOKIE.length + 1) ?? '';
 }
 
 function validateCredentials(email: unknown, password: unknown) {
@@ -70,19 +80,29 @@ async function verifyPassword(
 export class AuthService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async createSession(userId: string) {
+  private async createSession(userId: string, previousToken?: string) {
     const token = randomBytes(32).toString('hex');
-    await this.prisma.userSession.create({
-      data: {
-        tokenHash: tokenHash(token),
-        userId,
-        expiresAt: new Date(Date.now() + SESSION_AGE_MS),
-      },
+    await this.prisma.$transaction(async (tx) => {
+      await tx.userSession.create({
+        data: {
+          tokenHash: tokenHash(token),
+          userId,
+          expiresAt: new Date(Date.now() + SESSION_AGE_MS),
+        },
+      });
+      if (previousToken && /^[0-9a-f]{64}$/.test(previousToken))
+        await tx.userSession.deleteMany({
+          where: { tokenHash: tokenHash(previousToken) },
+        });
     });
     return token;
   }
 
-  async register(emailInput: unknown, passwordInput: unknown) {
+  async register(
+    emailInput: unknown,
+    passwordInput: unknown,
+    previousToken?: string,
+  ) {
     const { email, password } = validateCredentials(emailInput, passwordInput);
     const passwordHash = await hashPassword(password);
     let user: { id: string; email: string };
@@ -102,10 +122,14 @@ export class AuthService {
       }
       throw error;
     }
-    return { user, token: await this.createSession(user.id) };
+    return { user, token: await this.createSession(user.id, previousToken) };
   }
 
-  async signIn(emailInput: unknown, passwordInput: unknown) {
+  async signIn(
+    emailInput: unknown,
+    passwordInput: unknown,
+    previousToken?: string,
+  ) {
     const { email, password } = validateCredentials(emailInput, passwordInput);
     const account = await this.prisma.user.findUnique({
       where: { email },
@@ -116,7 +140,7 @@ export class AuthService {
     }
     return {
       user: { id: account.id, email: account.email },
-      token: await this.createSession(account.id),
+      token: await this.createSession(account.id, previousToken),
     };
   }
 

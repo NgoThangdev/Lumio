@@ -7,8 +7,13 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import type { Response } from 'express';
-import { AuthService, SESSION_AGE_MS, SESSION_COOKIE } from './auth.service.js';
+import type { Request, Response } from 'express';
+import {
+  AuthService,
+  SESSION_AGE_MS,
+  SESSION_COOKIE,
+  sessionTokenFromCookieHeader,
+} from './auth.service.js';
 import { SessionGuard } from './session.guard.js';
 import type { AuthenticatedRequest } from './session.guard.js';
 
@@ -34,9 +39,14 @@ export class AuthController {
   @Post('register')
   async register(
     @Body() body: CredentialsBody,
+    @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const result = await this.auth.register(body?.email, body?.password);
+    const result = await this.auth.register(
+      body?.email,
+      body?.password,
+      sessionTokenFromCookieHeader(request.headers.cookie),
+    );
     this.setCookie(response, result.token);
     return result.user;
   }
@@ -44,9 +54,14 @@ export class AuthController {
   @Post('sign-in')
   async signIn(
     @Body() body: CredentialsBody,
+    @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const result = await this.auth.signIn(body?.email, body?.password);
+    const result = await this.auth.signIn(
+      body?.email,
+      body?.password,
+      sessionTokenFromCookieHeader(request.headers.cookie),
+    );
     this.setCookie(response, result.token);
     return result.user;
   }

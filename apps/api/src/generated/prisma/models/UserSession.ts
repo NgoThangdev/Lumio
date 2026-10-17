@@ -175,6 +175,7 @@ export type UserSessionWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"UserSession"> | Date | string
   expiresAt?: Prisma.DateTimeFilter<"UserSession"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  pushSubscriptions?: Prisma.PushSubscriptionListRelationFilter
 }
 
 export type UserSessionOrderByWithRelationInput = {
@@ -183,6 +184,7 @@ export type UserSessionOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
+  pushSubscriptions?: Prisma.PushSubscriptionOrderByRelationAggregateInput
 }
 
 export type UserSessionWhereUniqueInput = Prisma.AtLeast<{
@@ -194,6 +196,7 @@ export type UserSessionWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"UserSession"> | Date | string
   expiresAt?: Prisma.DateTimeFilter<"UserSession"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  pushSubscriptions?: Prisma.PushSubscriptionListRelationFilter
 }, "tokenHash">
 
 export type UserSessionOrderByWithAggregationInput = {
@@ -221,6 +224,7 @@ export type UserSessionCreateInput = {
   createdAt?: Date | string
   expiresAt: Date | string
   user: Prisma.UserCreateNestedOneWithoutSessionsInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutSessionInput
 }
 
 export type UserSessionUncheckedCreateInput = {
@@ -228,6 +232,7 @@ export type UserSessionUncheckedCreateInput = {
   userId: string
   createdAt?: Date | string
   expiresAt: Date | string
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutSessionInput
 }
 
 export type UserSessionUpdateInput = {
@@ -235,6 +240,7 @@ export type UserSessionUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutSessionsNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutSessionNestedInput
 }
 
 export type UserSessionUncheckedUpdateInput = {
@@ -242,6 +248,7 @@ export type UserSessionUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutSessionNestedInput
 }
 
 export type UserSessionCreateManyInput = {
@@ -295,6 +302,11 @@ export type UserSessionMinOrderByAggregateInput = {
   expiresAt?: Prisma.SortOrder
 }
 
+export type UserSessionScalarRelationFilter = {
+  is?: Prisma.UserSessionWhereInput
+  isNot?: Prisma.UserSessionWhereInput
+}
+
 export type UserSessionCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.UserSessionCreateWithoutUserInput, Prisma.UserSessionUncheckedCreateWithoutUserInput> | Prisma.UserSessionCreateWithoutUserInput[] | Prisma.UserSessionUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.UserSessionCreateOrConnectWithoutUserInput | Prisma.UserSessionCreateOrConnectWithoutUserInput[]
@@ -341,16 +353,32 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type UserSessionCreateNestedOneWithoutPushSubscriptionsInput = {
+  create?: Prisma.XOR<Prisma.UserSessionCreateWithoutPushSubscriptionsInput, Prisma.UserSessionUncheckedCreateWithoutPushSubscriptionsInput>
+  connectOrCreate?: Prisma.UserSessionCreateOrConnectWithoutPushSubscriptionsInput
+  connect?: Prisma.UserSessionWhereUniqueInput
+}
+
+export type UserSessionUpdateOneRequiredWithoutPushSubscriptionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserSessionCreateWithoutPushSubscriptionsInput, Prisma.UserSessionUncheckedCreateWithoutPushSubscriptionsInput>
+  connectOrCreate?: Prisma.UserSessionCreateOrConnectWithoutPushSubscriptionsInput
+  upsert?: Prisma.UserSessionUpsertWithoutPushSubscriptionsInput
+  connect?: Prisma.UserSessionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserSessionUpdateToOneWithWhereWithoutPushSubscriptionsInput, Prisma.UserSessionUpdateWithoutPushSubscriptionsInput>, Prisma.UserSessionUncheckedUpdateWithoutPushSubscriptionsInput>
+}
+
 export type UserSessionCreateWithoutUserInput = {
   tokenHash: string
   createdAt?: Date | string
   expiresAt: Date | string
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutSessionInput
 }
 
 export type UserSessionUncheckedCreateWithoutUserInput = {
   tokenHash: string
   createdAt?: Date | string
   expiresAt: Date | string
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutSessionInput
 }
 
 export type UserSessionCreateOrConnectWithoutUserInput = {
@@ -389,6 +417,50 @@ export type UserSessionScalarWhereInput = {
   expiresAt?: Prisma.DateTimeFilter<"UserSession"> | Date | string
 }
 
+export type UserSessionCreateWithoutPushSubscriptionsInput = {
+  tokenHash: string
+  createdAt?: Date | string
+  expiresAt: Date | string
+  user: Prisma.UserCreateNestedOneWithoutSessionsInput
+}
+
+export type UserSessionUncheckedCreateWithoutPushSubscriptionsInput = {
+  tokenHash: string
+  userId: string
+  createdAt?: Date | string
+  expiresAt: Date | string
+}
+
+export type UserSessionCreateOrConnectWithoutPushSubscriptionsInput = {
+  where: Prisma.UserSessionWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserSessionCreateWithoutPushSubscriptionsInput, Prisma.UserSessionUncheckedCreateWithoutPushSubscriptionsInput>
+}
+
+export type UserSessionUpsertWithoutPushSubscriptionsInput = {
+  update: Prisma.XOR<Prisma.UserSessionUpdateWithoutPushSubscriptionsInput, Prisma.UserSessionUncheckedUpdateWithoutPushSubscriptionsInput>
+  create: Prisma.XOR<Prisma.UserSessionCreateWithoutPushSubscriptionsInput, Prisma.UserSessionUncheckedCreateWithoutPushSubscriptionsInput>
+  where?: Prisma.UserSessionWhereInput
+}
+
+export type UserSessionUpdateToOneWithWhereWithoutPushSubscriptionsInput = {
+  where?: Prisma.UserSessionWhereInput
+  data: Prisma.XOR<Prisma.UserSessionUpdateWithoutPushSubscriptionsInput, Prisma.UserSessionUncheckedUpdateWithoutPushSubscriptionsInput>
+}
+
+export type UserSessionUpdateWithoutPushSubscriptionsInput = {
+  tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutSessionsNestedInput
+}
+
+export type UserSessionUncheckedUpdateWithoutPushSubscriptionsInput = {
+  tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type UserSessionCreateManyUserInput = {
   tokenHash: string
   createdAt?: Date | string
@@ -399,12 +471,14 @@ export type UserSessionUpdateWithoutUserInput = {
   tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutSessionNestedInput
 }
 
 export type UserSessionUncheckedUpdateWithoutUserInput = {
   tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutSessionNestedInput
 }
 
 export type UserSessionUncheckedUpdateManyWithoutUserInput = {
@@ -414,6 +488,35 @@ export type UserSessionUncheckedUpdateManyWithoutUserInput = {
 }
 
 
+/**
+ * Count Type UserSessionCountOutputType
+ */
+
+export type UserSessionCountOutputType = {
+  pushSubscriptions: number
+}
+
+export type UserSessionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  pushSubscriptions?: boolean | UserSessionCountOutputTypeCountPushSubscriptionsArgs
+}
+
+/**
+ * UserSessionCountOutputType without action
+ */
+export type UserSessionCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserSessionCountOutputType
+   */
+  select?: Prisma.UserSessionCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UserSessionCountOutputType without action
+ */
+export type UserSessionCountOutputTypeCountPushSubscriptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PushSubscriptionWhereInput
+}
+
 
 export type UserSessionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   tokenHash?: boolean
@@ -421,6 +524,8 @@ export type UserSessionSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   createdAt?: boolean
   expiresAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  pushSubscriptions?: boolean | Prisma.UserSession$pushSubscriptionsArgs<ExtArgs>
+  _count?: boolean | Prisma.UserSessionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userSession"]>
 
 export type UserSessionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -449,6 +554,8 @@ export type UserSessionSelectScalar = {
 export type UserSessionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"tokenHash" | "userId" | "createdAt" | "expiresAt", ExtArgs["result"]["userSession"]>
 export type UserSessionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  pushSubscriptions?: boolean | Prisma.UserSession$pushSubscriptionsArgs<ExtArgs>
+  _count?: boolean | Prisma.UserSessionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserSessionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -461,6 +568,7 @@ export type $UserSessionPayload<ExtArgs extends runtime.Types.Extensions.Interna
   name: "UserSession"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
+    pushSubscriptions: Prisma.$PushSubscriptionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     tokenHash: string
@@ -862,6 +970,7 @@ readonly fields: UserSessionFieldRefs;
 export interface Prisma__UserSessionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  pushSubscriptions<T extends Prisma.UserSession$pushSubscriptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserSession$pushSubscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PushSubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1293,6 +1402,30 @@ export type UserSessionDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many UserSessions to delete.
    */
   limit?: number
+}
+
+/**
+ * UserSession.pushSubscriptions
+ */
+export type UserSession$pushSubscriptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PushSubscription
+   */
+  select?: Prisma.PushSubscriptionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PushSubscription
+   */
+  omit?: Prisma.PushSubscriptionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PushSubscriptionInclude<ExtArgs> | null
+  where?: Prisma.PushSubscriptionWhereInput
+  orderBy?: Prisma.PushSubscriptionOrderByWithRelationInput | Prisma.PushSubscriptionOrderByWithRelationInput[]
+  cursor?: Prisma.PushSubscriptionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PushSubscriptionScalarFieldEnum | Prisma.PushSubscriptionScalarFieldEnum[]
 }
 
 /**

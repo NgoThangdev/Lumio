@@ -1084,14 +1084,6 @@ export type NullableBoolFieldUpdateOperationsInput = {
   set?: boolean | null
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type EnumStockLevelFieldUpdateOperationsInput = {
   set?: $Enums.StockLevel
 }
@@ -1102,10 +1094,6 @@ export type NullableDecimalFieldUpdateOperationsInput = {
   decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
   multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
 }
 
 export type NullableIntFieldUpdateOperationsInput = {
