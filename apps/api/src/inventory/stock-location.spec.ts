@@ -5,13 +5,13 @@ function transaction(input?: {
   legacyLocationId?: string;
 }) {
   return {
-    location: {
-      findFirst: vi.fn(async ({ where }: { where: { id: string } }) =>
-        where.id === (input?.validLocationId ?? 'pantry')
-          ? { id: where.id }
-          : null,
-      ),
-    },
+    $queryRaw: vi.fn(
+      async (query: TemplateStringsArray, ...values: unknown[]) => {
+        void query;
+        const id = values[0];
+        return id === (input?.validLocationId ?? 'pantry') ? [{ id }] : [];
+      },
+    ),
     stockBatch: {
       findFirst: vi.fn(async () =>
         input?.legacyLocationId ? { locationId: input.legacyLocationId } : null,

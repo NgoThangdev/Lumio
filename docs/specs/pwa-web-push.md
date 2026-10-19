@@ -38,7 +38,7 @@ React registers the service worker, presents install/offline/permission states, 
 
 **Technical proposal:** evaluate urgent candidates periodically and the digest once daily. Respect user quiet hours by deferring push until they end and re-evaluating the condition then; do not release a stale queued alert. Record an idempotency key based on user, household when applicable, kind, subject, and local day or condition transition. A scheduled run, retry, or multiple API processes must not create duplicate intents. Delivery to multiple subscribed devices is expected, but delivery attempts must be tracked independently. Push-service acceptance is not proof that a person saw the notification.
 
-**Technical proposal:** the digest is a user-level record with household-grouped content. Its tap should open a signed-in aggregate attention view; it must not choose an arbitrary household Home. The exact digest view and schedule time remain to be specified before that slice is built.
+The digest is a user-level record with household-grouped content. Its tap opens a signed-in aggregate attention view. The approved Phase 1 time is a per-user `HH:mm` preference, defaulting to `08:00` in `Asia/Ho_Chi_Minh`; the daily digest remains opt-in.
 
 ## Data and API boundaries
 

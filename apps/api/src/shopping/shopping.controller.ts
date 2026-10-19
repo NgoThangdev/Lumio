@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -141,6 +142,21 @@ export class ShoppingController {
       body?.expiryDate,
       body?.locationId,
       body?.destinationTripId,
+    );
+  }
+
+  @Delete(':tripId/entries/:entryId')
+  removeEntry(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Param('tripId') tripId: string,
+    @Param('entryId') entryId: string,
+  ) {
+    return this.shopping.removeEntry(
+      request.actorId,
+      householdId,
+      tripId,
+      entryId,
     );
   }
 

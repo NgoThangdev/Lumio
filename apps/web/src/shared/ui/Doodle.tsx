@@ -1,9 +1,12 @@
 import placeholderUrl from '../assets/illustrations/placeholder.svg';
-import homeUrl from '../assets/illustrations/controls/home.svg';
-import householdUrl from '../assets/illustrations/controls/household.svg';
-import inventoryUrl from '../assets/illustrations/controls/inventories.svg';
-import shoppingUrl from '../assets/illustrations/controls/shopping.svg';
-import eggCartonUrl from '../assets/illustrations/inventories/egg-carton.svg';
+const controlAssets = import.meta.glob<string>(
+  '../assets/illustrations/controls/*.svg',
+  {
+    eager: true,
+    query: '?url',
+    import: 'default',
+  },
+);
 
 export type IllustrationKey =
   | 'jar'
@@ -13,18 +16,24 @@ export type IllustrationKey =
   | 'home'
   | 'household'
   | 'inventory'
-  | 'basket';
-
-const illustrations: Record<IllustrationKey, string> = {
-  jar: placeholderUrl,
-  milk: placeholderUrl,
-  eggs: eggCartonUrl,
-  rice: placeholderUrl,
-  home: homeUrl,
-  household: householdUrl,
-  inventory: inventoryUrl,
-  basket: shoppingUrl,
-};
+  | 'inventories'
+  | 'basket'
+  | 'shopping'
+  | 'add'
+  | 'calendar'
+  | 'close'
+  | 'cogwheel'
+  | 'settings'
+  | 'menu-bar'
+  | 'menu'
+  | 'minus'
+  | 'plus'
+  | 'profile'
+  | 'refresh'
+  | 'restock'
+  | 'sort'
+  | 'undo'
+  | 'use';
 
 const inventoryAssets = import.meta.glob<string>(
   '../assets/illustrations/inventories/*.svg',
@@ -57,8 +66,80 @@ const inventoryUrls = new Map(
   ]),
 );
 
+const controlUrls = new Map(
+  Object.entries(controlAssets).map(([path, url]) => [
+    normalize(
+      path
+        .split('/')
+        .pop()!
+        .replace(/\.svg$/, ''),
+    ),
+    url,
+  ]),
+);
+
+function controlUrl(asset: string, fallback?: string) {
+  return (
+    controlUrls.get(normalize(asset)) ??
+    (fallback ? controlUrls.get(normalize(fallback)) : undefined) ??
+    placeholderUrl
+  );
+}
+
+const controlIllustrations: Record<
+  Exclude<IllustrationKey, 'jar' | 'milk' | 'eggs' | 'rice'>,
+  string
+> = {
+  home: controlUrl('home'),
+  household: controlUrl('household'),
+  inventory: controlUrl('inventory', 'inventories'),
+  inventories: controlUrl('inventories', 'inventory'),
+  basket: controlUrl('shopping'),
+  shopping: controlUrl('shopping'),
+  add: controlUrl('add'),
+  calendar: controlUrl('calendar'),
+  close: controlUrl('close'),
+  cogwheel: controlUrl('cogwheel'),
+  settings: controlUrl('cogwheel'),
+  'menu-bar': controlUrl('menu-bar'),
+  menu: controlUrl('menu-bar'),
+  minus: controlUrl('minus'),
+  plus: controlUrl('plus'),
+  profile: controlUrl('profile'),
+  refresh: controlUrl('refresh'),
+  restock: controlUrl('restock'),
+  sort: controlUrl('sort'),
+  undo: controlUrl('undo'),
+  use: controlUrl('use'),
+};
+
+const illustrations: Record<IllustrationKey, string> = {
+  jar: placeholderUrl,
+  milk: inventoryUrls.get('milk') ?? placeholderUrl,
+  eggs: inventoryUrls.get('egg carton') ?? placeholderUrl,
+  rice: inventoryUrls.get('rice') ?? placeholderUrl,
+  ...controlIllustrations,
+};
+
 // Specific names go first so a compound name selects its matching illustration.
 const itemNames: [string, string][] = [
+  ['bell pepper', 'bell pepper'],
+  ['bell peppers', 'bell pepper'],
+  ['canned foods', 'canned food'],
+  ['canned goods', 'canned food'],
+  ['dishwasher tablet', 'tablet'],
+  ['dishwasher tablets', 'tablet'],
+  ['diaper', 'diapers'],
+  ['diapers', 'diapers'],
+  ['garbage bags', 'garbage bag'],
+  ['trash bag', 'garbage bag'],
+  ['trash bags', 'garbage bag'],
+  ['light bulb', 'light bulbs'],
+  ['mushroom', 'mushrooms'],
+  ['oat', 'oats'],
+  ['sausage', 'sausages'],
+  ['snack', 'snacks'],
+  ['toothbrushes', 'toothbrush'],
   ['toilet paper', 'toilet paper'],
   ['giay ve sinh', 'toilet paper'],
   ['cooking oil', 'cooking oil'],
@@ -117,6 +198,9 @@ const itemNames: [string, string][] = [
 
 function illustrationForItem(name: string) {
   const normalized = ` ${normalize(name)} `;
+  const exactMatch = inventoryUrls.get(normalize(name));
+  if (exactMatch) return exactMatch;
+
   const match = itemNames.find(([term]) => normalized.includes(` ${term} `));
   return match
     ? (inventoryUrls.get(match[1]) ?? placeholderUrl)

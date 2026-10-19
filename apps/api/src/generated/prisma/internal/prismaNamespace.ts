@@ -410,6 +410,7 @@ export const ModelName = {
   Membership: 'Membership',
   HouseholdInvitation: 'HouseholdInvitation',
   InventoryItem: 'InventoryItem',
+  InventoryItemChange: 'InventoryItemChange',
   InventoryItemTag: 'InventoryItemTag',
   InventoryStateAction: 'InventoryStateAction',
   ShoppingTrip: 'ShoppingTrip',
@@ -436,7 +437,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "userSession" | "notificationPreference" | "pushSubscription" | "notificationIntent" | "notificationDelivery" | "household" | "category" | "location" | "tag" | "membership" | "householdInvitation" | "inventoryItem" | "inventoryItemTag" | "inventoryStateAction" | "shoppingTrip" | "shoppingEntry" | "tripStockCheck" | "locationStockCheck" | "stockBatch" | "inventoryAction" | "inventoryUndo" | "openTransfer" | "actionBatchAllocation"
+    modelProps: "user" | "userSession" | "notificationPreference" | "pushSubscription" | "notificationIntent" | "notificationDelivery" | "household" | "category" | "location" | "tag" | "membership" | "householdInvitation" | "inventoryItem" | "inventoryItemChange" | "inventoryItemTag" | "inventoryStateAction" | "shoppingTrip" | "shoppingEntry" | "tripStockCheck" | "locationStockCheck" | "stockBatch" | "inventoryAction" | "inventoryUndo" | "openTransfer" | "actionBatchAllocation"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1402,6 +1403,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    InventoryItemChange: {
+      payload: Prisma.$InventoryItemChangePayload<ExtArgs>
+      fields: Prisma.InventoryItemChangeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.InventoryItemChangeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryItemChangePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.InventoryItemChangeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryItemChangePayload>
+        }
+        findFirst: {
+          args: Prisma.InventoryItemChangeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryItemChangePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.InventoryItemChangeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryItemChangePayload>
+        }
+        findMany: {
+          args: Prisma.InventoryItemChangeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryItemChangePayload>[]
+        }
+        create: {
+          args: Prisma.InventoryItemChangeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryItemChangePayload>
+        }
+        createMany: {
+          args: Prisma.InventoryItemChangeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.InventoryItemChangeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryItemChangePayload>[]
+        }
+        delete: {
+          args: Prisma.InventoryItemChangeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryItemChangePayload>
+        }
+        update: {
+          args: Prisma.InventoryItemChangeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryItemChangePayload>
+        }
+        deleteMany: {
+          args: Prisma.InventoryItemChangeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.InventoryItemChangeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.InventoryItemChangeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryItemChangePayload>[]
+        }
+        upsert: {
+          args: Prisma.InventoryItemChangeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InventoryItemChangePayload>
+        }
+        aggregate: {
+          args: Prisma.InventoryItemChangeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInventoryItemChange>
+        }
+        groupBy: {
+          args: Prisma.InventoryItemChangeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InventoryItemChangeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.InventoryItemChangeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InventoryItemChangeCountAggregateOutputType> | number
+        }
+      }
+    }
     InventoryItemTag: {
       payload: Prisma.$InventoryItemTagPayload<ExtArgs>
       fields: Prisma.InventoryItemTagFieldRefs
@@ -2280,6 +2355,7 @@ export const NotificationPreferenceScalarFieldEnum = {
   lowStockAlertsEnabled: 'lowStockAlertsEnabled',
   shoppingRemindersEnabled: 'shoppingRemindersEnabled',
   dailyDigestEnabled: 'dailyDigestEnabled',
+  digestTime: 'digestTime',
   householdEventsEnabled: 'householdEventsEnabled',
   quietHoursStart: 'quietHoursStart',
   quietHoursEnd: 'quietHoursEnd',
@@ -2337,7 +2413,9 @@ export type NotificationDeliveryScalarFieldEnum = (typeof NotificationDeliverySc
 
 export const HouseholdScalarFieldEnum = {
   id: 'id',
-  name: 'name'
+  name: 'name',
+  defaultShoppingCycleDays: 'defaultShoppingCycleDays',
+  defaultStore: 'defaultStore'
 } as const
 
 export type HouseholdScalarFieldEnum = (typeof HouseholdScalarFieldEnum)[keyof typeof HouseholdScalarFieldEnum]
@@ -2347,7 +2425,10 @@ export const CategoryScalarFieldEnum = {
   id: 'id',
   householdId: 'householdId',
   name: 'name',
-  nameKey: 'nameKey'
+  nameKey: 'nameKey',
+  shoppingSection: 'shoppingSection',
+  defaultTrackingMode: 'defaultTrackingMode',
+  defaultPrimaryUnit: 'defaultPrimaryUnit'
 } as const
 
 export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
@@ -2419,11 +2500,26 @@ export const InventoryItemScalarFieldEnum = {
   neverRunOut: 'neverRunOut',
   predictionEnabled: 'predictionEnabled',
   stockRevision: 'stockRevision',
+  archivedAt: 'archivedAt',
   openedTrackingEnabled: 'openedTrackingEnabled',
   recommendedDaysAfterOpening: 'recommendedDaysAfterOpening'
 } as const
 
 export type InventoryItemScalarFieldEnum = (typeof InventoryItemScalarFieldEnum)[keyof typeof InventoryItemScalarFieldEnum]
+
+
+export const InventoryItemChangeScalarFieldEnum = {
+  id: 'id',
+  householdId: 'householdId',
+  itemId: 'itemId',
+  actorId: 'actorId',
+  kind: 'kind',
+  before: 'before',
+  after: 'after',
+  createdAt: 'createdAt'
+} as const
+
+export type InventoryItemChangeScalarFieldEnum = (typeof InventoryItemChangeScalarFieldEnum)[keyof typeof InventoryItemChangeScalarFieldEnum]
 
 
 export const InventoryItemTagScalarFieldEnum = {
@@ -2740,16 +2836,16 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
- * Reference to a field of type 'MembershipRole'
+ * Reference to a field of type 'ShoppingSection'
  */
-export type EnumMembershipRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MembershipRole'>
+export type EnumShoppingSectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ShoppingSection'>
     
 
 
 /**
- * Reference to a field of type 'MembershipRole[]'
+ * Reference to a field of type 'ShoppingSection[]'
  */
-export type ListEnumMembershipRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MembershipRole[]'>
+export type ListEnumShoppingSectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ShoppingSection[]'>
     
 
 
@@ -2764,6 +2860,20 @@ export type EnumTrackingModeFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
  * Reference to a field of type 'TrackingMode[]'
  */
 export type ListEnumTrackingModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TrackingMode[]'>
+    
+
+
+/**
+ * Reference to a field of type 'MembershipRole'
+ */
+export type EnumMembershipRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MembershipRole'>
+    
+
+
+/**
+ * Reference to a field of type 'MembershipRole[]'
+ */
+export type ListEnumMembershipRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MembershipRole[]'>
     
 
 
@@ -3056,6 +3166,7 @@ export type GlobalOmitConfig = {
   membership?: Prisma.MembershipOmit
   householdInvitation?: Prisma.HouseholdInvitationOmit
   inventoryItem?: Prisma.InventoryItemOmit
+  inventoryItemChange?: Prisma.InventoryItemChangeOmit
   inventoryItemTag?: Prisma.InventoryItemTagOmit
   inventoryStateAction?: Prisma.InventoryStateActionOmit
   shoppingTrip?: Prisma.ShoppingTripOmit

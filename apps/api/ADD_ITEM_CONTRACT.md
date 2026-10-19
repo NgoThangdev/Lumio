@@ -20,6 +20,8 @@ The response is the created item with category, tags, current/backup locations, 
 
 `GET` and `POST /api/households/:householdId/categories`, `/locations`, and `/tags` provide list and Admin-only create for the Add Item selectors. Names are normalized for duplicate checking within each household. Item detail and list include classification and placements; search and grouping are outside this backend slice.
 
+Category `defaultTrackingMode` and `defaultPrimaryUnit` are optional Add Item form hints. They do not change the request contract or server resolution: clients continue to submit the intended item mode and primary unit explicitly, and defaults never alter existing items.
+
 The old `{ name, primaryUnit, trackingMode? }` request remains a **transitional empty-item path** for existing clients; it does not complete the Phase 1 Add Item UX. It has no preferred restock location. Direct Restock and Shopping Finish resolve a new quantity batch's location from the request/entry, then this item preference, then this same item's latest located batch. They return `LOCATION_REQUIRED` if none exists. The API never infers a physical location from another item. Existing batches with null `locationId` remain unknown; no migration backfill guesses their placement. Existing rows retain nullable category and location references until explicitly classified. For non-quantity items, the current/home location and aggregate backup location are distinct fields; initial Add Item sets both to the selected location.
 
 The reviewed `20261010091418_atomic_add_item_catalog` migration was applied and tested on local `127.0.0.1:55432/lumio_local` only. This does not establish the migration state of any other database.

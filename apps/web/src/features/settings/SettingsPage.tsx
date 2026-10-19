@@ -10,6 +10,13 @@ import {
 import { keys } from '../../shared/api/keys';
 import type { NotificationPreferences, User } from '../../shared/api/types';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
+import {
+  applyAppearance,
+  readAppearanceChoice,
+  saveAppearanceChoice,
+  type AppearanceChoice,
+} from '../../shared/ui/appearance';
+import { HouseholdShoppingSettings } from './HouseholdShoppingSettings';
 
 const categories = [
   ['expiryAlertsEnabled', 'Expiry alerts', 'When stock is close to expiring.'],
@@ -59,6 +66,11 @@ function permissionState() {
 export function SettingsPage({ user }: { user: User }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [appearance, setAppearance] = useState(readAppearanceChoice);
+  const [systemDark, setSystemDark] = useState(
+    () => window.matchMedia('(prefers-color-scheme: dark)').matches,
+  );
+  const [appearanceNotice, setAppearanceNotice] = useState('');
   const preferenceKey = keys.notificationPreferences(user.id);
   const preferences = useQuery({
     queryKey: preferenceKey,
@@ -102,6 +114,7 @@ export function SettingsPage({ user }: { user: User }) {
   const save = useMutation({
     mutationFn: (
       body: Pick<NotificationPreferences, PreferenceKey> & {
+        digestTime: NotificationPreferences['digestTime'];
         quietHours: NotificationPreferences['quietHours'];
       },
     ) =>
@@ -131,6 +144,15 @@ export function SettingsPage({ user }: { user: User }) {
     const update = () => setPermission(permissionState());
     window.addEventListener('focus', update);
     return () => window.removeEventListener('focus', update);
+  }, []);
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const update = (event: MediaQueryListEvent) => {
+      setSystemDark(event.matches);
+      if (readAppearanceChoice() === 'system') applyAppearance('system');
+    };
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
   }, []);
   useEffect(() => {
     let active = true;
@@ -230,6 +252,7 @@ export function SettingsPage({ user }: { user: User }) {
       lowStockAlertsEnabled: draft.lowStockAlertsEnabled,
       shoppingRemindersEnabled: draft.shoppingRemindersEnabled,
       dailyDigestEnabled: draft.dailyDigestEnabled,
+      digestTime: draft.digestTime,
       householdEventsEnabled: draft.householdEventsEnabled,
       quietHours: quietHoursEnabled
         ? {
@@ -255,6 +278,18 @@ export function SettingsPage({ user }: { user: User }) {
     } catch {
       // The mutation error below distinguishes rejection, pre-send offline, and uncertain outcome.
     }
+  }
+
+  function chooseAppearance(choice: AppearanceChoice) {
+    const persisted = saveAppearanceChoice(choice);
+    setAppearance(choice);
+    setAppearanceNotice(
+      persisted
+        ? choice === 'system'
+          ? 'Lumio is following this device’s appearance setting.'
+          : `${choice === 'dark' ? 'Dark' : 'Light'} Mode is saved in this browser.`
+        : 'Appearance changed for this page, but this browser could not save the choice. It may reset after reload.',
+    );
   }
 
   const pushSupported = permission !== 'unsupported';
@@ -483,20 +518,75 @@ export function SettingsPage({ user }: { user: User }) {
   }
 
   return (
-    <main className="settings-page narrow">
+    <section className="settings-page narrow">
       <div className="settings-heading">
         <div>
           <p className="eyebrow">Your account</p>
           <h1>Settings</h1>
           <p className="muted">
-            Notification choices apply to your account across households.
+            Manage household shopping defaults and your own notification
+            choices.
           </p>
         </div>
         <Button variant="secondary" onClick={() => navigate(-1)}>
           Back
         </Button>
       </div>
-      <Card>
+      <nav className="settings-jump-links" aria-label="Settings sections">
+        <a href="#appearance-settings">Appearance</a>
+        <a href="#household-settings">Household</a>
+        <a href="#notification-settings">Notifications</a>
+        <a href="#push-settings">Browser Push</a>
+        <a href="#offline-settings">Offline app</a>
+      </nav>
+      <Card id="appearance-settings" className="appearance-settings">
+        <p className="eyebrow">This browser</p>
+        <h2>Appearance</h2>
+        <p className="muted">
+          Choose Dark Mode, keep Light Mode, or return to your device setting.
+        </p>
+        <label className="preference-row appearance-switch">
+          <span>
+            <strong>Dark Mode</strong>
+            <small>
+              {appearance === 'system'
+                ? `Following device appearance (${systemDark ? 'Dark' : 'Light'}).`
+                : `${appearance === 'dark' ? 'Dark' : 'Light'} Mode is selected in this browser.`}
+            </small>
+          </span>
+          <input
+            type="checkbox"
+            role="switch"
+            checked={
+              appearance === 'system' ? systemDark : appearance === 'dark'
+            }
+            onChange={(event) =>
+              chooseAppearance(event.target.checked ? 'dark' : 'light')
+            }
+          />
+        </label>
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={appearance === 'system'}
+          onClick={() => chooseAppearance('system')}
+        >
+          Use device setting
+        </Button>
+        {appearanceNotice && (
+          <p className="muted" role="status">
+            {appearanceNotice}
+          </p>
+        )}
+      </Card>
+      <section id="household-settings" className="settings-scope">
+        <div className="settings-scope-heading">
+          <p className="eyebrow">Household-specific</p>
+          <h2>Household settings</h2>
+        </div>
+        <HouseholdShoppingSettings />
+      </section>
+      <Card id="offline-settings">
         <h2>Offline app shell</h2>
         <p>
           {offlineShell === 'ready'
@@ -509,6 +599,11 @@ export function SettingsPage({ user }: { user: User }) {
         </p>
         {offlineShellError && <p className="muted">{offlineShellError}</p>}
       </Card>
+      <div
+        id="notification-settings"
+        className="settings-anchor"
+        aria-hidden="true"
+      />
       {preferences.isPending && (
         <p className="muted" role="status">
           Loading your notification preferences…
@@ -548,14 +643,20 @@ export function SettingsPage({ user }: { user: User }) {
             ? save.error.message
             : save.error instanceof MutationOutcomeUnknownError
               ? 'The save result is uncertain because the connection failed. Reload Settings and check the saved values before choosing to retry.'
-              : `Preferences were not saved: ${save.error.message}`}
+              : save.error instanceof ApiError &&
+                  save.error.status === 400 &&
+                  save.error.code === 'INVALID_DIGEST_TIME'
+                ? `Digest time was not saved: ${save.error.message}. Choose a time in 24-hour HH:mm format.`
+                : `Preferences were not saved: ${save.error.message}`}
         </Notice>
       )}
       {draft && (
         <Card>
-          <h2>Alerts</h2>
+          <p className="eyebrow">Your account · across households</p>
+          <h2>Notifications</h2>
           <p className="muted">
-            These are saved preferences. Lumio does not send Web Push yet.
+            These preferences are saved to your account. Automatic notification
+            delivery depends on server setup.
           </p>
           {categories.map(([key, title, help]) => (
             <label className="preference-row" key={key}>
@@ -578,6 +679,26 @@ export function SettingsPage({ user }: { user: User }) {
               />
             </label>
           ))}
+          {draft.dailyDigestEnabled && (
+            <label>
+              Daily digest time
+              <input
+                type="time"
+                value={draft.digestTime}
+                required
+                disabled={save.isPending}
+                onChange={(event) => {
+                  setSaved(false);
+                  setDraft((current) =>
+                    current
+                      ? { ...current, digestTime: event.target.value }
+                      : current,
+                  );
+                }}
+              />
+              <small className="muted">Timezone: {draft.timezone}</small>
+            </label>
+          )}
           <section className="quiet-hours">
             <label className="check-label">
               <input
@@ -646,8 +767,9 @@ export function SettingsPage({ user }: { user: User }) {
           </Button>
         </Card>
       )}
-      <Card>
-        <h2>Push on this browser</h2>
+      <Card id="push-settings">
+        <p className="eyebrow">This browser</p>
+        <h2>Push notifications</h2>
         <p>{pushStatus}</p>
         {publicKeyQuery.isPending && (
           <p className="muted" role="status">
@@ -692,6 +814,6 @@ export function SettingsPage({ user }: { user: User }) {
           delivery is not active in this local setup.
         </p>
       </Card>
-    </main>
+    </section>
   );
 }

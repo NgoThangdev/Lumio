@@ -112,7 +112,7 @@ export class InventoryReadService {
 
   private loadItems(householdId: string) {
     return this.prisma.inventoryItem.findMany({
-      where: { householdId },
+      where: { householdId, archivedAt: null },
       include: {
         category: { select: { id: true, name: true } },
         currentLocation: { select: { id: true, name: true } },

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useLocation, useSearchParams } from 'react-router';
 import { useHousehold } from '../../app/useHousehold';
@@ -20,6 +20,7 @@ import {
 } from '../../shared/ui/primitives';
 import { Doodle } from '../../shared/ui/Doodle';
 import { AddItemForm, type QuickPurchaseSeed } from './AddItemForm';
+import { ArchivedItems } from './ArchivedItems';
 
 function locationLabel(item: Item, locations?: CatalogOption[]) {
   if (item.trackingMode === 'QUANTITY') {
@@ -95,6 +96,7 @@ function ItemRow({
 export function InventoryPage() {
   const household = useHousehold();
   const location = useLocation();
+  const initialAddItemScrollHandled = useRef(false);
   const routeState = location.state as {
     quickPurchaseDraft?: Partial<QuickPurchaseSeed>;
   } | null;
@@ -103,14 +105,34 @@ export function InventoryPage() {
     seed && typeof seed.name === 'string' && typeof seed.quantity === 'string'
       ? (seed as QuickPurchaseSeed)
       : undefined;
-  const [urlParams] = useSearchParams();
+  const [urlParams, setUrlParams] = useSearchParams();
   const [shoppingDate, setShoppingDate] = useState('');
   const [search, setSearch] = useState(() => urlParams.get('q') ?? '');
-  const [status, setStatus] = useState('ALL');
-  const [groupBy, setGroupBy] = useState('location');
-  const [categoryId, setCategoryId] = useState('');
-  const [locationId, setLocationId] = useState('');
-  const [tagId, setTagId] = useState('');
+  const [status, setStatus] = useState(() => urlParams.get('status') ?? 'ALL');
+  const [groupBy, setGroupBy] = useState(
+    () => urlParams.get('groupBy') ?? 'location',
+  );
+  const [categoryId, setCategoryId] = useState(
+    () => urlParams.get('categoryId') ?? '',
+  );
+  const locationId = urlParams.get('locationId') ?? '';
+  const setLocationId = (nextId: string) => {
+    setUrlParams((current) => {
+      const next = new URLSearchParams(current);
+      if (nextId) next.set('locationId', nextId);
+      else next.delete('locationId');
+      return next;
+    });
+  };
+  const [tagId, setTagId] = useState(() => urlParams.get('tagId') ?? '');
+  const setInventoryParam = (name: string, value: string, fallback: string) => {
+    setUrlParams((current) => {
+      const next = new URLSearchParams(current);
+      if (value && value !== fallback) next.set(name, value);
+      else next.delete(name);
+      return next;
+    });
+  };
   const params = new URLSearchParams({ groupBy, status });
   if (search.trim()) params.set('q', search.trim());
   if (categoryId) params.set('categoryId', categoryId);
@@ -163,6 +185,21 @@ export function InventoryPage() {
         `/households/${household.id}/stock-intelligence${shoppingDate ? `?shoppingDate=${shoppingDate}` : ''}`,
       ),
   });
+  const inventoryPageReady =
+    !inventory.isPending &&
+    !categories.isPending &&
+    !locations.isPending &&
+    !tags.isPending;
+  useEffect(() => {
+    if (initialAddItemScrollHandled.current || !inventoryPageReady) return;
+    initialAddItemScrollHandled.current = true;
+    if (window.location.hash !== '#add-item') return;
+    const target = document.getElementById('add-item');
+    if (!target) return;
+    window.requestAnimationFrame(() =>
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+    );
+  }, [inventoryPageReady, location.hash]);
   const base = `/households/${household.id}`;
   // These values are accepted by the queried Inventory endpoint, including OPENED.
   const quickFilters = [
@@ -182,44 +219,15 @@ export function InventoryPage() {
     <div className="inventory-page">
       <div className="grid inventory-grid">
         <section className="inventory-list" aria-label="Household items">
-          {locations.data?.length ? (
-            <Card className="location-check-launch">
-              <div>
-                <p className="eyebrow">Quick stock check</p>
-                <h2>Check by location</h2>
-                <p className="muted">
-                  Walk through one place at a time, independently of Shopping
-                  Trips.
-                </p>
-              </div>
-              <div className="location-check-links">
-                {locations.data.map((entry) => (
-                  <Link
-                    className="secondary"
-                    key={entry.id}
-                    to={`${base}/locations/${entry.id}/check`}
-                  >
-                    Check {entry.name} <span aria-hidden="true">›</span>
-                  </Link>
-                ))}
-              </div>
-            </Card>
-          ) : locations.isPending ? (
-            <p className="muted" role="status">
-              Loading locations…
-            </p>
-          ) : locations.isError ? (
-            <Notice kind="error">
-              Locations for stock checks could not be loaded:{' '}
-              {locations.error.message}
-            </Notice>
-          ) : null}
           <label className="inventory-search">
             <span className="sr-only">Search items</span>
             <input
               type="search"
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => {
+                setSearch(event.target.value);
+                setInventoryParam('q', event.target.value.trim(), '');
+              }}
               placeholder="Search items, e.g. milk, rice, eggs…"
             />
           </label>
@@ -234,7 +242,10 @@ export function InventoryPage() {
                 type="button"
                 className={`inventory-filter-pill inventory-filter-${filter.value.toLowerCase()}${status === filter.value ? ' selected' : ''}`}
                 aria-pressed={status === filter.value}
-                onClick={() => setStatus(filter.value)}
+                onClick={() => {
+                  setStatus(filter.value);
+                  setInventoryParam('status', filter.value, 'ALL');
+                }}
               >
                 {filter.label}
               </button>
@@ -249,7 +260,10 @@ export function InventoryPage() {
                 Status
                 <select
                   value={status}
-                  onChange={(event) => setStatus(event.target.value)}
+                  onChange={(event) => {
+                    setStatus(event.target.value);
+                    setInventoryParam('status', event.target.value, 'ALL');
+                  }}
                 >
                   <option value="ALL">All</option>
                   <option value="LOW">Low or needs buying</option>
@@ -264,7 +278,14 @@ export function InventoryPage() {
                 Group by
                 <select
                   value={groupBy}
-                  onChange={(event) => setGroupBy(event.target.value)}
+                  onChange={(event) => {
+                    setGroupBy(event.target.value);
+                    setInventoryParam(
+                      'groupBy',
+                      event.target.value,
+                      'location',
+                    );
+                  }}
                 >
                   <option value="location">Location</option>
                   <option value="category">Category</option>
@@ -275,7 +296,10 @@ export function InventoryPage() {
                 Category
                 <select
                   value={categoryId}
-                  onChange={(event) => setCategoryId(event.target.value)}
+                  onChange={(event) => {
+                    setCategoryId(event.target.value);
+                    setInventoryParam('categoryId', event.target.value, '');
+                  }}
                   disabled={categories.isPending || categories.isError}
                 >
                   <option value="">All categories</option>
@@ -305,7 +329,10 @@ export function InventoryPage() {
                 Tag
                 <select
                   value={tagId}
-                  onChange={(event) => setTagId(event.target.value)}
+                  onChange={(event) => {
+                    setTagId(event.target.value);
+                    setInventoryParam('tagId', event.target.value, '');
+                  }}
                   disabled={tags.isPending || tags.isError}
                 >
                   <option value="">All tags</option>
@@ -318,6 +345,43 @@ export function InventoryPage() {
               </label>
             </div>
           </details>
+          {locations.data?.length ? (
+            <details className="location-check-launch">
+              <summary>Check by location</summary>
+              <div className="location-check-links">
+                {locations.data.map((entry) => (
+                  <Link
+                    className="secondary"
+                    key={entry.id}
+                    to={`${base}/locations/${entry.id}/check`}
+                  >
+                    Check {entry.name}
+                  </Link>
+                ))}
+              </div>
+            </details>
+          ) : locations.isPending ? (
+            <p className="muted" role="status">
+              Loading locations...
+            </p>
+          ) : locations.isError ? (
+            <Notice kind="error">
+              Locations for stock checks could not be loaded:{' '}
+              {locations.error.message}
+            </Notice>
+          ) : null}
+          {locationId && (
+            <div className="inventory-active-location">
+              <span>
+                Showing{' '}
+                {locations.data?.find((entry) => entry.id === locationId)
+                  ?.name ?? 'selected location'}
+              </span>
+              <button type="button" onClick={() => setLocationId('')}>
+                Clear location
+              </button>
+            </div>
+          )}
           {(categories.isPending || locations.isPending || tags.isPending) && (
             <p className="muted" role="status">
               Loading filter options…
@@ -412,6 +476,9 @@ export function InventoryPage() {
           quickPurchaseSeed={quickPurchaseSeed}
         />
       </div>
+      {household.role === 'ADMIN' && (
+        <ArchivedItems householdId={household.id} />
+      )}
       <div className="insight-strip">
         {intelligence.data && intelligence.data.useSoon.length > 0 && (
           <Card className="use-soon">
@@ -438,7 +505,9 @@ export function InventoryPage() {
             <div>
               <p className="eyebrow">Shopping suggestions</p>
               <h2>
-                {intelligence.data?.suggestions.length ?? '—'} items suggested
+                {intelligence.data
+                  ? `${intelligence.data.suggestions.length} ${intelligence.data.suggestions.length === 1 ? 'item' : 'items'} suggested`
+                  : '—'}
               </h2>
             </div>
             <label>
@@ -450,6 +519,12 @@ export function InventoryPage() {
               />
             </label>
           </div>
+          {intelligence.data && (
+            <p className="muted">
+              Assessment date: {intelligence.data.shoppingDate} (from Lumio's
+              stock assessment)
+            </p>
+          )}
           {intelligence.isPending ? (
             <p className="muted">Loading stock assessment…</p>
           ) : intelligence.isError ? (

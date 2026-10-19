@@ -22,6 +22,7 @@ import {
   Notice,
   StockBadge,
 } from '../../shared/ui/primitives';
+import { ItemLifecyclePanel } from './ItemLifecyclePanel';
 
 const asDate = (value: string | null) =>
   value ? value.slice(0, 10) : 'No expiry';
@@ -175,9 +176,14 @@ export function ItemDetailPage() {
         <div>
           <p className="eyebrow">A little part of your home</p>
           <h2 className="detail-title">{item.name}</h2>
+          {item.archivedAt && (
+            <p className="muted">Archived · stock and history retained</p>
+          )}
           <div className="detail-badges">
-            <StockBadge status={assessment?.lowStockRisk} />
-            {assessment?.expiryRisk === 'USE_SOON' && (
+            {!item.archivedAt && (
+              <StockBadge status={assessment?.lowStockRisk} />
+            )}
+            {!item.archivedAt && assessment?.expiryRisk === 'USE_SOON' && (
               <StockBadge status="USE_SOON" />
             )}
           </div>
@@ -185,29 +191,7 @@ export function ItemDetailPage() {
         <ItemVisual name={item.name} large />
       </div>
       {notice && <Notice kind="success">{notice}</Notice>}
-      {undoCandidate && (
-        <Card className="action-card">
-          <p className="eyebrow">Recent action</p>
-          <p className="muted">The server says this action can be undone.</p>
-          {undoAction.isError && (
-            <Notice kind="error">{undoAction.error.message}</Notice>
-          )}
-          {undoAction.isPending && (
-            <p className="muted" role="status">
-              Undoing action...
-            </p>
-          )}
-          <Button
-            type="button"
-            variant="secondary"
-            disabled={undoAction.isPending}
-            onClick={() => undoAction.mutate(undoCandidate)}
-          >
-            Undo
-          </Button>
-        </Card>
-      )}
-      {!undoCandidate && undoAction.isError && (
+      {!item.archivedAt && !undoCandidate && undoAction.isError && (
         <Notice kind="error">{undoAction.error.message}</Notice>
       )}
       {intelligence.isError && (
@@ -223,7 +207,15 @@ export function ItemDetailPage() {
         }
       >
         <div className="stack detail-overview">
-          {item.trackingMode === 'QUANTITY' ? (
+          {item.archivedAt ? (
+            <section className="stock-summary">
+              <p className="eyebrow">Archived stock</p>
+              <p>
+                Stock and history are retained. See the saved batches and
+                activity below.
+              </p>
+            </section>
+          ) : item.trackingMode === 'QUANTITY' ? (
             <section className="stock-summary">
               <p className="eyebrow">Ready to use</p>
               <strong>{assessment?.eligibleStock ?? '—'}</strong>{' '}
@@ -275,12 +267,12 @@ export function ItemDetailPage() {
               )}
             </section>
           )}
-          {intelligence.isPending && (
+          {!item.archivedAt && intelligence.isPending && (
             <Card className="assessment-loading">
               <p className="muted">Loading stock assessment…</p>
             </Card>
           )}
-          {assessment && (
+          {!item.archivedAt && assessment && (
             <Card className="assessment-card">
               <p className="eyebrow">Stock health</p>
               <h2>How things are looking</h2>
@@ -312,8 +304,32 @@ export function ItemDetailPage() {
             </Card>
           )}
         </div>
-        {item.trackingMode === 'QUANTITY' && (
+        {!item.archivedAt && item.trackingMode === 'QUANTITY' && (
           <div className="stack detail-actions">
+            {undoCandidate && (
+              <Card className="action-card plain-action-card undo-action">
+                <p className="eyebrow">Recent action</p>
+                <p className="muted">
+                  The server says this action can be undone.
+                </p>
+                {undoAction.isError && (
+                  <Notice kind="error">{undoAction.error.message}</Notice>
+                )}
+                {undoAction.isPending && (
+                  <p className="muted" role="status">
+                    Undoing action...
+                  </p>
+                )}
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={undoAction.isPending}
+                  onClick={() => undoAction.mutate(undoCandidate)}
+                >
+                  Undo
+                </Button>
+              </Card>
+            )}
             <Card className="action-card use-action">
               <details>
                 <summary className="action-summary">
@@ -505,23 +521,9 @@ export function ItemDetailPage() {
                 onRefresh={refresh}
               />
             )}
-            {household.role === 'ADMIN' && (
-              <ConfigForm
-                householdId={household.id}
-                item={item}
-                onSaved={refresh}
-              />
-            )}
-            {household.role === 'ADMIN' && (
-              <OpeningConfigForm
-                householdId={household.id}
-                item={item}
-                onSaved={refresh}
-              />
-            )}
           </div>
         )}
-        {item.trackingMode !== 'QUANTITY' && (
+        {!item.archivedAt && item.trackingMode !== 'QUANTITY' && (
           <StateActions
             householdId={household.id}
             item={item}
@@ -697,9 +699,57 @@ export function ItemDetailPage() {
                 ))
               )}
             </Card>
+            <Card>
+              <h2>
+                Item changes{' '}
+                <span className="count">{item.changes?.length ?? 0}</span>
+              </h2>
+              {!item.changes?.length ? (
+                <p className="muted">No item changes yet.</p>
+              ) : (
+                item.changes.map((change) => (
+                  <div className="row static" key={change.id}>
+                    <span>
+                      <strong>
+                        {change.kind === 'EDIT'
+                          ? 'Details edited'
+                          : change.kind === 'ARCHIVE'
+                            ? 'Archived'
+                            : 'Restored'}
+                      </strong>
+                      <small>
+                        {new Date(change.createdAt).toLocaleString()}
+                      </small>
+                    </span>
+                  </div>
+                ))
+              )}
+            </Card>
           </div>
         </details>
       </div>
+      {household.role === 'ADMIN' && (
+        <section
+          className="stack detail-management"
+          aria-label="Item management"
+        >
+          <ItemLifecyclePanel householdId={household.id} item={item} />
+          {!item.archivedAt && item.trackingMode === 'QUANTITY' && (
+            <>
+              <ConfigForm
+                householdId={household.id}
+                item={item}
+                onSaved={refresh}
+              />
+              <OpeningConfigForm
+                householdId={household.id}
+                item={item}
+                onSaved={refresh}
+              />
+            </>
+          )}
+        </section>
+      )}
     </>
   );
 }

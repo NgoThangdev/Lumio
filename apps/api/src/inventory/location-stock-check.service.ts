@@ -174,7 +174,7 @@ export class LocationStockCheckService {
     itemId: string,
   ) {
     return tx.inventoryItem.findFirst({
-      where: { id: itemId, householdId },
+      where: { id: itemId, householdId, archivedAt: null },
       include: {
         batches: {
           where: { locationId },
@@ -209,6 +209,7 @@ export class LocationStockCheckService {
       const items = await tx.inventoryItem.findMany({
         where: {
           householdId,
+          archivedAt: null,
           OR: [
             {
               trackingMode: 'QUANTITY',
@@ -272,10 +273,13 @@ export class LocationStockCheckService {
     return this.prisma.$transaction(
       async (tx) => {
         await this.requireAccess(tx, actorId, householdId, locationId);
-        const locked = await tx.$queryRaw<Array<{ id: string }>>`
-        SELECT "id" FROM "InventoryItem" WHERE "id" = ${itemId} AND "householdId" = ${householdId} FOR UPDATE
+        const locked = await tx.$queryRaw<
+          Array<{ id: string; archivedAt: Date | null }>
+        >`
+        SELECT "id", "archivedAt" FROM "InventoryItem" WHERE "id" = ${itemId} AND "householdId" = ${householdId} FOR UPDATE
       `;
         if (!locked.length) throw new NotFoundException('ITEM_NOT_FOUND');
+        if (locked[0].archivedAt) throw new ConflictException('ITEM_ARCHIVED');
         const item = await this.loadItem(tx, householdId, locationId, itemId);
         if (!item || !associated(item, locationId))
           throw new NotFoundException('CHECK_ITEM_NOT_FOUND');

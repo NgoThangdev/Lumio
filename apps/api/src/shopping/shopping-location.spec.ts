@@ -37,6 +37,9 @@ describe('Shopping Finish location resolution', () => {
           if (strings.join('').includes('ShoppingTrip')) {
             return [{ status: 'SHOPPING' }];
           }
+          if (strings.join('').includes('"Location"')) {
+            return values[0] === 'pantry' ? [{ id: 'pantry' }] : [];
+          }
           const itemId = values[0] as keyof typeof items;
           return [
             {
@@ -112,7 +115,11 @@ describe('Shopping Finish location resolution', () => {
   it('persists a household-validated explicit purchase location on the entry', async () => {
     const update = vi.fn();
     const tx = {
-      $queryRaw: vi.fn().mockResolvedValue([{ status: 'SHOPPING' }]),
+      $queryRaw: vi.fn(async (strings: TemplateStringsArray) =>
+        strings.join('').includes('"Location"')
+          ? [{ id: 'pantry' }]
+          : [{ status: 'SHOPPING' }],
+      ),
       shoppingEntry: {
         findFirst: vi.fn().mockResolvedValue({
           id: 'entry',
@@ -122,16 +129,15 @@ describe('Shopping Finish location resolution', () => {
         }),
         update,
       },
-      location: {
-        findFirst: vi.fn().mockResolvedValue({ id: 'pantry' }),
-      },
     };
     const prisma = {
       membership: { findUnique: vi.fn().mockResolvedValue({ userId: 'user' }) },
       $transaction: vi.fn(async (callback: (client: typeof tx) => unknown) =>
         callback(tx),
       ),
-      shoppingTrip: { findFirst: vi.fn().mockResolvedValue({ id: 'trip' }) },
+      shoppingTrip: {
+        findFirst: vi.fn().mockResolvedValue({ id: 'trip', entries: [] }),
+      },
     };
     const service = new ShoppingService(
       prisma as never,
@@ -151,10 +157,7 @@ describe('Shopping Finish location resolution', () => {
       'pantry',
     );
 
-    expect(tx.location.findFirst).toHaveBeenCalledWith({
-      where: { id: 'pantry', householdId: 'household' },
-      select: { id: true },
-    });
+    expect(tx.$queryRaw).toHaveBeenCalledTimes(2);
     expect(update).toHaveBeenCalledWith({
       where: { id: 'entry' },
       data: {

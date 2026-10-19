@@ -5,6 +5,12 @@ export const keys = {
   attention: (userId: string) => ['user', userId, 'attention'] as const,
   households: ['households'] as const,
   household: (householdId: string) => ['household', householdId] as const,
+  shoppingSettings: (householdId: string) =>
+    ['household', householdId, 'shopping-settings'] as const,
+  members: (householdId: string) =>
+    ['household', householdId, 'members'] as const,
+  invitations: (householdId: string) =>
+    ['household', householdId, 'invitations'] as const,
   catalog: (householdId: string, kind: 'categories' | 'locations' | 'tags') =>
     ['household', householdId, 'catalog', kind] as const,
   items: (householdId: string) => ['household', householdId, 'items'] as const,

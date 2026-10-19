@@ -262,7 +262,7 @@ export class InventoryService {
   async readItem({ actorId, householdId, itemId }: ReadItemInput) {
     const membership = await this.prisma.membership.findUnique({
       where: { userId_householdId: { userId: actorId, householdId } },
-      select: { userId: true },
+      select: { role: true },
     });
     if (!membership) {
       throw new ForbiddenException(
@@ -290,10 +290,14 @@ export class InventoryService {
         stockChecks: {
           orderBy: { checkedAt: 'asc' },
         },
+        locationStockChecks: {
+          orderBy: [{ checkedAt: 'asc' }, { locationId: 'asc' }],
+        },
         actions: {
           orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
           include: { allocations: true, openTransfer: true, undo: true },
         },
+        changes: { orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] },
       },
     });
     if (!item) {
@@ -301,6 +305,8 @@ export class InventoryService {
         'Inventory item was not found in this household.',
       );
     }
+    if (item.archivedAt && membership.role !== 'ADMIN')
+      throw new ForbiddenException('HOUSEHOLD_ADMIN_REQUIRED');
     return withOpenedStock(item);
   }
 
@@ -315,7 +321,7 @@ export class InventoryService {
       );
     }
     const items = await this.prisma.inventoryItem.findMany({
-      where: { householdId },
+      where: { householdId, archivedAt: null },
       include: {
         category: true,
         currentLocation: true,
@@ -388,19 +394,24 @@ export class InventoryService {
     }
     const item = await this.prisma.inventoryItem.findFirst({
       where: { id: input.itemId, householdId: input.householdId },
-      select: { trackingMode: true },
+      select: { trackingMode: true, archivedAt: true },
     });
     if (!item)
       throw new NotFoundException(
         'Inventory item was not found in this household.',
       );
+    if (item.archivedAt) throw new ConflictException('ITEM_ARCHIVED');
     if (item.trackingMode !== 'QUANTITY') {
       throw new BadRequestException(
         'Quantity stock settings require QUANTITY tracking.',
       );
     }
     const result = await this.prisma.inventoryItem.updateMany({
-      where: { id: input.itemId, householdId: input.householdId },
+      where: {
+        id: input.itemId,
+        householdId: input.householdId,
+        archivedAt: null,
+      },
       data: {
         minimumStock,
         lowStockThreshold,
@@ -452,14 +463,15 @@ export class InventoryService {
           'Household Admin membership is required to change opening settings.',
         );
       const locked = await tx.$queryRaw<
-        Array<{ id: string; trackingMode: string }>
+        Array<{ id: string; trackingMode: string; archivedAt: Date | null }>
       >`
-        SELECT "id", "trackingMode" FROM "InventoryItem" WHERE "id" = ${itemId} AND "householdId" = ${householdId} FOR UPDATE
+        SELECT "id", "trackingMode", "archivedAt" FROM "InventoryItem" WHERE "id" = ${itemId} AND "householdId" = ${householdId} FOR UPDATE
       `;
       if (locked.length !== 1)
         throw new NotFoundException(
           'Inventory item was not found in this household.',
         );
+      if (locked[0].archivedAt) throw new ConflictException('ITEM_ARCHIVED');
       if (locked[0].trackingMode !== 'QUANTITY')
         throw new BadRequestException(
           'Opening settings require QUANTITY tracking.',
@@ -580,15 +592,17 @@ export class InventoryService {
           id: string;
           openedTrackingEnabled: boolean;
           recommendedDaysAfterOpening: number | null;
+          archivedAt: Date | null;
         }>
       >`
-        SELECT "id", "openedTrackingEnabled", "recommendedDaysAfterOpening" FROM "InventoryItem"
+        SELECT "id", "openedTrackingEnabled", "recommendedDaysAfterOpening", "archivedAt" FROM "InventoryItem"
         WHERE "id" = ${itemId} AND "householdId" = ${householdId} AND "trackingMode" = 'QUANTITY' FOR UPDATE
       `;
       if (locked.length !== 1)
         throw new NotFoundException(
           'Quantity item was not found in this household.',
         );
+      if (locked[0].archivedAt) throw new ConflictException('ITEM_ARCHIVED');
       if (!locked[0].openedTrackingEnabled)
         throw new BadRequestException(
           'Opening tracking is not enabled for this item.',
@@ -627,15 +641,20 @@ export class InventoryService {
           'Household membership is required to finish this item.',
         );
       const locked = await tx.$queryRaw<
-        Array<{ id: string; openedTrackingEnabled: boolean }>
+        Array<{
+          id: string;
+          openedTrackingEnabled: boolean;
+          archivedAt: Date | null;
+        }>
       >`
-        SELECT "id", "openedTrackingEnabled" FROM "InventoryItem"
+        SELECT "id", "openedTrackingEnabled", "archivedAt" FROM "InventoryItem"
         WHERE "id" = ${itemId} AND "householdId" = ${householdId} AND "trackingMode" = 'QUANTITY' FOR UPDATE
       `;
       if (locked.length !== 1)
         throw new NotFoundException(
           'Quantity item was not found in this household.',
         );
+      if (locked[0].archivedAt) throw new ConflictException('ITEM_ARCHIVED');
       if (!locked[0].openedTrackingEnabled)
         throw new BadRequestException(
           'Opening tracking is not enabled for this item.',
@@ -706,9 +725,10 @@ export class InventoryService {
           trackingMode: string;
           openedTrackingEnabled: boolean;
           recommendedDaysAfterOpening: number | null;
+          archivedAt: Date | null;
         }>
       >`
-        SELECT "id", "trackingMode", "openedTrackingEnabled", "recommendedDaysAfterOpening" FROM "InventoryItem"
+        SELECT "id", "trackingMode", "openedTrackingEnabled", "recommendedDaysAfterOpening", "archivedAt" FROM "InventoryItem"
         WHERE "id" = ${itemId} AND "householdId" = ${householdId}
         FOR UPDATE
       `;
@@ -717,6 +737,8 @@ export class InventoryService {
           'Inventory item was not found in this household.',
         );
       }
+      if (lockedItems[0].archivedAt)
+        throw new ConflictException('ITEM_ARCHIVED');
       if (lockedItems[0].trackingMode !== 'QUANTITY') {
         throw new BadRequestException(
           'Use quantity requires QUANTITY tracking.',
@@ -879,9 +901,10 @@ export class InventoryService {
         trackingMode: string;
         openedTrackingEnabled: boolean;
         preferredRestockLocationId: string | null;
+        archivedAt: Date | null;
       }>
     >`
-      SELECT "id", "trackingMode", "openedTrackingEnabled", "preferredRestockLocationId" FROM "InventoryItem"
+      SELECT "id", "trackingMode", "openedTrackingEnabled", "preferredRestockLocationId", "archivedAt" FROM "InventoryItem"
       WHERE "id" = ${itemId} AND "householdId" = ${householdId}
       FOR UPDATE
     `;
@@ -890,6 +913,7 @@ export class InventoryService {
         'Inventory item was not found in this household.',
       );
     }
+    if (lockedItems[0].archivedAt) throw new ConflictException('ITEM_ARCHIVED');
     if (lockedItems[0].trackingMode !== 'QUANTITY') {
       throw new BadRequestException(
         'Restock quantity requires QUANTITY tracking.',

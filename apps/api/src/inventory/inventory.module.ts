@@ -16,6 +16,7 @@ import { LocationStockCheckController } from './location-stock-check.controller.
 import { LocationStockCheckService } from './location-stock-check.service.js';
 import { RecentActivityController } from './recent-activity.controller.js';
 import { RecentActivityService } from './recent-activity.service.js';
+import { InventoryItemLifecycleService } from './inventory-item-lifecycle.service.js';
 
 @Module({
   imports: [PrismaModule, AuthModule],
@@ -29,6 +30,7 @@ import { RecentActivityService } from './recent-activity.service.js';
   ],
   providers: [
     InventoryService,
+    InventoryItemLifecycleService,
     InventoryStateService,
     InventoryUndoService,
     LocationStockCheckService,

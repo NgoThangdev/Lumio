@@ -30,6 +30,7 @@ export type NotificationPreferenceMinAggregateOutputType = {
   lowStockAlertsEnabled: boolean | null
   shoppingRemindersEnabled: boolean | null
   dailyDigestEnabled: boolean | null
+  digestTime: string | null
   householdEventsEnabled: boolean | null
   quietHoursStart: string | null
   quietHoursEnd: string | null
@@ -42,6 +43,7 @@ export type NotificationPreferenceMaxAggregateOutputType = {
   lowStockAlertsEnabled: boolean | null
   shoppingRemindersEnabled: boolean | null
   dailyDigestEnabled: boolean | null
+  digestTime: string | null
   householdEventsEnabled: boolean | null
   quietHoursStart: string | null
   quietHoursEnd: string | null
@@ -54,6 +56,7 @@ export type NotificationPreferenceCountAggregateOutputType = {
   lowStockAlertsEnabled: number
   shoppingRemindersEnabled: number
   dailyDigestEnabled: number
+  digestTime: number
   householdEventsEnabled: number
   quietHoursStart: number
   quietHoursEnd: number
@@ -68,6 +71,7 @@ export type NotificationPreferenceMinAggregateInputType = {
   lowStockAlertsEnabled?: true
   shoppingRemindersEnabled?: true
   dailyDigestEnabled?: true
+  digestTime?: true
   householdEventsEnabled?: true
   quietHoursStart?: true
   quietHoursEnd?: true
@@ -80,6 +84,7 @@ export type NotificationPreferenceMaxAggregateInputType = {
   lowStockAlertsEnabled?: true
   shoppingRemindersEnabled?: true
   dailyDigestEnabled?: true
+  digestTime?: true
   householdEventsEnabled?: true
   quietHoursStart?: true
   quietHoursEnd?: true
@@ -92,6 +97,7 @@ export type NotificationPreferenceCountAggregateInputType = {
   lowStockAlertsEnabled?: true
   shoppingRemindersEnabled?: true
   dailyDigestEnabled?: true
+  digestTime?: true
   householdEventsEnabled?: true
   quietHoursStart?: true
   quietHoursEnd?: true
@@ -177,6 +183,7 @@ export type NotificationPreferenceGroupByOutputType = {
   lowStockAlertsEnabled: boolean
   shoppingRemindersEnabled: boolean
   dailyDigestEnabled: boolean
+  digestTime: string
   householdEventsEnabled: boolean
   quietHoursStart: string | null
   quietHoursEnd: string | null
@@ -210,6 +217,7 @@ export type NotificationPreferenceWhereInput = {
   lowStockAlertsEnabled?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   shoppingRemindersEnabled?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   dailyDigestEnabled?: Prisma.BoolFilter<"NotificationPreference"> | boolean
+  digestTime?: Prisma.StringFilter<"NotificationPreference"> | string
   householdEventsEnabled?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   quietHoursStart?: Prisma.StringNullableFilter<"NotificationPreference"> | string | null
   quietHoursEnd?: Prisma.StringNullableFilter<"NotificationPreference"> | string | null
@@ -223,6 +231,7 @@ export type NotificationPreferenceOrderByWithRelationInput = {
   lowStockAlertsEnabled?: Prisma.SortOrder
   shoppingRemindersEnabled?: Prisma.SortOrder
   dailyDigestEnabled?: Prisma.SortOrder
+  digestTime?: Prisma.SortOrder
   householdEventsEnabled?: Prisma.SortOrder
   quietHoursStart?: Prisma.SortOrderInput | Prisma.SortOrder
   quietHoursEnd?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -239,6 +248,7 @@ export type NotificationPreferenceWhereUniqueInput = Prisma.AtLeast<{
   lowStockAlertsEnabled?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   shoppingRemindersEnabled?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   dailyDigestEnabled?: Prisma.BoolFilter<"NotificationPreference"> | boolean
+  digestTime?: Prisma.StringFilter<"NotificationPreference"> | string
   householdEventsEnabled?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   quietHoursStart?: Prisma.StringNullableFilter<"NotificationPreference"> | string | null
   quietHoursEnd?: Prisma.StringNullableFilter<"NotificationPreference"> | string | null
@@ -252,6 +262,7 @@ export type NotificationPreferenceOrderByWithAggregationInput = {
   lowStockAlertsEnabled?: Prisma.SortOrder
   shoppingRemindersEnabled?: Prisma.SortOrder
   dailyDigestEnabled?: Prisma.SortOrder
+  digestTime?: Prisma.SortOrder
   householdEventsEnabled?: Prisma.SortOrder
   quietHoursStart?: Prisma.SortOrderInput | Prisma.SortOrder
   quietHoursEnd?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -270,6 +281,7 @@ export type NotificationPreferenceScalarWhereWithAggregatesInput = {
   lowStockAlertsEnabled?: Prisma.BoolWithAggregatesFilter<"NotificationPreference"> | boolean
   shoppingRemindersEnabled?: Prisma.BoolWithAggregatesFilter<"NotificationPreference"> | boolean
   dailyDigestEnabled?: Prisma.BoolWithAggregatesFilter<"NotificationPreference"> | boolean
+  digestTime?: Prisma.StringWithAggregatesFilter<"NotificationPreference"> | string
   householdEventsEnabled?: Prisma.BoolWithAggregatesFilter<"NotificationPreference"> | boolean
   quietHoursStart?: Prisma.StringNullableWithAggregatesFilter<"NotificationPreference"> | string | null
   quietHoursEnd?: Prisma.StringNullableWithAggregatesFilter<"NotificationPreference"> | string | null
@@ -281,6 +293,7 @@ export type NotificationPreferenceCreateInput = {
   lowStockAlertsEnabled?: boolean
   shoppingRemindersEnabled?: boolean
   dailyDigestEnabled?: boolean
+  digestTime?: string
   householdEventsEnabled?: boolean
   quietHoursStart?: string | null
   quietHoursEnd?: string | null
@@ -294,6 +307,7 @@ export type NotificationPreferenceUncheckedCreateInput = {
   lowStockAlertsEnabled?: boolean
   shoppingRemindersEnabled?: boolean
   dailyDigestEnabled?: boolean
+  digestTime?: string
   householdEventsEnabled?: boolean
   quietHoursStart?: string | null
   quietHoursEnd?: string | null
@@ -305,6 +319,7 @@ export type NotificationPreferenceUpdateInput = {
   lowStockAlertsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shoppingRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyDigestEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  digestTime?: Prisma.StringFieldUpdateOperationsInput | string
   householdEventsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quietHoursStart?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quietHoursEnd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -318,6 +333,7 @@ export type NotificationPreferenceUncheckedUpdateInput = {
   lowStockAlertsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shoppingRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyDigestEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  digestTime?: Prisma.StringFieldUpdateOperationsInput | string
   householdEventsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quietHoursStart?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quietHoursEnd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -330,6 +346,7 @@ export type NotificationPreferenceCreateManyInput = {
   lowStockAlertsEnabled?: boolean
   shoppingRemindersEnabled?: boolean
   dailyDigestEnabled?: boolean
+  digestTime?: string
   householdEventsEnabled?: boolean
   quietHoursStart?: string | null
   quietHoursEnd?: string | null
@@ -341,6 +358,7 @@ export type NotificationPreferenceUpdateManyMutationInput = {
   lowStockAlertsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shoppingRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyDigestEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  digestTime?: Prisma.StringFieldUpdateOperationsInput | string
   householdEventsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quietHoursStart?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quietHoursEnd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -353,6 +371,7 @@ export type NotificationPreferenceUncheckedUpdateManyInput = {
   lowStockAlertsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shoppingRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyDigestEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  digestTime?: Prisma.StringFieldUpdateOperationsInput | string
   householdEventsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quietHoursStart?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quietHoursEnd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -370,6 +389,7 @@ export type NotificationPreferenceCountOrderByAggregateInput = {
   lowStockAlertsEnabled?: Prisma.SortOrder
   shoppingRemindersEnabled?: Prisma.SortOrder
   dailyDigestEnabled?: Prisma.SortOrder
+  digestTime?: Prisma.SortOrder
   householdEventsEnabled?: Prisma.SortOrder
   quietHoursStart?: Prisma.SortOrder
   quietHoursEnd?: Prisma.SortOrder
@@ -382,6 +402,7 @@ export type NotificationPreferenceMaxOrderByAggregateInput = {
   lowStockAlertsEnabled?: Prisma.SortOrder
   shoppingRemindersEnabled?: Prisma.SortOrder
   dailyDigestEnabled?: Prisma.SortOrder
+  digestTime?: Prisma.SortOrder
   householdEventsEnabled?: Prisma.SortOrder
   quietHoursStart?: Prisma.SortOrder
   quietHoursEnd?: Prisma.SortOrder
@@ -394,6 +415,7 @@ export type NotificationPreferenceMinOrderByAggregateInput = {
   lowStockAlertsEnabled?: Prisma.SortOrder
   shoppingRemindersEnabled?: Prisma.SortOrder
   dailyDigestEnabled?: Prisma.SortOrder
+  digestTime?: Prisma.SortOrder
   householdEventsEnabled?: Prisma.SortOrder
   quietHoursStart?: Prisma.SortOrder
   quietHoursEnd?: Prisma.SortOrder
@@ -445,6 +467,7 @@ export type NotificationPreferenceCreateWithoutUserInput = {
   lowStockAlertsEnabled?: boolean
   shoppingRemindersEnabled?: boolean
   dailyDigestEnabled?: boolean
+  digestTime?: string
   householdEventsEnabled?: boolean
   quietHoursStart?: string | null
   quietHoursEnd?: string | null
@@ -456,6 +479,7 @@ export type NotificationPreferenceUncheckedCreateWithoutUserInput = {
   lowStockAlertsEnabled?: boolean
   shoppingRemindersEnabled?: boolean
   dailyDigestEnabled?: boolean
+  digestTime?: string
   householdEventsEnabled?: boolean
   quietHoursStart?: string | null
   quietHoursEnd?: string | null
@@ -483,6 +507,7 @@ export type NotificationPreferenceUpdateWithoutUserInput = {
   lowStockAlertsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shoppingRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyDigestEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  digestTime?: Prisma.StringFieldUpdateOperationsInput | string
   householdEventsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quietHoursStart?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quietHoursEnd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -494,6 +519,7 @@ export type NotificationPreferenceUncheckedUpdateWithoutUserInput = {
   lowStockAlertsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shoppingRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dailyDigestEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  digestTime?: Prisma.StringFieldUpdateOperationsInput | string
   householdEventsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quietHoursStart?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quietHoursEnd?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -508,6 +534,7 @@ export type NotificationPreferenceSelect<ExtArgs extends runtime.Types.Extension
   lowStockAlertsEnabled?: boolean
   shoppingRemindersEnabled?: boolean
   dailyDigestEnabled?: boolean
+  digestTime?: boolean
   householdEventsEnabled?: boolean
   quietHoursStart?: boolean
   quietHoursEnd?: boolean
@@ -521,6 +548,7 @@ export type NotificationPreferenceSelectCreateManyAndReturn<ExtArgs extends runt
   lowStockAlertsEnabled?: boolean
   shoppingRemindersEnabled?: boolean
   dailyDigestEnabled?: boolean
+  digestTime?: boolean
   householdEventsEnabled?: boolean
   quietHoursStart?: boolean
   quietHoursEnd?: boolean
@@ -534,6 +562,7 @@ export type NotificationPreferenceSelectUpdateManyAndReturn<ExtArgs extends runt
   lowStockAlertsEnabled?: boolean
   shoppingRemindersEnabled?: boolean
   dailyDigestEnabled?: boolean
+  digestTime?: boolean
   householdEventsEnabled?: boolean
   quietHoursStart?: boolean
   quietHoursEnd?: boolean
@@ -547,13 +576,14 @@ export type NotificationPreferenceSelectScalar = {
   lowStockAlertsEnabled?: boolean
   shoppingRemindersEnabled?: boolean
   dailyDigestEnabled?: boolean
+  digestTime?: boolean
   householdEventsEnabled?: boolean
   quietHoursStart?: boolean
   quietHoursEnd?: boolean
   updatedAt?: boolean
 }
 
-export type NotificationPreferenceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"userId" | "expiryAlertsEnabled" | "lowStockAlertsEnabled" | "shoppingRemindersEnabled" | "dailyDigestEnabled" | "householdEventsEnabled" | "quietHoursStart" | "quietHoursEnd" | "updatedAt", ExtArgs["result"]["notificationPreference"]>
+export type NotificationPreferenceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"userId" | "expiryAlertsEnabled" | "lowStockAlertsEnabled" | "shoppingRemindersEnabled" | "dailyDigestEnabled" | "digestTime" | "householdEventsEnabled" | "quietHoursStart" | "quietHoursEnd" | "updatedAt", ExtArgs["result"]["notificationPreference"]>
 export type NotificationPreferenceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -575,6 +605,7 @@ export type $NotificationPreferencePayload<ExtArgs extends runtime.Types.Extensi
     lowStockAlertsEnabled: boolean
     shoppingRemindersEnabled: boolean
     dailyDigestEnabled: boolean
+    digestTime: string
     householdEventsEnabled: boolean
     quietHoursStart: string | null
     quietHoursEnd: string | null
@@ -1008,6 +1039,7 @@ export interface NotificationPreferenceFieldRefs {
   readonly lowStockAlertsEnabled: Prisma.FieldRef<"NotificationPreference", 'Boolean'>
   readonly shoppingRemindersEnabled: Prisma.FieldRef<"NotificationPreference", 'Boolean'>
   readonly dailyDigestEnabled: Prisma.FieldRef<"NotificationPreference", 'Boolean'>
+  readonly digestTime: Prisma.FieldRef<"NotificationPreference", 'String'>
   readonly householdEventsEnabled: Prisma.FieldRef<"NotificationPreference", 'Boolean'>
   readonly quietHoursStart: Prisma.FieldRef<"NotificationPreference", 'String'>
   readonly quietHoursEnd: Prisma.FieldRef<"NotificationPreference", 'String'>

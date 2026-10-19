@@ -11,11 +11,16 @@ import {
 import { keys } from '../../shared/api/keys';
 import type {
   CatalogOption,
+  HouseholdShoppingSettings,
   Intelligence,
   Item,
   TrackingMode,
 } from '../../shared/api/types';
 import { ItemVisual, Notice } from '../../shared/ui/primitives';
+import {
+  shoppingSections,
+  type ShoppingSection,
+} from '../../shared/shoppingSections';
 import { StockCheckPanel } from './StockCheckPanel';
 
 type TripSummary = {
@@ -30,6 +35,7 @@ type Entry = {
   status: 'PENDING' | 'PURCHASED' | 'SKIPPED' | 'MOVED';
   source: 'SUGGESTED' | 'MANUAL';
   priority: 'MUST_BUY' | 'SHOULD_BUY' | 'OPTIONAL';
+  shoppingSection: ShoppingSection;
   suggestedQuantity: string | null;
   suggestedReason: string | null;
   actualQuantity: string | null;
@@ -64,6 +70,16 @@ type PurchaseDraft = {
   locationId: string;
 };
 
+const priorityOrder = ['MUST_BUY', 'SHOULD_BUY', 'OPTIONAL'] as const;
+
+function priorityLabel(priority: Entry['priority']) {
+  return priority === 'MUST_BUY'
+    ? 'Must buy'
+    : priority === 'SHOULD_BUY'
+      ? 'Should buy'
+      : 'Manual / optional';
+}
+
 function validPurchaseAmount(
   value: string,
   mode: TrackingMode,
@@ -78,6 +94,20 @@ function validPurchaseAmount(
     (packageCount ? /^\d+$/.test(value) : /^\d+(?:\.\d{1,6})?$/.test(value)) &&
     Number(value) > 0
   );
+}
+
+function plannedDateFromCycle(days: number) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date());
+  const part = (type: string) =>
+    Number(parts.find((entry) => entry.type === type)?.value);
+  return new Date(Date.UTC(part('year'), part('month') - 1, part('day') + days))
+    .toISOString()
+    .slice(0, 10);
 }
 
 export function ShoppingPage() {
@@ -105,12 +135,26 @@ export function ShoppingPage() {
     queryFn: () =>
       api<Intelligence>(`/households/${householdId}/stock-intelligence`),
   });
+  const shoppingSettings = useQuery({
+    queryKey: keys.shoppingSettings(householdId),
+    queryFn: () =>
+      api<HouseholdShoppingSettings>(
+        `/households/${householdId}/shopping-settings`,
+      ),
+    enabled: !tripId,
+  });
   const locations = useQuery({
     queryKey: keys.catalog(householdId, 'locations'),
     queryFn: () => api<CatalogOption[]>(`/households/${householdId}/locations`),
   });
-  const [store, setStore] = useState('');
-  const [plannedDate, setPlannedDate] = useState('');
+  const [storeDraft, setStoreDraft] = useState<string | null>(null);
+  const [plannedDateDraft, setPlannedDateDraft] = useState<string | null>(null);
+  const store = storeDraft ?? shoppingSettings.data?.defaultStore ?? '';
+  const plannedDate =
+    plannedDateDraft ??
+    (shoppingSettings.data
+      ? plannedDateFromCycle(shoppingSettings.data.defaultShoppingCycleDays)
+      : '');
   const [manualItemId, setManualItemId] = useState('');
   const [drafts, setDrafts] = useState<Record<string, PurchaseDraft>>({});
   const [busy, setBusy] = useState(false);
@@ -125,6 +169,12 @@ export function ShoppingPage() {
     Set<string>
   >(() => new Set());
   const trip = tripQuery.data ?? null;
+  const unsupportedSection = trip?.entries.find(
+    (entry) =>
+      !shoppingSections.some(
+        (section) => section.code === entry.shoppingSection,
+      ),
+  );
   const createTrip = useMutation({
     mutationFn: (input: { store: string; plannedDate: string }) =>
       api<TripSummary>(base, 'POST', input),
@@ -147,10 +197,6 @@ export function ShoppingPage() {
     },
   });
 
-  useEffect(() => {
-    if (intelligence.data?.shoppingDate && !plannedDate)
-      setPlannedDate(intelligence.data.shoppingDate);
-  }, [intelligence.data?.shoppingDate, plannedDate]);
   useEffect(() => {
     if (trip) {
       setDrafts(
@@ -285,13 +331,15 @@ export function ShoppingPage() {
 
   return (
     <div className="shopping-layout">
-      <Link
-        className="primary quick-purchase-entry"
-        to={`${routeBase}/quick-purchase`}
-      >
-        <span aria-hidden="true">＋</span> Quick Purchase{' '}
-        <small>Save an unplanned purchase straight to inventory</small>
-      </Link>
+      {!tripId && (
+        <Link
+          className="primary quick-purchase-entry"
+          to={`${routeBase}/quick-purchase`}
+        >
+          <span aria-hidden="true">＋</span> Quick Purchase{' '}
+          <small>Save an unplanned purchase straight to inventory</small>
+        </Link>
+      )}
       {error && (
         <div className="message error" role="alert">
           {error}
@@ -376,18 +424,37 @@ export function ShoppingPage() {
                 await queryClient.invalidateQueries({
                   queryKey: keys.trips(householdId),
                 });
-                setStore('');
                 setNotice('Trip created.');
               });
             }}
           >
             <p className="eyebrow">Plan</p>
             <h2>Create a trip</h2>
+            {shoppingSettings.isPending && (
+              <p className="muted" role="status">
+                Loading household shopping defaults…
+              </p>
+            )}
+            {shoppingSettings.isError && (
+              <Notice kind="error">
+                Shopping defaults could not be loaded:{' '}
+                {shoppingSettings.error.message}. Enter the store and date
+                yourself, or{' '}
+                <button
+                  type="button"
+                  className="link"
+                  onClick={() => void shoppingSettings.refetch()}
+                >
+                  retry defaults
+                </button>
+                .
+              </Notice>
+            )}
             <label>
               Primary store
               <input
                 value={store}
-                onChange={(event) => setStore(event.target.value)}
+                onChange={(event) => setStoreDraft(event.target.value)}
                 placeholder="e.g. Winmart"
                 required
               />
@@ -397,10 +464,17 @@ export function ShoppingPage() {
               <input
                 type="date"
                 value={plannedDate}
-                onChange={(event) => setPlannedDate(event.target.value)}
+                onChange={(event) => setPlannedDateDraft(event.target.value)}
                 required
               />
             </label>
+            {shoppingSettings.data && (
+              <p className="muted">
+                Suggested from this household's{' '}
+                {`${shoppingSettings.data.defaultShoppingCycleDays}-day`} cycle
+                in Asia/Ho_Chi_Minh. You can change both fields.
+              </p>
+            )}
             <button className="primary" disabled={busy}>
               Create trip
             </button>
@@ -420,11 +494,19 @@ export function ShoppingPage() {
                     ? 'Shopping mode'
                     : 'Finished'}
               </p>
-              <h2>{trip.store}</h2>
-              <p>
-                {trip.plannedDate.slice(0, 10)} · {purchasedCount} /{' '}
-                {trip.entries.length} purchased
-              </p>
+              <h1>{trip.store}</h1>
+              <div className="trip-header-meta">
+                <p>
+                  {trip.plannedDate.slice(0, 10)} · {purchasedCount} /{' '}
+                  {trip.entries.length} purchased
+                </p>
+                <Link
+                  className="secondary trip-quick-purchase"
+                  to={`${routeBase}/quick-purchase`}
+                >
+                  Quick Purchase
+                </Link>
+              </div>
             </div>
           </div>
           {trip.status === 'DRAFT' &&
@@ -460,20 +542,22 @@ export function ShoppingPage() {
                       ? 'Importing…'
                       : 'Import suggestions from current stock'}
                   </button>
-                  <button
-                    className="primary"
-                    disabled={busy}
-                    onClick={() =>
-                      void run(async () =>
-                        updateTrip(`${base}/${trip.id}/start`, 'POST'),
-                      )
-                    }
-                  >
-                    Start shopping
-                  </button>
                 </div>
               </>
             ))}
+          {trip.status === 'DRAFT' && (
+            <button
+              className="primary"
+              disabled={busy}
+              onClick={() =>
+                void run(async () =>
+                  updateTrip(`${base}/${trip.id}/start`, 'POST'),
+                )
+              }
+            >
+              Start shopping
+            </button>
+          )}
           {trip.status !== 'RESTOCKED' && available.length > 0 && (
             <form
               className="card manual-add"
@@ -490,10 +574,6 @@ export function ShoppingPage() {
             >
               <div>
                 <p className="eyebrow">Add an existing item</p>
-                <p className="muted">
-                  Add any item you plan to buy. Enter the actual amount only
-                  when you mark it purchased.
-                </p>
               </div>
               <select
                 aria-label="Existing item"
@@ -520,28 +600,32 @@ export function ShoppingPage() {
             </form>
           )}
           <div className="trip-checklist">
-            {trip.entries.length === 0 ? (
+            {unsupportedSection ? (
+              <Notice kind="error">
+                The API returned an unsupported shopping section for{' '}
+                {unsupportedSection.item.name}. Reload this trip after the API
+                is updated.
+              </Notice>
+            ) : trip.entries.length === 0 ? (
               <section className="card">
                 <p className="muted">
                   The checklist is empty. Add suggestions or an existing item.
                 </p>
               </section>
             ) : (
-              (['MUST_BUY', 'SHOULD_BUY', 'OPTIONAL'] as const).map(
-                (priority) => {
-                  const entries = trip.entries.filter(
-                    (entry) => entry.priority === priority,
-                  );
+              shoppingSections.map(
+                ({ code, label }: (typeof shoppingSections)[number]) => {
+                  const entries = trip.entries
+                    .filter((entry) => entry.shoppingSection === code)
+                    .sort(
+                      (left, right) =>
+                        priorityOrder.indexOf(left.priority) -
+                        priorityOrder.indexOf(right.priority),
+                    );
                   return (
                     entries.length > 0 && (
-                      <section className="card" key={priority}>
-                        <p className="eyebrow">
-                          {priority === 'MUST_BUY'
-                            ? 'Must buy'
-                            : priority === 'SHOULD_BUY'
-                              ? 'Should buy'
-                              : 'Manual / optional'}
-                        </p>
+                      <section className="card" key={code}>
+                        <h3 className="shopping-section-title">{label}</h3>
                         {entries.map((entry) => {
                           const mode = entryMode(entry);
                           const packageCount = entryUsesPackages(entry);
@@ -578,6 +662,9 @@ export function ShoppingPage() {
                                   {entry.status.toLowerCase()}
                                 </span>
                               </div>
+                              <p className="eyebrow">
+                                {priorityLabel(entry.priority)}
+                              </p>
                               {entry.status === 'MOVED' && (
                                 <p className="move-saved" role="status">
                                   Will move when this trip is finished
@@ -930,6 +1017,33 @@ export function ShoppingPage() {
                                         : 'Not purchased; no stock added.'}
                                   </p>
                                 )
+                              )}
+                              {trip.status !== 'RESTOCKED' && (
+                                <details>
+                                  <summary>Remove entry</summary>
+                                  <p className="muted">
+                                    Remove only {entry.item.name} from this
+                                    trip. Stock and the item remain unchanged.
+                                  </p>
+                                  <button
+                                    type="button"
+                                    className="secondary"
+                                    disabled={busy}
+                                    onClick={() =>
+                                      void run(async () => {
+                                        await updateTrip(
+                                          `${base}/${trip.id}/entries/${entry.id}`,
+                                          'DELETE',
+                                        );
+                                        setNotice(
+                                          `${entry.item.name} removed from this trip.`,
+                                        );
+                                      })
+                                    }
+                                  >
+                                    Confirm removal of {entry.item.name}
+                                  </button>
+                                </details>
                               )}
                             </div>
                           );

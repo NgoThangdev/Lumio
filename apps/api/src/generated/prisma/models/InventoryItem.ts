@@ -68,6 +68,7 @@ export type InventoryItemMinAggregateOutputType = {
   neverRunOut: boolean | null
   predictionEnabled: boolean | null
   stockRevision: number | null
+  archivedAt: Date | null
   openedTrackingEnabled: boolean | null
   recommendedDaysAfterOpening: number | null
 }
@@ -94,6 +95,7 @@ export type InventoryItemMaxAggregateOutputType = {
   neverRunOut: boolean | null
   predictionEnabled: boolean | null
   stockRevision: number | null
+  archivedAt: Date | null
   openedTrackingEnabled: boolean | null
   recommendedDaysAfterOpening: number | null
 }
@@ -120,6 +122,7 @@ export type InventoryItemCountAggregateOutputType = {
   neverRunOut: number
   predictionEnabled: number
   stockRevision: number
+  archivedAt: number
   openedTrackingEnabled: number
   recommendedDaysAfterOpening: number
   _all: number
@@ -168,6 +171,7 @@ export type InventoryItemMinAggregateInputType = {
   neverRunOut?: true
   predictionEnabled?: true
   stockRevision?: true
+  archivedAt?: true
   openedTrackingEnabled?: true
   recommendedDaysAfterOpening?: true
 }
@@ -194,6 +198,7 @@ export type InventoryItemMaxAggregateInputType = {
   neverRunOut?: true
   predictionEnabled?: true
   stockRevision?: true
+  archivedAt?: true
   openedTrackingEnabled?: true
   recommendedDaysAfterOpening?: true
 }
@@ -220,6 +225,7 @@ export type InventoryItemCountAggregateInputType = {
   neverRunOut?: true
   predictionEnabled?: true
   stockRevision?: true
+  archivedAt?: true
   openedTrackingEnabled?: true
   recommendedDaysAfterOpening?: true
   _all?: true
@@ -333,6 +339,7 @@ export type InventoryItemGroupByOutputType = {
   neverRunOut: boolean
   predictionEnabled: boolean
   stockRevision: number
+  archivedAt: Date | null
   openedTrackingEnabled: boolean
   recommendedDaysAfterOpening: number | null
   _count: InventoryItemCountAggregateOutputType | null
@@ -382,6 +389,7 @@ export type InventoryItemWhereInput = {
   neverRunOut?: Prisma.BoolFilter<"InventoryItem"> | boolean
   predictionEnabled?: Prisma.BoolFilter<"InventoryItem"> | boolean
   stockRevision?: Prisma.IntFilter<"InventoryItem"> | number
+  archivedAt?: Prisma.DateTimeNullableFilter<"InventoryItem"> | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFilter<"InventoryItem"> | boolean
   recommendedDaysAfterOpening?: Prisma.IntNullableFilter<"InventoryItem"> | number | null
   household?: Prisma.XOR<Prisma.HouseholdScalarRelationFilter, Prisma.HouseholdWhereInput>
@@ -397,6 +405,7 @@ export type InventoryItemWhereInput = {
   shoppingEntries?: Prisma.ShoppingEntryListRelationFilter
   stockChecks?: Prisma.TripStockCheckListRelationFilter
   locationStockChecks?: Prisma.LocationStockCheckListRelationFilter
+  changes?: Prisma.InventoryItemChangeListRelationFilter
 }
 
 export type InventoryItemOrderByWithRelationInput = {
@@ -421,6 +430,7 @@ export type InventoryItemOrderByWithRelationInput = {
   neverRunOut?: Prisma.SortOrder
   predictionEnabled?: Prisma.SortOrder
   stockRevision?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   openedTrackingEnabled?: Prisma.SortOrder
   recommendedDaysAfterOpening?: Prisma.SortOrderInput | Prisma.SortOrder
   household?: Prisma.HouseholdOrderByWithRelationInput
@@ -436,6 +446,7 @@ export type InventoryItemOrderByWithRelationInput = {
   shoppingEntries?: Prisma.ShoppingEntryOrderByRelationAggregateInput
   stockChecks?: Prisma.TripStockCheckOrderByRelationAggregateInput
   locationStockChecks?: Prisma.LocationStockCheckOrderByRelationAggregateInput
+  changes?: Prisma.InventoryItemChangeOrderByRelationAggregateInput
 }
 
 export type InventoryItemWhereUniqueInput = Prisma.AtLeast<{
@@ -463,6 +474,7 @@ export type InventoryItemWhereUniqueInput = Prisma.AtLeast<{
   neverRunOut?: Prisma.BoolFilter<"InventoryItem"> | boolean
   predictionEnabled?: Prisma.BoolFilter<"InventoryItem"> | boolean
   stockRevision?: Prisma.IntFilter<"InventoryItem"> | number
+  archivedAt?: Prisma.DateTimeNullableFilter<"InventoryItem"> | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFilter<"InventoryItem"> | boolean
   recommendedDaysAfterOpening?: Prisma.IntNullableFilter<"InventoryItem"> | number | null
   household?: Prisma.XOR<Prisma.HouseholdScalarRelationFilter, Prisma.HouseholdWhereInput>
@@ -478,6 +490,7 @@ export type InventoryItemWhereUniqueInput = Prisma.AtLeast<{
   shoppingEntries?: Prisma.ShoppingEntryListRelationFilter
   stockChecks?: Prisma.TripStockCheckListRelationFilter
   locationStockChecks?: Prisma.LocationStockCheckListRelationFilter
+  changes?: Prisma.InventoryItemChangeListRelationFilter
 }, "id">
 
 export type InventoryItemOrderByWithAggregationInput = {
@@ -502,6 +515,7 @@ export type InventoryItemOrderByWithAggregationInput = {
   neverRunOut?: Prisma.SortOrder
   predictionEnabled?: Prisma.SortOrder
   stockRevision?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   openedTrackingEnabled?: Prisma.SortOrder
   recommendedDaysAfterOpening?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.InventoryItemCountOrderByAggregateInput
@@ -536,6 +550,7 @@ export type InventoryItemScalarWhereWithAggregatesInput = {
   neverRunOut?: Prisma.BoolWithAggregatesFilter<"InventoryItem"> | boolean
   predictionEnabled?: Prisma.BoolWithAggregatesFilter<"InventoryItem"> | boolean
   stockRevision?: Prisma.IntWithAggregatesFilter<"InventoryItem"> | number
+  archivedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"InventoryItem"> | Date | string | null
   openedTrackingEnabled?: Prisma.BoolWithAggregatesFilter<"InventoryItem"> | boolean
   recommendedDaysAfterOpening?: Prisma.IntNullableWithAggregatesFilter<"InventoryItem"> | number | null
 }
@@ -557,6 +572,7 @@ export type InventoryItemCreateInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   household: Prisma.HouseholdCreateNestedOneWithoutInventoryItemsInput
@@ -572,6 +588,7 @@ export type InventoryItemCreateInput = {
   shoppingEntries?: Prisma.ShoppingEntryCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemUncheckedCreateInput = {
@@ -596,6 +613,7 @@ export type InventoryItemUncheckedCreateInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedCreateNestedManyWithoutItemInput
@@ -606,6 +624,7 @@ export type InventoryItemUncheckedCreateInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemUpdateInput = {
@@ -625,6 +644,7 @@ export type InventoryItemUpdateInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutInventoryItemsNestedInput
@@ -640,6 +660,7 @@ export type InventoryItemUpdateInput = {
   shoppingEntries?: Prisma.ShoppingEntryUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateInput = {
@@ -664,6 +685,7 @@ export type InventoryItemUncheckedUpdateInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedUpdateManyWithoutItemNestedInput
@@ -674,6 +696,7 @@ export type InventoryItemUncheckedUpdateInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemCreateManyInput = {
@@ -698,6 +721,7 @@ export type InventoryItemCreateManyInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
 }
@@ -719,6 +743,7 @@ export type InventoryItemUpdateManyMutationInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
@@ -745,6 +770,7 @@ export type InventoryItemUncheckedUpdateManyInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
@@ -781,6 +807,7 @@ export type InventoryItemCountOrderByAggregateInput = {
   neverRunOut?: Prisma.SortOrder
   predictionEnabled?: Prisma.SortOrder
   stockRevision?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrder
   openedTrackingEnabled?: Prisma.SortOrder
   recommendedDaysAfterOpening?: Prisma.SortOrder
 }
@@ -817,6 +844,7 @@ export type InventoryItemMaxOrderByAggregateInput = {
   neverRunOut?: Prisma.SortOrder
   predictionEnabled?: Prisma.SortOrder
   stockRevision?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrder
   openedTrackingEnabled?: Prisma.SortOrder
   recommendedDaysAfterOpening?: Prisma.SortOrder
 }
@@ -843,6 +871,7 @@ export type InventoryItemMinOrderByAggregateInput = {
   neverRunOut?: Prisma.SortOrder
   predictionEnabled?: Prisma.SortOrder
   stockRevision?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrder
   openedTrackingEnabled?: Prisma.SortOrder
   recommendedDaysAfterOpening?: Prisma.SortOrder
 }
@@ -1104,6 +1133,20 @@ export type NullableIntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type InventoryItemCreateNestedOneWithoutChangesInput = {
+  create?: Prisma.XOR<Prisma.InventoryItemCreateWithoutChangesInput, Prisma.InventoryItemUncheckedCreateWithoutChangesInput>
+  connectOrCreate?: Prisma.InventoryItemCreateOrConnectWithoutChangesInput
+  connect?: Prisma.InventoryItemWhereUniqueInput
+}
+
+export type InventoryItemUpdateOneRequiredWithoutChangesNestedInput = {
+  create?: Prisma.XOR<Prisma.InventoryItemCreateWithoutChangesInput, Prisma.InventoryItemUncheckedCreateWithoutChangesInput>
+  connectOrCreate?: Prisma.InventoryItemCreateOrConnectWithoutChangesInput
+  upsert?: Prisma.InventoryItemUpsertWithoutChangesInput
+  connect?: Prisma.InventoryItemWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InventoryItemUpdateToOneWithWhereWithoutChangesInput, Prisma.InventoryItemUpdateWithoutChangesInput>, Prisma.InventoryItemUncheckedUpdateWithoutChangesInput>
+}
+
 export type InventoryItemCreateNestedOneWithoutTagLinksInput = {
   create?: Prisma.XOR<Prisma.InventoryItemCreateWithoutTagLinksInput, Prisma.InventoryItemUncheckedCreateWithoutTagLinksInput>
   connectOrCreate?: Prisma.InventoryItemCreateOrConnectWithoutTagLinksInput
@@ -1233,6 +1276,7 @@ export type InventoryItemCreateWithoutHouseholdInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   category?: Prisma.CategoryCreateNestedOneWithoutItemsInput
@@ -1247,6 +1291,7 @@ export type InventoryItemCreateWithoutHouseholdInput = {
   shoppingEntries?: Prisma.ShoppingEntryCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemUncheckedCreateWithoutHouseholdInput = {
@@ -1270,6 +1315,7 @@ export type InventoryItemUncheckedCreateWithoutHouseholdInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedCreateNestedManyWithoutItemInput
@@ -1280,6 +1326,7 @@ export type InventoryItemUncheckedCreateWithoutHouseholdInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemCreateOrConnectWithoutHouseholdInput = {
@@ -1333,6 +1380,7 @@ export type InventoryItemScalarWhereInput = {
   neverRunOut?: Prisma.BoolFilter<"InventoryItem"> | boolean
   predictionEnabled?: Prisma.BoolFilter<"InventoryItem"> | boolean
   stockRevision?: Prisma.IntFilter<"InventoryItem"> | number
+  archivedAt?: Prisma.DateTimeNullableFilter<"InventoryItem"> | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFilter<"InventoryItem"> | boolean
   recommendedDaysAfterOpening?: Prisma.IntNullableFilter<"InventoryItem"> | number | null
 }
@@ -1354,6 +1402,7 @@ export type InventoryItemCreateWithoutCategoryInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   household: Prisma.HouseholdCreateNestedOneWithoutInventoryItemsInput
@@ -1368,6 +1417,7 @@ export type InventoryItemCreateWithoutCategoryInput = {
   shoppingEntries?: Prisma.ShoppingEntryCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemUncheckedCreateWithoutCategoryInput = {
@@ -1391,6 +1441,7 @@ export type InventoryItemUncheckedCreateWithoutCategoryInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedCreateNestedManyWithoutItemInput
@@ -1401,6 +1452,7 @@ export type InventoryItemUncheckedCreateWithoutCategoryInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemCreateOrConnectWithoutCategoryInput = {
@@ -1446,6 +1498,7 @@ export type InventoryItemCreateWithoutCurrentLocationInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   household: Prisma.HouseholdCreateNestedOneWithoutInventoryItemsInput
@@ -1460,6 +1513,7 @@ export type InventoryItemCreateWithoutCurrentLocationInput = {
   shoppingEntries?: Prisma.ShoppingEntryCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemUncheckedCreateWithoutCurrentLocationInput = {
@@ -1483,6 +1537,7 @@ export type InventoryItemUncheckedCreateWithoutCurrentLocationInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedCreateNestedManyWithoutItemInput
@@ -1493,6 +1548,7 @@ export type InventoryItemUncheckedCreateWithoutCurrentLocationInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemCreateOrConnectWithoutCurrentLocationInput = {
@@ -1522,6 +1578,7 @@ export type InventoryItemCreateWithoutBackupLocationInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   household: Prisma.HouseholdCreateNestedOneWithoutInventoryItemsInput
@@ -1536,6 +1593,7 @@ export type InventoryItemCreateWithoutBackupLocationInput = {
   shoppingEntries?: Prisma.ShoppingEntryCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemUncheckedCreateWithoutBackupLocationInput = {
@@ -1559,6 +1617,7 @@ export type InventoryItemUncheckedCreateWithoutBackupLocationInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedCreateNestedManyWithoutItemInput
@@ -1569,6 +1628,7 @@ export type InventoryItemUncheckedCreateWithoutBackupLocationInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemCreateOrConnectWithoutBackupLocationInput = {
@@ -1598,6 +1658,7 @@ export type InventoryItemCreateWithoutPreferredRestockLocationInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   household: Prisma.HouseholdCreateNestedOneWithoutInventoryItemsInput
@@ -1612,6 +1673,7 @@ export type InventoryItemCreateWithoutPreferredRestockLocationInput = {
   shoppingEntries?: Prisma.ShoppingEntryCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemUncheckedCreateWithoutPreferredRestockLocationInput = {
@@ -1635,6 +1697,7 @@ export type InventoryItemUncheckedCreateWithoutPreferredRestockLocationInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedCreateNestedManyWithoutItemInput
@@ -1645,6 +1708,7 @@ export type InventoryItemUncheckedCreateWithoutPreferredRestockLocationInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemCreateOrConnectWithoutPreferredRestockLocationInput = {
@@ -1705,6 +1769,162 @@ export type InventoryItemUpdateManyWithWhereWithoutPreferredRestockLocationInput
   data: Prisma.XOR<Prisma.InventoryItemUpdateManyMutationInput, Prisma.InventoryItemUncheckedUpdateManyWithoutPreferredRestockLocationInput>
 }
 
+export type InventoryItemCreateWithoutChangesInput = {
+  id?: string
+  name: string
+  primaryUnit: string
+  trackingMode?: $Enums.TrackingMode
+  currentLevel?: $Enums.StockLevel | null
+  isPresent?: boolean | null
+  backupCount?: number
+  lowAtLevel?: $Enums.StockLevel
+  buyAtLevel?: $Enums.StockLevel
+  minimumStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  neverRunOut?: boolean
+  predictionEnabled?: boolean
+  stockRevision?: number
+  archivedAt?: Date | string | null
+  openedTrackingEnabled?: boolean
+  recommendedDaysAfterOpening?: number | null
+  household: Prisma.HouseholdCreateNestedOneWithoutInventoryItemsInput
+  category?: Prisma.CategoryCreateNestedOneWithoutItemsInput
+  currentLocation?: Prisma.LocationCreateNestedOneWithoutCurrentItemsInput
+  backupLocation?: Prisma.LocationCreateNestedOneWithoutBackupItemsInput
+  preferredRestockLocation?: Prisma.LocationCreateNestedOneWithoutPreferredItemsInput
+  tagLinks?: Prisma.InventoryItemTagCreateNestedManyWithoutItemInput
+  batches?: Prisma.StockBatchCreateNestedManyWithoutItemInput
+  actions?: Prisma.InventoryActionCreateNestedManyWithoutItemInput
+  stateActions?: Prisma.InventoryStateActionCreateNestedManyWithoutItemInput
+  undos?: Prisma.InventoryUndoCreateNestedManyWithoutItemInput
+  shoppingEntries?: Prisma.ShoppingEntryCreateNestedManyWithoutItemInput
+  stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutItemInput
+  locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutItemInput
+}
+
+export type InventoryItemUncheckedCreateWithoutChangesInput = {
+  id?: string
+  householdId: string
+  name: string
+  primaryUnit: string
+  categoryId?: string | null
+  currentLocationId?: string | null
+  backupLocationId?: string | null
+  preferredRestockLocationId?: string | null
+  trackingMode?: $Enums.TrackingMode
+  currentLevel?: $Enums.StockLevel | null
+  isPresent?: boolean | null
+  backupCount?: number
+  lowAtLevel?: $Enums.StockLevel
+  buyAtLevel?: $Enums.StockLevel
+  minimumStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  neverRunOut?: boolean
+  predictionEnabled?: boolean
+  stockRevision?: number
+  archivedAt?: Date | string | null
+  openedTrackingEnabled?: boolean
+  recommendedDaysAfterOpening?: number | null
+  tagLinks?: Prisma.InventoryItemTagUncheckedCreateNestedManyWithoutItemInput
+  batches?: Prisma.StockBatchUncheckedCreateNestedManyWithoutItemInput
+  actions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutItemInput
+  stateActions?: Prisma.InventoryStateActionUncheckedCreateNestedManyWithoutItemInput
+  undos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutItemInput
+  shoppingEntries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutItemInput
+  stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutItemInput
+  locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutItemInput
+}
+
+export type InventoryItemCreateOrConnectWithoutChangesInput = {
+  where: Prisma.InventoryItemWhereUniqueInput
+  create: Prisma.XOR<Prisma.InventoryItemCreateWithoutChangesInput, Prisma.InventoryItemUncheckedCreateWithoutChangesInput>
+}
+
+export type InventoryItemUpsertWithoutChangesInput = {
+  update: Prisma.XOR<Prisma.InventoryItemUpdateWithoutChangesInput, Prisma.InventoryItemUncheckedUpdateWithoutChangesInput>
+  create: Prisma.XOR<Prisma.InventoryItemCreateWithoutChangesInput, Prisma.InventoryItemUncheckedCreateWithoutChangesInput>
+  where?: Prisma.InventoryItemWhereInput
+}
+
+export type InventoryItemUpdateToOneWithWhereWithoutChangesInput = {
+  where?: Prisma.InventoryItemWhereInput
+  data: Prisma.XOR<Prisma.InventoryItemUpdateWithoutChangesInput, Prisma.InventoryItemUncheckedUpdateWithoutChangesInput>
+}
+
+export type InventoryItemUpdateWithoutChangesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryUnit?: Prisma.StringFieldUpdateOperationsInput | string
+  trackingMode?: Prisma.EnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode
+  currentLevel?: Prisma.NullableEnumStockLevelFieldUpdateOperationsInput | $Enums.StockLevel | null
+  isPresent?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  backupCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lowAtLevel?: Prisma.EnumStockLevelFieldUpdateOperationsInput | $Enums.StockLevel
+  buyAtLevel?: Prisma.EnumStockLevelFieldUpdateOperationsInput | $Enums.StockLevel
+  minimumStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  household?: Prisma.HouseholdUpdateOneRequiredWithoutInventoryItemsNestedInput
+  category?: Prisma.CategoryUpdateOneWithoutItemsNestedInput
+  currentLocation?: Prisma.LocationUpdateOneWithoutCurrentItemsNestedInput
+  backupLocation?: Prisma.LocationUpdateOneWithoutBackupItemsNestedInput
+  preferredRestockLocation?: Prisma.LocationUpdateOneWithoutPreferredItemsNestedInput
+  tagLinks?: Prisma.InventoryItemTagUpdateManyWithoutItemNestedInput
+  batches?: Prisma.StockBatchUpdateManyWithoutItemNestedInput
+  actions?: Prisma.InventoryActionUpdateManyWithoutItemNestedInput
+  stateActions?: Prisma.InventoryStateActionUpdateManyWithoutItemNestedInput
+  undos?: Prisma.InventoryUndoUpdateManyWithoutItemNestedInput
+  shoppingEntries?: Prisma.ShoppingEntryUpdateManyWithoutItemNestedInput
+  stockChecks?: Prisma.TripStockCheckUpdateManyWithoutItemNestedInput
+  locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutItemNestedInput
+}
+
+export type InventoryItemUncheckedUpdateWithoutChangesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  householdId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  primaryUnit?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  backupLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredRestockLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trackingMode?: Prisma.EnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode
+  currentLevel?: Prisma.NullableEnumStockLevelFieldUpdateOperationsInput | $Enums.StockLevel | null
+  isPresent?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  backupCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lowAtLevel?: Prisma.EnumStockLevelFieldUpdateOperationsInput | $Enums.StockLevel
+  buyAtLevel?: Prisma.EnumStockLevelFieldUpdateOperationsInput | $Enums.StockLevel
+  minimumStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tagLinks?: Prisma.InventoryItemTagUncheckedUpdateManyWithoutItemNestedInput
+  batches?: Prisma.StockBatchUncheckedUpdateManyWithoutItemNestedInput
+  actions?: Prisma.InventoryActionUncheckedUpdateManyWithoutItemNestedInput
+  stateActions?: Prisma.InventoryStateActionUncheckedUpdateManyWithoutItemNestedInput
+  undos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutItemNestedInput
+  shoppingEntries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutItemNestedInput
+  stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutItemNestedInput
+  locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutItemNestedInput
+}
+
 export type InventoryItemCreateWithoutTagLinksInput = {
   id?: string
   name: string
@@ -1722,6 +1942,7 @@ export type InventoryItemCreateWithoutTagLinksInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   household: Prisma.HouseholdCreateNestedOneWithoutInventoryItemsInput
@@ -1736,6 +1957,7 @@ export type InventoryItemCreateWithoutTagLinksInput = {
   shoppingEntries?: Prisma.ShoppingEntryCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemUncheckedCreateWithoutTagLinksInput = {
@@ -1760,6 +1982,7 @@ export type InventoryItemUncheckedCreateWithoutTagLinksInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   batches?: Prisma.StockBatchUncheckedCreateNestedManyWithoutItemInput
@@ -1769,6 +1992,7 @@ export type InventoryItemUncheckedCreateWithoutTagLinksInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemCreateOrConnectWithoutTagLinksInput = {
@@ -1804,6 +2028,7 @@ export type InventoryItemUpdateWithoutTagLinksInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutInventoryItemsNestedInput
@@ -1818,6 +2043,7 @@ export type InventoryItemUpdateWithoutTagLinksInput = {
   shoppingEntries?: Prisma.ShoppingEntryUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateWithoutTagLinksInput = {
@@ -1842,6 +2068,7 @@ export type InventoryItemUncheckedUpdateWithoutTagLinksInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   batches?: Prisma.StockBatchUncheckedUpdateManyWithoutItemNestedInput
@@ -1851,6 +2078,7 @@ export type InventoryItemUncheckedUpdateWithoutTagLinksInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemCreateWithoutStateActionsInput = {
@@ -1870,6 +2098,7 @@ export type InventoryItemCreateWithoutStateActionsInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   household: Prisma.HouseholdCreateNestedOneWithoutInventoryItemsInput
@@ -1884,6 +2113,7 @@ export type InventoryItemCreateWithoutStateActionsInput = {
   shoppingEntries?: Prisma.ShoppingEntryCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemUncheckedCreateWithoutStateActionsInput = {
@@ -1908,6 +2138,7 @@ export type InventoryItemUncheckedCreateWithoutStateActionsInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedCreateNestedManyWithoutItemInput
@@ -1917,6 +2148,7 @@ export type InventoryItemUncheckedCreateWithoutStateActionsInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemCreateOrConnectWithoutStateActionsInput = {
@@ -1952,6 +2184,7 @@ export type InventoryItemUpdateWithoutStateActionsInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutInventoryItemsNestedInput
@@ -1966,6 +2199,7 @@ export type InventoryItemUpdateWithoutStateActionsInput = {
   shoppingEntries?: Prisma.ShoppingEntryUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateWithoutStateActionsInput = {
@@ -1990,6 +2224,7 @@ export type InventoryItemUncheckedUpdateWithoutStateActionsInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedUpdateManyWithoutItemNestedInput
@@ -1999,6 +2234,7 @@ export type InventoryItemUncheckedUpdateWithoutStateActionsInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemCreateWithoutShoppingEntriesInput = {
@@ -2018,6 +2254,7 @@ export type InventoryItemCreateWithoutShoppingEntriesInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   household: Prisma.HouseholdCreateNestedOneWithoutInventoryItemsInput
@@ -2032,6 +2269,7 @@ export type InventoryItemCreateWithoutShoppingEntriesInput = {
   undos?: Prisma.InventoryUndoCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemUncheckedCreateWithoutShoppingEntriesInput = {
@@ -2056,6 +2294,7 @@ export type InventoryItemUncheckedCreateWithoutShoppingEntriesInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedCreateNestedManyWithoutItemInput
@@ -2065,6 +2304,7 @@ export type InventoryItemUncheckedCreateWithoutShoppingEntriesInput = {
   undos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemCreateOrConnectWithoutShoppingEntriesInput = {
@@ -2100,6 +2340,7 @@ export type InventoryItemUpdateWithoutShoppingEntriesInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutInventoryItemsNestedInput
@@ -2114,6 +2355,7 @@ export type InventoryItemUpdateWithoutShoppingEntriesInput = {
   undos?: Prisma.InventoryUndoUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateWithoutShoppingEntriesInput = {
@@ -2138,6 +2380,7 @@ export type InventoryItemUncheckedUpdateWithoutShoppingEntriesInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedUpdateManyWithoutItemNestedInput
@@ -2147,6 +2390,7 @@ export type InventoryItemUncheckedUpdateWithoutShoppingEntriesInput = {
   undos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemCreateWithoutStockChecksInput = {
@@ -2166,6 +2410,7 @@ export type InventoryItemCreateWithoutStockChecksInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   household: Prisma.HouseholdCreateNestedOneWithoutInventoryItemsInput
@@ -2180,6 +2425,7 @@ export type InventoryItemCreateWithoutStockChecksInput = {
   undos?: Prisma.InventoryUndoCreateNestedManyWithoutItemInput
   shoppingEntries?: Prisma.ShoppingEntryCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemUncheckedCreateWithoutStockChecksInput = {
@@ -2204,6 +2450,7 @@ export type InventoryItemUncheckedCreateWithoutStockChecksInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedCreateNestedManyWithoutItemInput
@@ -2213,6 +2460,7 @@ export type InventoryItemUncheckedCreateWithoutStockChecksInput = {
   undos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutItemInput
   shoppingEntries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemCreateOrConnectWithoutStockChecksInput = {
@@ -2248,6 +2496,7 @@ export type InventoryItemUpdateWithoutStockChecksInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutInventoryItemsNestedInput
@@ -2262,6 +2511,7 @@ export type InventoryItemUpdateWithoutStockChecksInput = {
   undos?: Prisma.InventoryUndoUpdateManyWithoutItemNestedInput
   shoppingEntries?: Prisma.ShoppingEntryUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateWithoutStockChecksInput = {
@@ -2286,6 +2536,7 @@ export type InventoryItemUncheckedUpdateWithoutStockChecksInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedUpdateManyWithoutItemNestedInput
@@ -2295,6 +2546,7 @@ export type InventoryItemUncheckedUpdateWithoutStockChecksInput = {
   undos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutItemNestedInput
   shoppingEntries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemCreateWithoutLocationStockChecksInput = {
@@ -2314,6 +2566,7 @@ export type InventoryItemCreateWithoutLocationStockChecksInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   household: Prisma.HouseholdCreateNestedOneWithoutInventoryItemsInput
@@ -2328,6 +2581,7 @@ export type InventoryItemCreateWithoutLocationStockChecksInput = {
   undos?: Prisma.InventoryUndoCreateNestedManyWithoutItemInput
   shoppingEntries?: Prisma.ShoppingEntryCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemUncheckedCreateWithoutLocationStockChecksInput = {
@@ -2352,6 +2606,7 @@ export type InventoryItemUncheckedCreateWithoutLocationStockChecksInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedCreateNestedManyWithoutItemInput
@@ -2361,6 +2616,7 @@ export type InventoryItemUncheckedCreateWithoutLocationStockChecksInput = {
   undos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutItemInput
   shoppingEntries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemCreateOrConnectWithoutLocationStockChecksInput = {
@@ -2396,6 +2652,7 @@ export type InventoryItemUpdateWithoutLocationStockChecksInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutInventoryItemsNestedInput
@@ -2410,6 +2667,7 @@ export type InventoryItemUpdateWithoutLocationStockChecksInput = {
   undos?: Prisma.InventoryUndoUpdateManyWithoutItemNestedInput
   shoppingEntries?: Prisma.ShoppingEntryUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateWithoutLocationStockChecksInput = {
@@ -2434,6 +2692,7 @@ export type InventoryItemUncheckedUpdateWithoutLocationStockChecksInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedUpdateManyWithoutItemNestedInput
@@ -2443,6 +2702,7 @@ export type InventoryItemUncheckedUpdateWithoutLocationStockChecksInput = {
   undos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutItemNestedInput
   shoppingEntries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemCreateWithoutBatchesInput = {
@@ -2462,6 +2722,7 @@ export type InventoryItemCreateWithoutBatchesInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   household: Prisma.HouseholdCreateNestedOneWithoutInventoryItemsInput
@@ -2476,6 +2737,7 @@ export type InventoryItemCreateWithoutBatchesInput = {
   shoppingEntries?: Prisma.ShoppingEntryCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemUncheckedCreateWithoutBatchesInput = {
@@ -2500,6 +2762,7 @@ export type InventoryItemUncheckedCreateWithoutBatchesInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedCreateNestedManyWithoutItemInput
@@ -2509,6 +2772,7 @@ export type InventoryItemUncheckedCreateWithoutBatchesInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemCreateOrConnectWithoutBatchesInput = {
@@ -2544,6 +2808,7 @@ export type InventoryItemUpdateWithoutBatchesInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutInventoryItemsNestedInput
@@ -2558,6 +2823,7 @@ export type InventoryItemUpdateWithoutBatchesInput = {
   shoppingEntries?: Prisma.ShoppingEntryUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateWithoutBatchesInput = {
@@ -2582,6 +2848,7 @@ export type InventoryItemUncheckedUpdateWithoutBatchesInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedUpdateManyWithoutItemNestedInput
@@ -2591,6 +2858,7 @@ export type InventoryItemUncheckedUpdateWithoutBatchesInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemCreateWithoutActionsInput = {
@@ -2610,6 +2878,7 @@ export type InventoryItemCreateWithoutActionsInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   household: Prisma.HouseholdCreateNestedOneWithoutInventoryItemsInput
@@ -2624,6 +2893,7 @@ export type InventoryItemCreateWithoutActionsInput = {
   shoppingEntries?: Prisma.ShoppingEntryCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemUncheckedCreateWithoutActionsInput = {
@@ -2648,6 +2918,7 @@ export type InventoryItemUncheckedCreateWithoutActionsInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedCreateNestedManyWithoutItemInput
@@ -2657,6 +2928,7 @@ export type InventoryItemUncheckedCreateWithoutActionsInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemCreateOrConnectWithoutActionsInput = {
@@ -2692,6 +2964,7 @@ export type InventoryItemUpdateWithoutActionsInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutInventoryItemsNestedInput
@@ -2706,6 +2979,7 @@ export type InventoryItemUpdateWithoutActionsInput = {
   shoppingEntries?: Prisma.ShoppingEntryUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateWithoutActionsInput = {
@@ -2730,6 +3004,7 @@ export type InventoryItemUncheckedUpdateWithoutActionsInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedUpdateManyWithoutItemNestedInput
@@ -2739,6 +3014,7 @@ export type InventoryItemUncheckedUpdateWithoutActionsInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemCreateWithoutUndosInput = {
@@ -2758,6 +3034,7 @@ export type InventoryItemCreateWithoutUndosInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   household: Prisma.HouseholdCreateNestedOneWithoutInventoryItemsInput
@@ -2772,6 +3049,7 @@ export type InventoryItemCreateWithoutUndosInput = {
   shoppingEntries?: Prisma.ShoppingEntryCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemUncheckedCreateWithoutUndosInput = {
@@ -2796,6 +3074,7 @@ export type InventoryItemUncheckedCreateWithoutUndosInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedCreateNestedManyWithoutItemInput
@@ -2805,6 +3084,7 @@ export type InventoryItemUncheckedCreateWithoutUndosInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutItemInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutItemInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutItemInput
+  changes?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InventoryItemCreateOrConnectWithoutUndosInput = {
@@ -2840,6 +3120,7 @@ export type InventoryItemUpdateWithoutUndosInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutInventoryItemsNestedInput
@@ -2854,6 +3135,7 @@ export type InventoryItemUpdateWithoutUndosInput = {
   shoppingEntries?: Prisma.ShoppingEntryUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateWithoutUndosInput = {
@@ -2878,6 +3160,7 @@ export type InventoryItemUncheckedUpdateWithoutUndosInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedUpdateManyWithoutItemNestedInput
@@ -2887,6 +3170,7 @@ export type InventoryItemUncheckedUpdateWithoutUndosInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemCreateManyHouseholdInput = {
@@ -2910,6 +3194,7 @@ export type InventoryItemCreateManyHouseholdInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
 }
@@ -2931,6 +3216,7 @@ export type InventoryItemUpdateWithoutHouseholdInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   category?: Prisma.CategoryUpdateOneWithoutItemsNestedInput
@@ -2945,6 +3231,7 @@ export type InventoryItemUpdateWithoutHouseholdInput = {
   shoppingEntries?: Prisma.ShoppingEntryUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateWithoutHouseholdInput = {
@@ -2968,6 +3255,7 @@ export type InventoryItemUncheckedUpdateWithoutHouseholdInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedUpdateManyWithoutItemNestedInput
@@ -2978,6 +3266,7 @@ export type InventoryItemUncheckedUpdateWithoutHouseholdInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateManyWithoutHouseholdInput = {
@@ -3001,6 +3290,7 @@ export type InventoryItemUncheckedUpdateManyWithoutHouseholdInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
@@ -3026,6 +3316,7 @@ export type InventoryItemCreateManyCategoryInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
 }
@@ -3047,6 +3338,7 @@ export type InventoryItemUpdateWithoutCategoryInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutInventoryItemsNestedInput
@@ -3061,6 +3353,7 @@ export type InventoryItemUpdateWithoutCategoryInput = {
   shoppingEntries?: Prisma.ShoppingEntryUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateWithoutCategoryInput = {
@@ -3084,6 +3377,7 @@ export type InventoryItemUncheckedUpdateWithoutCategoryInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedUpdateManyWithoutItemNestedInput
@@ -3094,6 +3388,7 @@ export type InventoryItemUncheckedUpdateWithoutCategoryInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateManyWithoutCategoryInput = {
@@ -3117,6 +3412,7 @@ export type InventoryItemUncheckedUpdateManyWithoutCategoryInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
@@ -3142,6 +3438,7 @@ export type InventoryItemCreateManyCurrentLocationInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
 }
@@ -3167,6 +3464,7 @@ export type InventoryItemCreateManyBackupLocationInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
 }
@@ -3192,6 +3490,7 @@ export type InventoryItemCreateManyPreferredRestockLocationInput = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
+  archivedAt?: Date | string | null
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: number | null
 }
@@ -3213,6 +3512,7 @@ export type InventoryItemUpdateWithoutCurrentLocationInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutInventoryItemsNestedInput
@@ -3227,6 +3527,7 @@ export type InventoryItemUpdateWithoutCurrentLocationInput = {
   shoppingEntries?: Prisma.ShoppingEntryUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateWithoutCurrentLocationInput = {
@@ -3250,6 +3551,7 @@ export type InventoryItemUncheckedUpdateWithoutCurrentLocationInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedUpdateManyWithoutItemNestedInput
@@ -3260,6 +3562,7 @@ export type InventoryItemUncheckedUpdateWithoutCurrentLocationInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateManyWithoutCurrentLocationInput = {
@@ -3283,6 +3586,7 @@ export type InventoryItemUncheckedUpdateManyWithoutCurrentLocationInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
@@ -3304,6 +3608,7 @@ export type InventoryItemUpdateWithoutBackupLocationInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutInventoryItemsNestedInput
@@ -3318,6 +3623,7 @@ export type InventoryItemUpdateWithoutBackupLocationInput = {
   shoppingEntries?: Prisma.ShoppingEntryUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateWithoutBackupLocationInput = {
@@ -3341,6 +3647,7 @@ export type InventoryItemUncheckedUpdateWithoutBackupLocationInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedUpdateManyWithoutItemNestedInput
@@ -3351,6 +3658,7 @@ export type InventoryItemUncheckedUpdateWithoutBackupLocationInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateManyWithoutBackupLocationInput = {
@@ -3374,6 +3682,7 @@ export type InventoryItemUncheckedUpdateManyWithoutBackupLocationInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
@@ -3395,6 +3704,7 @@ export type InventoryItemUpdateWithoutPreferredRestockLocationInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutInventoryItemsNestedInput
@@ -3409,6 +3719,7 @@ export type InventoryItemUpdateWithoutPreferredRestockLocationInput = {
   shoppingEntries?: Prisma.ShoppingEntryUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateWithoutPreferredRestockLocationInput = {
@@ -3432,6 +3743,7 @@ export type InventoryItemUncheckedUpdateWithoutPreferredRestockLocationInput = {
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tagLinks?: Prisma.InventoryItemTagUncheckedUpdateManyWithoutItemNestedInput
@@ -3442,6 +3754,7 @@ export type InventoryItemUncheckedUpdateWithoutPreferredRestockLocationInput = {
   shoppingEntries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutItemNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutItemNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutItemNestedInput
+  changes?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InventoryItemUncheckedUpdateManyWithoutPreferredRestockLocationInput = {
@@ -3465,6 +3778,7 @@ export type InventoryItemUncheckedUpdateManyWithoutPreferredRestockLocationInput
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedTrackingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recommendedDaysAfterOpening?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
@@ -3483,6 +3797,7 @@ export type InventoryItemCountOutputType = {
   shoppingEntries: number
   stockChecks: number
   locationStockChecks: number
+  changes: number
 }
 
 export type InventoryItemCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3494,6 +3809,7 @@ export type InventoryItemCountOutputTypeSelect<ExtArgs extends runtime.Types.Ext
   shoppingEntries?: boolean | InventoryItemCountOutputTypeCountShoppingEntriesArgs
   stockChecks?: boolean | InventoryItemCountOutputTypeCountStockChecksArgs
   locationStockChecks?: boolean | InventoryItemCountOutputTypeCountLocationStockChecksArgs
+  changes?: boolean | InventoryItemCountOutputTypeCountChangesArgs
 }
 
 /**
@@ -3562,6 +3878,13 @@ export type InventoryItemCountOutputTypeCountLocationStockChecksArgs<ExtArgs ext
   where?: Prisma.LocationStockCheckWhereInput
 }
 
+/**
+ * InventoryItemCountOutputType without action
+ */
+export type InventoryItemCountOutputTypeCountChangesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InventoryItemChangeWhereInput
+}
+
 
 export type InventoryItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3585,6 +3908,7 @@ export type InventoryItemSelect<ExtArgs extends runtime.Types.Extensions.Interna
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: boolean
+  archivedAt?: boolean
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: boolean
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
@@ -3600,6 +3924,7 @@ export type InventoryItemSelect<ExtArgs extends runtime.Types.Extensions.Interna
   shoppingEntries?: boolean | Prisma.InventoryItem$shoppingEntriesArgs<ExtArgs>
   stockChecks?: boolean | Prisma.InventoryItem$stockChecksArgs<ExtArgs>
   locationStockChecks?: boolean | Prisma.InventoryItem$locationStockChecksArgs<ExtArgs>
+  changes?: boolean | Prisma.InventoryItem$changesArgs<ExtArgs>
   _count?: boolean | Prisma.InventoryItemCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inventoryItem"]>
 
@@ -3625,6 +3950,7 @@ export type InventoryItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: boolean
+  archivedAt?: boolean
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: boolean
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
@@ -3656,6 +3982,7 @@ export type InventoryItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: boolean
+  archivedAt?: boolean
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: boolean
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
@@ -3687,11 +4014,12 @@ export type InventoryItemSelectScalar = {
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: boolean
+  archivedAt?: boolean
   openedTrackingEnabled?: boolean
   recommendedDaysAfterOpening?: boolean
 }
 
-export type InventoryItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "householdId" | "name" | "primaryUnit" | "categoryId" | "currentLocationId" | "backupLocationId" | "preferredRestockLocationId" | "trackingMode" | "currentLevel" | "isPresent" | "backupCount" | "lowAtLevel" | "buyAtLevel" | "minimumStock" | "lowStockThreshold" | "buyThreshold" | "targetStock" | "neverRunOut" | "predictionEnabled" | "stockRevision" | "openedTrackingEnabled" | "recommendedDaysAfterOpening", ExtArgs["result"]["inventoryItem"]>
+export type InventoryItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "householdId" | "name" | "primaryUnit" | "categoryId" | "currentLocationId" | "backupLocationId" | "preferredRestockLocationId" | "trackingMode" | "currentLevel" | "isPresent" | "backupCount" | "lowAtLevel" | "buyAtLevel" | "minimumStock" | "lowStockThreshold" | "buyThreshold" | "targetStock" | "neverRunOut" | "predictionEnabled" | "stockRevision" | "archivedAt" | "openedTrackingEnabled" | "recommendedDaysAfterOpening", ExtArgs["result"]["inventoryItem"]>
 export type InventoryItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
   category?: boolean | Prisma.InventoryItem$categoryArgs<ExtArgs>
@@ -3706,6 +4034,7 @@ export type InventoryItemInclude<ExtArgs extends runtime.Types.Extensions.Intern
   shoppingEntries?: boolean | Prisma.InventoryItem$shoppingEntriesArgs<ExtArgs>
   stockChecks?: boolean | Prisma.InventoryItem$stockChecksArgs<ExtArgs>
   locationStockChecks?: boolean | Prisma.InventoryItem$locationStockChecksArgs<ExtArgs>
+  changes?: boolean | Prisma.InventoryItem$changesArgs<ExtArgs>
   _count?: boolean | Prisma.InventoryItemCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type InventoryItemIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3739,6 +4068,7 @@ export type $InventoryItemPayload<ExtArgs extends runtime.Types.Extensions.Inter
     shoppingEntries: Prisma.$ShoppingEntryPayload<ExtArgs>[]
     stockChecks: Prisma.$TripStockCheckPayload<ExtArgs>[]
     locationStockChecks: Prisma.$LocationStockCheckPayload<ExtArgs>[]
+    changes: Prisma.$InventoryItemChangePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3762,6 +4092,7 @@ export type $InventoryItemPayload<ExtArgs extends runtime.Types.Extensions.Inter
     neverRunOut: boolean
     predictionEnabled: boolean
     stockRevision: number
+    archivedAt: Date | null
     openedTrackingEnabled: boolean
     recommendedDaysAfterOpening: number | null
   }, ExtArgs["result"]["inventoryItem"]>
@@ -4171,6 +4502,7 @@ export interface Prisma__InventoryItemClient<T, Null = never, ExtArgs extends ru
   shoppingEntries<T extends Prisma.InventoryItem$shoppingEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InventoryItem$shoppingEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShoppingEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   stockChecks<T extends Prisma.InventoryItem$stockChecksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InventoryItem$stockChecksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TripStockCheckPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   locationStockChecks<T extends Prisma.InventoryItem$locationStockChecksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InventoryItem$locationStockChecksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LocationStockCheckPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  changes<T extends Prisma.InventoryItem$changesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InventoryItem$changesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InventoryItemChangePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4221,6 +4553,7 @@ export interface InventoryItemFieldRefs {
   readonly neverRunOut: Prisma.FieldRef<"InventoryItem", 'Boolean'>
   readonly predictionEnabled: Prisma.FieldRef<"InventoryItem", 'Boolean'>
   readonly stockRevision: Prisma.FieldRef<"InventoryItem", 'Int'>
+  readonly archivedAt: Prisma.FieldRef<"InventoryItem", 'DateTime'>
   readonly openedTrackingEnabled: Prisma.FieldRef<"InventoryItem", 'Boolean'>
   readonly recommendedDaysAfterOpening: Prisma.FieldRef<"InventoryItem", 'Int'>
 }
@@ -4889,6 +5222,30 @@ export type InventoryItem$locationStockChecksArgs<ExtArgs extends runtime.Types.
   take?: number
   skip?: number
   distinct?: Prisma.LocationStockCheckScalarFieldEnum | Prisma.LocationStockCheckScalarFieldEnum[]
+}
+
+/**
+ * InventoryItem.changes
+ */
+export type InventoryItem$changesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InventoryItemChange
+   */
+  select?: Prisma.InventoryItemChangeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InventoryItemChange
+   */
+  omit?: Prisma.InventoryItemChangeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InventoryItemChangeInclude<ExtArgs> | null
+  where?: Prisma.InventoryItemChangeWhereInput
+  orderBy?: Prisma.InventoryItemChangeOrderByWithRelationInput | Prisma.InventoryItemChangeOrderByWithRelationInput[]
+  cursor?: Prisma.InventoryItemChangeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InventoryItemChangeScalarFieldEnum | Prisma.InventoryItemChangeScalarFieldEnum[]
 }
 
 /**

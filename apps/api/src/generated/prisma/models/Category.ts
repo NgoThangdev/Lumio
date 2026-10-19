@@ -29,6 +29,9 @@ export type CategoryMinAggregateOutputType = {
   householdId: string | null
   name: string | null
   nameKey: string | null
+  shoppingSection: $Enums.ShoppingSection | null
+  defaultTrackingMode: $Enums.TrackingMode | null
+  defaultPrimaryUnit: string | null
 }
 
 export type CategoryMaxAggregateOutputType = {
@@ -36,6 +39,9 @@ export type CategoryMaxAggregateOutputType = {
   householdId: string | null
   name: string | null
   nameKey: string | null
+  shoppingSection: $Enums.ShoppingSection | null
+  defaultTrackingMode: $Enums.TrackingMode | null
+  defaultPrimaryUnit: string | null
 }
 
 export type CategoryCountAggregateOutputType = {
@@ -43,6 +49,9 @@ export type CategoryCountAggregateOutputType = {
   householdId: number
   name: number
   nameKey: number
+  shoppingSection: number
+  defaultTrackingMode: number
+  defaultPrimaryUnit: number
   _all: number
 }
 
@@ -52,6 +61,9 @@ export type CategoryMinAggregateInputType = {
   householdId?: true
   name?: true
   nameKey?: true
+  shoppingSection?: true
+  defaultTrackingMode?: true
+  defaultPrimaryUnit?: true
 }
 
 export type CategoryMaxAggregateInputType = {
@@ -59,6 +71,9 @@ export type CategoryMaxAggregateInputType = {
   householdId?: true
   name?: true
   nameKey?: true
+  shoppingSection?: true
+  defaultTrackingMode?: true
+  defaultPrimaryUnit?: true
 }
 
 export type CategoryCountAggregateInputType = {
@@ -66,6 +81,9 @@ export type CategoryCountAggregateInputType = {
   householdId?: true
   name?: true
   nameKey?: true
+  shoppingSection?: true
+  defaultTrackingMode?: true
+  defaultPrimaryUnit?: true
   _all?: true
 }
 
@@ -146,6 +164,9 @@ export type CategoryGroupByOutputType = {
   householdId: string
   name: string
   nameKey: string
+  shoppingSection: $Enums.ShoppingSection | null
+  defaultTrackingMode: $Enums.TrackingMode | null
+  defaultPrimaryUnit: string | null
   _count: CategoryCountAggregateOutputType | null
   _min: CategoryMinAggregateOutputType | null
   _max: CategoryMaxAggregateOutputType | null
@@ -174,6 +195,9 @@ export type CategoryWhereInput = {
   householdId?: Prisma.StringFilter<"Category"> | string
   name?: Prisma.StringFilter<"Category"> | string
   nameKey?: Prisma.StringFilter<"Category"> | string
+  shoppingSection?: Prisma.EnumShoppingSectionNullableFilter<"Category"> | $Enums.ShoppingSection | null
+  defaultTrackingMode?: Prisma.EnumTrackingModeNullableFilter<"Category"> | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.StringNullableFilter<"Category"> | string | null
   household?: Prisma.XOR<Prisma.HouseholdScalarRelationFilter, Prisma.HouseholdWhereInput>
   items?: Prisma.InventoryItemListRelationFilter
 }
@@ -183,6 +207,9 @@ export type CategoryOrderByWithRelationInput = {
   householdId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   nameKey?: Prisma.SortOrder
+  shoppingSection?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultTrackingMode?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultPrimaryUnit?: Prisma.SortOrderInput | Prisma.SortOrder
   household?: Prisma.HouseholdOrderByWithRelationInput
   items?: Prisma.InventoryItemOrderByRelationAggregateInput
 }
@@ -196,6 +223,9 @@ export type CategoryWhereUniqueInput = Prisma.AtLeast<{
   householdId?: Prisma.StringFilter<"Category"> | string
   name?: Prisma.StringFilter<"Category"> | string
   nameKey?: Prisma.StringFilter<"Category"> | string
+  shoppingSection?: Prisma.EnumShoppingSectionNullableFilter<"Category"> | $Enums.ShoppingSection | null
+  defaultTrackingMode?: Prisma.EnumTrackingModeNullableFilter<"Category"> | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.StringNullableFilter<"Category"> | string | null
   household?: Prisma.XOR<Prisma.HouseholdScalarRelationFilter, Prisma.HouseholdWhereInput>
   items?: Prisma.InventoryItemListRelationFilter
 }, "id" | "householdId_nameKey">
@@ -205,6 +235,9 @@ export type CategoryOrderByWithAggregationInput = {
   householdId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   nameKey?: Prisma.SortOrder
+  shoppingSection?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultTrackingMode?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultPrimaryUnit?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.CategoryCountOrderByAggregateInput
   _max?: Prisma.CategoryMaxOrderByAggregateInput
   _min?: Prisma.CategoryMinOrderByAggregateInput
@@ -218,12 +251,18 @@ export type CategoryScalarWhereWithAggregatesInput = {
   householdId?: Prisma.StringWithAggregatesFilter<"Category"> | string
   name?: Prisma.StringWithAggregatesFilter<"Category"> | string
   nameKey?: Prisma.StringWithAggregatesFilter<"Category"> | string
+  shoppingSection?: Prisma.EnumShoppingSectionNullableWithAggregatesFilter<"Category"> | $Enums.ShoppingSection | null
+  defaultTrackingMode?: Prisma.EnumTrackingModeNullableWithAggregatesFilter<"Category"> | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.StringNullableWithAggregatesFilter<"Category"> | string | null
 }
 
 export type CategoryCreateInput = {
   id?: string
   name: string
   nameKey: string
+  shoppingSection?: $Enums.ShoppingSection | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
   household: Prisma.HouseholdCreateNestedOneWithoutCategoriesInput
   items?: Prisma.InventoryItemCreateNestedManyWithoutCategoryInput
 }
@@ -233,6 +272,9 @@ export type CategoryUncheckedCreateInput = {
   householdId: string
   name: string
   nameKey: string
+  shoppingSection?: $Enums.ShoppingSection | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
   items?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutCategoryInput
 }
 
@@ -240,6 +282,9 @@ export type CategoryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameKey?: Prisma.StringFieldUpdateOperationsInput | string
+  shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutCategoriesNestedInput
   items?: Prisma.InventoryItemUpdateManyWithoutCategoryNestedInput
 }
@@ -249,6 +294,9 @@ export type CategoryUncheckedUpdateInput = {
   householdId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameKey?: Prisma.StringFieldUpdateOperationsInput | string
+  shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   items?: Prisma.InventoryItemUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
@@ -257,12 +305,18 @@ export type CategoryCreateManyInput = {
   householdId: string
   name: string
   nameKey: string
+  shoppingSection?: $Enums.ShoppingSection | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
 }
 
 export type CategoryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameKey?: Prisma.StringFieldUpdateOperationsInput | string
+  shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CategoryUncheckedUpdateManyInput = {
@@ -270,6 +324,9 @@ export type CategoryUncheckedUpdateManyInput = {
   householdId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameKey?: Prisma.StringFieldUpdateOperationsInput | string
+  shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CategoryListRelationFilter = {
@@ -292,6 +349,9 @@ export type CategoryCountOrderByAggregateInput = {
   householdId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   nameKey?: Prisma.SortOrder
+  shoppingSection?: Prisma.SortOrder
+  defaultTrackingMode?: Prisma.SortOrder
+  defaultPrimaryUnit?: Prisma.SortOrder
 }
 
 export type CategoryMaxOrderByAggregateInput = {
@@ -299,6 +359,9 @@ export type CategoryMaxOrderByAggregateInput = {
   householdId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   nameKey?: Prisma.SortOrder
+  shoppingSection?: Prisma.SortOrder
+  defaultTrackingMode?: Prisma.SortOrder
+  defaultPrimaryUnit?: Prisma.SortOrder
 }
 
 export type CategoryMinOrderByAggregateInput = {
@@ -306,6 +369,9 @@ export type CategoryMinOrderByAggregateInput = {
   householdId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   nameKey?: Prisma.SortOrder
+  shoppingSection?: Prisma.SortOrder
+  defaultTrackingMode?: Prisma.SortOrder
+  defaultPrimaryUnit?: Prisma.SortOrder
 }
 
 export type CategoryNullableScalarRelationFilter = {
@@ -355,6 +421,14 @@ export type CategoryUncheckedUpdateManyWithoutHouseholdNestedInput = {
   deleteMany?: Prisma.CategoryScalarWhereInput | Prisma.CategoryScalarWhereInput[]
 }
 
+export type NullableEnumShoppingSectionFieldUpdateOperationsInput = {
+  set?: $Enums.ShoppingSection | null
+}
+
+export type NullableEnumTrackingModeFieldUpdateOperationsInput = {
+  set?: $Enums.TrackingMode | null
+}
+
 export type CategoryCreateNestedOneWithoutItemsInput = {
   create?: Prisma.XOR<Prisma.CategoryCreateWithoutItemsInput, Prisma.CategoryUncheckedCreateWithoutItemsInput>
   connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutItemsInput
@@ -375,6 +449,9 @@ export type CategoryCreateWithoutHouseholdInput = {
   id?: string
   name: string
   nameKey: string
+  shoppingSection?: $Enums.ShoppingSection | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
   items?: Prisma.InventoryItemCreateNestedManyWithoutCategoryInput
 }
 
@@ -382,6 +459,9 @@ export type CategoryUncheckedCreateWithoutHouseholdInput = {
   id?: string
   name: string
   nameKey: string
+  shoppingSection?: $Enums.ShoppingSection | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
   items?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutCategoryInput
 }
 
@@ -419,12 +499,18 @@ export type CategoryScalarWhereInput = {
   householdId?: Prisma.StringFilter<"Category"> | string
   name?: Prisma.StringFilter<"Category"> | string
   nameKey?: Prisma.StringFilter<"Category"> | string
+  shoppingSection?: Prisma.EnumShoppingSectionNullableFilter<"Category"> | $Enums.ShoppingSection | null
+  defaultTrackingMode?: Prisma.EnumTrackingModeNullableFilter<"Category"> | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.StringNullableFilter<"Category"> | string | null
 }
 
 export type CategoryCreateWithoutItemsInput = {
   id?: string
   name: string
   nameKey: string
+  shoppingSection?: $Enums.ShoppingSection | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
   household: Prisma.HouseholdCreateNestedOneWithoutCategoriesInput
 }
 
@@ -433,6 +519,9 @@ export type CategoryUncheckedCreateWithoutItemsInput = {
   householdId: string
   name: string
   nameKey: string
+  shoppingSection?: $Enums.ShoppingSection | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
 }
 
 export type CategoryCreateOrConnectWithoutItemsInput = {
@@ -455,6 +544,9 @@ export type CategoryUpdateWithoutItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameKey?: Prisma.StringFieldUpdateOperationsInput | string
+  shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutCategoriesNestedInput
 }
 
@@ -463,18 +555,27 @@ export type CategoryUncheckedUpdateWithoutItemsInput = {
   householdId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameKey?: Prisma.StringFieldUpdateOperationsInput | string
+  shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CategoryCreateManyHouseholdInput = {
   id?: string
   name: string
   nameKey: string
+  shoppingSection?: $Enums.ShoppingSection | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
 }
 
 export type CategoryUpdateWithoutHouseholdInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameKey?: Prisma.StringFieldUpdateOperationsInput | string
+  shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   items?: Prisma.InventoryItemUpdateManyWithoutCategoryNestedInput
 }
 
@@ -482,6 +583,9 @@ export type CategoryUncheckedUpdateWithoutHouseholdInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameKey?: Prisma.StringFieldUpdateOperationsInput | string
+  shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   items?: Prisma.InventoryItemUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
@@ -489,6 +593,9 @@ export type CategoryUncheckedUpdateManyWithoutHouseholdInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameKey?: Prisma.StringFieldUpdateOperationsInput | string
+  shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -527,6 +634,9 @@ export type CategorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   householdId?: boolean
   name?: boolean
   nameKey?: boolean
+  shoppingSection?: boolean
+  defaultTrackingMode?: boolean
+  defaultPrimaryUnit?: boolean
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Category$itemsArgs<ExtArgs>
   _count?: boolean | Prisma.CategoryCountOutputTypeDefaultArgs<ExtArgs>
@@ -537,6 +647,9 @@ export type CategorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   householdId?: boolean
   name?: boolean
   nameKey?: boolean
+  shoppingSection?: boolean
+  defaultTrackingMode?: boolean
+  defaultPrimaryUnit?: boolean
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["category"]>
 
@@ -545,6 +658,9 @@ export type CategorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   householdId?: boolean
   name?: boolean
   nameKey?: boolean
+  shoppingSection?: boolean
+  defaultTrackingMode?: boolean
+  defaultPrimaryUnit?: boolean
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["category"]>
 
@@ -553,9 +669,12 @@ export type CategorySelectScalar = {
   householdId?: boolean
   name?: boolean
   nameKey?: boolean
+  shoppingSection?: boolean
+  defaultTrackingMode?: boolean
+  defaultPrimaryUnit?: boolean
 }
 
-export type CategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "householdId" | "name" | "nameKey", ExtArgs["result"]["category"]>
+export type CategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "householdId" | "name" | "nameKey" | "shoppingSection" | "defaultTrackingMode" | "defaultPrimaryUnit", ExtArgs["result"]["category"]>
 export type CategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Category$itemsArgs<ExtArgs>
@@ -579,6 +698,9 @@ export type $CategoryPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     householdId: string
     name: string
     nameKey: string
+    shoppingSection: $Enums.ShoppingSection | null
+    defaultTrackingMode: $Enums.TrackingMode | null
+    defaultPrimaryUnit: string | null
   }, ExtArgs["result"]["category"]>
   composites: {}
 }
@@ -1008,6 +1130,9 @@ export interface CategoryFieldRefs {
   readonly householdId: Prisma.FieldRef<"Category", 'String'>
   readonly name: Prisma.FieldRef<"Category", 'String'>
   readonly nameKey: Prisma.FieldRef<"Category", 'String'>
+  readonly shoppingSection: Prisma.FieldRef<"Category", 'ShoppingSection'>
+  readonly defaultTrackingMode: Prisma.FieldRef<"Category", 'TrackingMode'>
+  readonly defaultPrimaryUnit: Prisma.FieldRef<"Category", 'String'>
 }
     
 

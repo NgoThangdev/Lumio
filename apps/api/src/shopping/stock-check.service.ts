@@ -93,14 +93,14 @@ export class StockCheckService {
 
   private loadItem(client: Client, householdId: string, itemId: string) {
     return client.inventoryItem.findFirst({
-      where: { id: itemId, householdId },
+      where: { id: itemId, householdId, archivedAt: null },
       include: { batches: { orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] } },
     });
   }
 
   private async view(client: Client, householdId: string, tripId: string) {
     const checks = await client.tripStockCheck.findMany({
-      where: { tripId, item: { householdId } },
+      where: { tripId, item: { householdId, archivedAt: null } },
       include: {
         item: {
           include: {
@@ -142,7 +142,7 @@ export class StockCheckService {
       await this.requireCheckableTrip(tx, householdId, tripId);
       if (!(await tx.tripStockCheck.count({ where: { tripId } }))) {
         const items = await tx.inventoryItem.findMany({
-          where: { householdId },
+          where: { householdId, archivedAt: null },
           include: {
             batches: { select: { createdAt: true } },
             actions: {
@@ -192,10 +192,13 @@ export class StockCheckService {
         where: { tripId_itemId: { tripId, itemId } },
       });
       if (!check) throw new NotFoundException('CHECK_ITEM_NOT_FOUND');
-      const locked = await tx.$queryRaw<Array<{ id: string }>>`
-        SELECT "id" FROM "InventoryItem" WHERE "id" = ${itemId} AND "householdId" = ${householdId} FOR UPDATE
+      const locked = await tx.$queryRaw<
+        Array<{ id: string; archivedAt: Date | null }>
+      >`
+        SELECT "id", "archivedAt" FROM "InventoryItem" WHERE "id" = ${itemId} AND "householdId" = ${householdId} FOR UPDATE
       `;
       if (!locked.length) throw new NotFoundException('ITEM_NOT_FOUND');
+      if (locked[0].archivedAt) throw new ConflictException('ITEM_ARCHIVED');
       const item = await this.loadItem(tx, householdId, itemId);
       if (!item) throw new NotFoundException('ITEM_NOT_FOUND');
       if (!Number.isInteger(body.expectedRevision))

@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { config as loadEnv } from 'dotenv';
 import { fileURLToPath } from 'node:url';
-import { localCalendarDate } from '../inventory/plan-use.js';
 import { NotificationDispatchService } from './notification-dispatch.service.js';
 import { NotificationEvaluatorService } from './notification-evaluator.service.js';
 
@@ -14,7 +13,6 @@ export type NotificationSchedulerConfig =
   | { enabled: false }
   | {
       enabled: true;
-      digestMinute: number;
       activationCutoff: Date;
       urgentIntervalMinutes: number;
     };
@@ -31,9 +29,6 @@ export function parseNotificationSchedulerConfig(
   if (enabled !== 'true')
     throw new Error('INVALID_NOTIFICATION_AUTOMATION_ENABLED');
 
-  const digestTime = env.NOTIFICATION_DIGEST_TIME;
-  if (!digestTime || !/^([01]\d|2[0-3]):[0-5]\d$/.test(digestTime))
-    throw new Error('INVALID_NOTIFICATION_DIGEST_TIME');
   const cutoff = env.NOTIFICATION_ACTIVATION_CUTOFF;
   if (
     !cutoff ||
@@ -47,8 +42,6 @@ export function parseNotificationSchedulerConfig(
     throw new Error('INVALID_NOTIFICATION_URGENT_INTERVAL');
   return {
     enabled: true,
-    digestMinute:
-      Number(digestTime.slice(0, 2)) * 60 + Number(digestTime.slice(3)),
     activationCutoff: new Date(cutoff),
     urgentIntervalMinutes: Number(interval),
   };
@@ -62,17 +55,12 @@ export function notificationSchedulerConfigFromEnvironment() {
   return parseNotificationSchedulerConfig(process.env);
 }
 
-function localMinute(at: Date) {
-  return (at.getUTCHours() * 60 + at.getUTCMinutes() + 7 * 60) % 1440;
-}
-
 @Injectable()
 export class NotificationSchedulerService implements OnApplicationShutdown {
   private readonly logger = new Logger(NotificationSchedulerService.name);
   private timer: ReturnType<typeof setInterval> | null = null;
   private running = false;
   private lastUrgentSlot: number | null = null;
-  private lastDigestDay: string | null = null;
 
   constructor(
     private readonly evaluator: NotificationEvaluatorService,
@@ -114,14 +102,7 @@ export class NotificationSchedulerService implements OnApplicationShutdown {
         await this.evaluator.evaluateEligibleUsers(at, 'IMMEDIATE_ITEM');
         this.lastUrgentSlot = slot;
       }
-      const day = localCalendarDate(at);
-      if (
-        localMinute(at) >= this.config.digestMinute &&
-        this.lastDigestDay !== day
-      ) {
-        await this.evaluator.evaluateEligibleUsers(at, 'DAILY_DIGEST');
-        this.lastDigestDay = day;
-      }
+      await this.evaluator.evaluateDueDigests(at);
       await this.dispatcher.dispatchDue(at, this.config.activationCutoff);
     } finally {
       this.running = false;

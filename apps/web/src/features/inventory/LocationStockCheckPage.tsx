@@ -71,14 +71,18 @@ export function LocationStockCheckPage() {
     return <Notice kind="error">Location checklist is unavailable.</Notice>;
 
   return (
-    <main className="location-stock-check-page">
+    <section className="location-stock-check-page">
       <div className="location-check-heading">
         <div>
-          <p className="eyebrow">Inventory · Location check</p>
-          <h2>{check.data.location.name}</h2>
-          <p className="muted">
-            Confirm what is physically here. Items stay in the API’s checklist
-            order.
+          <h1>{check.data.location.name}</h1>
+          <p className="location-check-progress" role="status">
+            {
+              check.data.items.filter(
+                (item) =>
+                  item.status === 'CONFIRM' || item.status === 'CORRECT',
+              ).length
+            }{' '}
+            of {check.data.items.length} checked
           </p>
         </div>
         <Link
@@ -125,7 +129,7 @@ export function LocationStockCheckPage() {
           ))}
         </div>
       )}
-    </main>
+    </section>
   );
 }
 

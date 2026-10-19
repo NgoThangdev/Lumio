@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#faf9f5" />
     <meta
       name="description"
@@ -11,6 +12,22 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" href="/lumio-icon.svg" type="image/svg+xml" />
     <title>Lumio</title>
+    <script>
+      let choice = null;
+      try {
+        choice = localStorage.getItem('lumio-appearance');
+      } catch {
+        // Fall through to the device preference when local storage is unavailable.
+      }
+      const dark =
+        choice === 'dark' ||
+        (choice !== 'light' &&
+          matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      document
+        .querySelector('meta[name="theme-color"]')
+        ?.setAttribute('content', dark ? '#121a15' : '#faf9f5');
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -2,18 +2,24 @@ export class ApiError extends Error {
   readonly status: number;
   readonly code: string | null;
   readonly itemId: string | null;
+  readonly tripIds: string[];
+  readonly references: Record<string, number> | null;
 
   constructor(
     message: string,
     status: number,
     code: string | null = null,
     itemId: string | null = null,
+    tripIds: string[] = [],
+    references: Record<string, number> | null = null,
   ) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.code = code;
     this.itemId = itemId;
+    this.tripIds = tripIds;
+    this.references = references;
   }
 }
 
@@ -116,6 +122,17 @@ export async function api<T>(
       response.status,
       returnedCode,
       typeof body?.itemId === 'string' ? body.itemId : null,
+      Array.isArray(body?.tripIds)
+        ? body.tripIds.filter((id): id is string => typeof id === 'string')
+        : [],
+      typeof body?.references === 'object' && body.references !== null
+        ? Object.fromEntries(
+            Object.entries(body.references).filter(
+              (entry): entry is [string, number] =>
+                typeof entry[1] === 'number',
+            ),
+          )
+        : null,
     );
   }
   return data as T;

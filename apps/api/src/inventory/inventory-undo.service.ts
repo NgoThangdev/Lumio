@@ -63,9 +63,10 @@ export class InventoryUndoService {
             stockRevision: number;
             trackingMode: string;
             openedTrackingEnabled: boolean;
+            archivedAt: Date | null;
           }>
         >`
-          SELECT "id", "stockRevision", "trackingMode", "openedTrackingEnabled"
+          SELECT "id", "stockRevision", "trackingMode", "openedTrackingEnabled", "archivedAt"
           FROM "InventoryItem"
           WHERE "id" = ${itemId} AND "householdId" = ${householdId}
           FOR UPDATE
@@ -84,6 +85,7 @@ export class InventoryUndoService {
           if (action.userId !== actorId)
             throw new ForbiddenException('UNDO_ACTOR_REQUIRED');
           if (action.undo) return result(action.undo, true);
+          if (item.archivedAt) throw new ConflictException('ITEM_ARCHIVED');
           const supported =
             (action.type === 'USE' &&
               item.trackingMode === 'QUANTITY' &&
@@ -161,6 +163,7 @@ export class InventoryUndoService {
         if (action.userId !== actorId)
           throw new ForbiddenException('UNDO_ACTOR_REQUIRED');
         if (action.undo) return result(action.undo, true);
+        if (item.archivedAt) throw new ConflictException('ITEM_ARCHIVED');
         const supported =
           (action.type === 'UPDATE_LEVEL' &&
             item.trackingMode === 'FIVE_LEVEL' &&

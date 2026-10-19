@@ -114,6 +114,7 @@ function StockCheckEntry({
     setExtraUnopenedQuantity('0');
     setBatchDetailRequired(false);
     setStockConflict(entry.status === 'STALE');
+    if (entry.status === 'STALE') setNotice('');
   }, [entry.stockRevision, entry.status]);
 
   async function save(
@@ -131,7 +132,7 @@ function StockCheckEntry({
       });
       if (result.conflict) {
         setStockConflict(true);
-        setNotice(
+        setError(
           'Stock changed since this check. Review the refreshed stock above, then choose Confirm or Correct again.',
         );
       } else {

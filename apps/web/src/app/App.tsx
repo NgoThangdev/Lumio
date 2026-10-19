@@ -16,7 +16,10 @@ import {
   useParams,
 } from 'react-router';
 import { AuthPage } from '../features/auth/AuthPage';
+import { authReturnPath } from '../features/auth/returnPath';
 import { HouseholdsPage } from '../features/households/HouseholdsPage';
+import { HouseholdMembersPage } from '../features/households/HouseholdMembersPage';
+import { InvitationPage } from '../features/households/InvitationPage';
 import { HomePage } from '../features/home/HomePage';
 import { InventoryPage } from '../features/inventory/InventoryPage';
 import { ItemDetailPage } from '../features/inventory/ItemDetailPage';
@@ -41,6 +44,7 @@ function setSession(queryClient: QueryClient, user: User | null) {
 
 function SessionRoutes() {
   const queryClient = useQueryClient();
+  const location = useLocation();
   const session = useQuery({
     queryKey: keys.session,
     queryFn: async () => {
@@ -82,7 +86,12 @@ function SessionRoutes() {
         path="/sign-in"
         element={
           user ? (
-            <Navigate to="/households" replace />
+            <Navigate
+              to={authReturnPath(
+                (location.state as { from?: unknown } | null)?.from,
+              )}
+              replace
+            />
           ) : (
             <AuthPage
               onAuthed={(next) => {
@@ -92,6 +101,7 @@ function SessionRoutes() {
           )
         }
       />
+      <Route path="/invite/:secret" element={<InvitationPage user={user} />} />
       <Route element={user ? <SignedInShell user={user} /> : <RequireSignIn />}>
         <Route path="/attention" element={<AttentionPage user={user!} />} />
         <Route path="/settings" element={<SettingsPage user={user!} />} />
@@ -99,6 +109,10 @@ function SessionRoutes() {
         <Route path="/households/:householdId" element={<HouseholdBoundary />}>
           <Route index element={<Navigate to="home" replace />} />
           <Route path="home" element={<HomePage />} />
+          <Route
+            path="members"
+            element={<HouseholdMembersPage user={user!} />}
+          />
           <Route path="inventory" element={<InventoryPage />} />
           <Route path="inventory/:itemId" element={<ItemDetailPage />} />
           <Route
@@ -135,6 +149,12 @@ function RequireSignIn() {
 function SignedInShell({ user }: { user: User }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { pathname, search } = useLocation();
+  const householdId =
+    pathname.match(/^\/households\/([^/]+)(?:\/|$)/)?.[1] ??
+    (pathname === '/settings'
+      ? new URLSearchParams(search).get('householdId')
+      : null);
   const [signOutError, setSignOutError] = useState('');
   const [signingOut, setSigningOut] = useState(false);
   const signOut = async () => {
@@ -161,7 +181,14 @@ function SignedInShell({ user }: { user: User }) {
         </Link>
         <div className="top-actions">
           <small>{user.email}</small>
-          <Link className="link" to="/settings">
+          <Link
+            className="link"
+            to={
+              householdId
+                ? `/settings?householdId=${encodeURIComponent(householdId)}`
+                : '/settings'
+            }
+          >
             Settings
           </Link>
           <Button
@@ -199,12 +226,17 @@ function HouseholdWorkspace({ household }: { household: Household }) {
   const { pathname } = useLocation();
   const home = pathname.endsWith('/home');
   const shopping = pathname.includes('/shopping');
+  const tripDetail =
+    shopping &&
+    !pathname.endsWith('/quick-purchase') &&
+    /\/shopping\/[^/]+$/.test(pathname);
   const item = pathname.match(/\/inventory\/([^/]+)$/);
   const locationCheck = pathname.includes('/locations/');
+  const members = pathname.endsWith('/members');
   const base = `/households/${household.id}`;
   return (
     <>
-      {!home && (
+      {!home && !tripDetail && !locationCheck && (
         <div
           className={`workspace-heading${item ? ' workspace-heading-detail' : ''}`}
         >
@@ -222,7 +254,9 @@ function HouseholdWorkspace({ household }: { household: Household }) {
                     ? 'Item detail'
                     : locationCheck
                       ? 'Location check'
-                      : 'Inventory'}
+                      : members
+                        ? 'Members & invites'
+                        : 'Inventory'}
             </h1>
             {!item && (
               <p className="page-subtitle">
@@ -230,13 +264,19 @@ function HouseholdWorkspace({ household }: { household: Household }) {
                   ? 'A calmer way to care for what’s at home.'
                   : shopping
                     ? 'A little planning. A happier home.'
-                    : 'What’s at home, and what needs attention?'}
+                    : members
+                      ? 'Manage who shares this household.'
+                      : 'What’s at home, and what needs attention?'}
               </p>
             )}
           </div>
           {item ? (
             <Link className="secondary" to={`${base}/inventory`}>
               ← All items
+            </Link>
+          ) : household.role === 'ADMIN' && !members ? (
+            <Link className="secondary" to={`${base}/members`}>
+              Members & invites
             </Link>
           ) : (
             <Doodle
@@ -259,8 +299,8 @@ function HouseholdWorkspace({ household }: { household: Household }) {
           <span>Home</span>
         </Link>
         <Link
-          className={!home && !shopping ? 'selected' : ''}
-          aria-current={!home && !shopping ? 'page' : undefined}
+          className={!home && !shopping && !members ? 'selected' : ''}
+          aria-current={!home && !shopping && !members ? 'page' : undefined}
           to={`${base}/inventory`}
         >
           <Doodle kind="inventory" />

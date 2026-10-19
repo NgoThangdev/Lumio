@@ -16,6 +16,7 @@ const categoryKeys = [
 ] as const;
 type CategoryKey = (typeof categoryKeys)[number];
 type PreferenceUpdate = Partial<Record<CategoryKey, boolean>> & {
+  digestTime?: string;
   quietHoursStart?: string | null;
   quietHoursEnd?: string | null;
 };
@@ -25,6 +26,7 @@ const defaults = {
   lowStockAlertsEnabled: false,
   shoppingRemindersEnabled: false,
   dailyDigestEnabled: false,
+  digestTime: '08:00',
   householdEventsEnabled: false,
   quietHours: null as { start: string; end: string } | null,
   timezone: 'Asia/Ho_Chi_Minh',
@@ -38,7 +40,11 @@ function object(value: unknown, reason: string): Record<string, unknown> {
 
 function preferenceUpdate(input: unknown): PreferenceUpdate {
   const body = object(input, 'INVALID_NOTIFICATION_PREFERENCE');
-  const allowed = new Set<string>([...categoryKeys, 'quietHours']);
+  const allowed = new Set<string>([
+    ...categoryKeys,
+    'quietHours',
+    'digestTime',
+  ]);
   if (
     !Object.keys(body).length ||
     Object.keys(body).some((key) => !allowed.has(key))
@@ -50,6 +56,14 @@ function preferenceUpdate(input: unknown): PreferenceUpdate {
     if (typeof body[key] !== 'boolean')
       throw new BadRequestException('INVALID_NOTIFICATION_PREFERENCE');
     data[key] = body[key];
+  }
+  if ('digestTime' in body) {
+    if (
+      typeof body.digestTime !== 'string' ||
+      !/^([01]\d|2[0-3]):[0-5]\d$/.test(body.digestTime)
+    )
+      throw new BadRequestException('INVALID_DIGEST_TIME');
+    data.digestTime = body.digestTime;
   }
   if ('quietHours' in body) {
     if (body.quietHours === null) {
@@ -141,6 +155,7 @@ export class NotificationsService {
     lowStockAlertsEnabled: boolean;
     shoppingRemindersEnabled: boolean;
     dailyDigestEnabled: boolean;
+    digestTime: string;
     householdEventsEnabled: boolean;
     quietHoursStart: string | null;
     quietHoursEnd: string | null;
@@ -150,6 +165,7 @@ export class NotificationsService {
       lowStockAlertsEnabled: row.lowStockAlertsEnabled,
       shoppingRemindersEnabled: row.shoppingRemindersEnabled,
       dailyDigestEnabled: row.dailyDigestEnabled,
+      digestTime: row.digestTime,
       householdEventsEnabled: row.householdEventsEnabled,
       quietHours:
         row.quietHoursStart && row.quietHoursEnd

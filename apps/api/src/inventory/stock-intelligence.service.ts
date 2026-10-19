@@ -45,7 +45,10 @@ export class StockIntelligenceService {
   }
 
   private async assessWithClient(
-    client: Pick<Prisma.TransactionClient, 'membership' | 'inventoryItem'>,
+    client: Pick<
+      Prisma.TransactionClient,
+      'membership' | 'inventoryItem' | 'shoppingTrip' | 'household'
+    >,
     actorId: string,
     householdId: string,
     shoppingDateInput?: string,
@@ -62,7 +65,29 @@ export class StockIntelligenceService {
     }
     const now = at;
     const today = localCalendarDate(now);
-    const shoppingDate = shoppingDateInput ?? addCalendarDays(today, 7);
+    let shoppingDate = shoppingDateInput;
+    if (shoppingDate === undefined) {
+      const trip = await client.shoppingTrip.findFirst({
+        where: {
+          householdId,
+          status: { not: 'RESTOCKED' },
+          plannedDate: { gte: new Date(`${today}T00:00:00.000Z`) },
+        },
+        select: { plannedDate: true },
+        orderBy: [{ plannedDate: 'asc' }, { id: 'asc' }],
+      });
+      if (trip) shoppingDate = trip.plannedDate.toISOString().slice(0, 10);
+      else {
+        const household = await client.household.findUniqueOrThrow({
+          where: { id: householdId },
+          select: { defaultShoppingCycleDays: true },
+        });
+        shoppingDate = addCalendarDays(
+          today,
+          household.defaultShoppingCycleDays,
+        );
+      }
+    }
     if (
       !/^\d{4}-\d{2}-\d{2}$/.test(shoppingDate) ||
       Number.isNaN(Date.parse(`${shoppingDate}T00:00:00.000Z`)) ||
@@ -77,7 +102,7 @@ export class StockIntelligenceService {
     }
     const windowStart = addCalendarDays(today, -13);
     const items = await client.inventoryItem.findMany({
-      where: { householdId },
+      where: { householdId, archivedAt: null },
       include: {
         batches: {
           select: {

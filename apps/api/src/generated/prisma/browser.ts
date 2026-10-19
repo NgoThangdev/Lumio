@@ -83,6 +83,11 @@ export type HouseholdInvitation = Prisma.HouseholdInvitationModel
  */
 export type InventoryItem = Prisma.InventoryItemModel
 /**
+ * Model InventoryItemChange
+ * 
+ */
+export type InventoryItemChange = Prisma.InventoryItemChangeModel
+/**
  * Model InventoryItemTag
  * 
  */

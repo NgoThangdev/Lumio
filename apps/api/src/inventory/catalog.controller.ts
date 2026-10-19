@@ -1,8 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -38,6 +41,50 @@ export class CatalogController {
     );
   }
 
+  @Patch('categories/:categoryId')
+  updateCategorySection(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Param('categoryId') categoryId: string,
+    @Body() body: unknown,
+  ) {
+    return this.catalog.updateCategory(
+      request.actorId,
+      householdId,
+      categoryId,
+      body,
+    );
+  }
+
+  @Patch('categories/:categoryId/inventory-defaults')
+  updateCategoryInventoryDefaults(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Param('categoryId') categoryId: string,
+    @Body() body: unknown,
+  ) {
+    return this.catalog.updateCategoryInventoryDefaults(
+      request.actorId,
+      householdId,
+      categoryId,
+      body,
+    );
+  }
+
+  @Delete('categories/:categoryId')
+  @HttpCode(204)
+  removeCategory(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Param('categoryId') categoryId: string,
+  ) {
+    return this.catalog.removeCategory(
+      request.actorId,
+      householdId,
+      categoryId,
+    );
+  }
+
   @Get('locations')
   locations(
     @Req() request: AuthenticatedRequest,
@@ -57,6 +104,35 @@ export class CatalogController {
       householdId,
       'locations',
       body?.name,
+    );
+  }
+
+  @Patch('locations/:locationId')
+  renameLocation(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Param('locationId') locationId: string,
+    @Body() body: unknown,
+  ) {
+    return this.catalog.renameLocation(
+      request.actorId,
+      householdId,
+      locationId,
+      body,
+    );
+  }
+
+  @Delete('locations/:locationId')
+  @HttpCode(204)
+  removeLocation(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Param('locationId') locationId: string,
+  ) {
+    return this.catalog.removeLocation(
+      request.actorId,
+      householdId,
+      locationId,
     );
   }
 
@@ -80,5 +156,15 @@ export class CatalogController {
       'tags',
       body?.name,
     );
+  }
+
+  @Patch('tags/:tagId')
+  renameTag(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Param('tagId') tagId: string,
+    @Body() body: unknown,
+  ) {
+    return this.catalog.renameTag(request.actorId, householdId, tagId, body);
   }
 }

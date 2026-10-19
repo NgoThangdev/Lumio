@@ -64,6 +64,7 @@ function database() {
             lowStockAlertsEnabled: false,
             shoppingRemindersEnabled: false,
             dailyDigestEnabled: false,
+            digestTime: '08:00',
             householdEventsEnabled: false,
             quietHoursStart: null,
             quietHoursEnd: null,
@@ -105,6 +106,7 @@ describe('Notification preferences and subscriptions', () => {
       lowStockAlertsEnabled: false,
       shoppingRemindersEnabled: false,
       dailyDigestEnabled: false,
+      digestTime: '08:00',
       householdEventsEnabled: false,
       quietHours: null,
       timezone: 'Asia/Ho_Chi_Minh',
@@ -113,16 +115,19 @@ describe('Notification preferences and subscriptions', () => {
       await service.updatePreferences('alice', {
         expiryAlertsEnabled: true,
         dailyDigestEnabled: true,
+        digestTime: '09:30',
         quietHours: { start: '22:00', end: '07:00' },
       }),
     ).toMatchObject({
       expiryAlertsEnabled: true,
       dailyDigestEnabled: true,
+      digestTime: '09:30',
       quietHours: { start: '22:00', end: '07:00' },
     });
     expect(await service.preferences('bob')).toMatchObject({
       expiryAlertsEnabled: false,
       dailyDigestEnabled: false,
+      digestTime: '08:00',
     });
     expect(
       await service.updatePreferences('alice', { quietHours: null }),
@@ -138,6 +143,10 @@ describe('Notification preferences and subscriptions', () => {
       {},
       { userId: 'bob' },
       { dailyDigestEnabled: 'yes' },
+      { digestTime: '8:00' },
+      { digestTime: '24:00' },
+      { digestTime: '08:60' },
+      { digestTime: null },
       { quietHours: { start: '22:00', end: '22:00' } },
       { quietHours: { start: '99:00', end: '07:00' } },
     ]) {

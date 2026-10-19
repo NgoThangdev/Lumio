@@ -139,6 +139,18 @@ export function HomePage() {
     },
     enabled: !!attention.data?.items.length,
   });
+  const snapshot = useQuery({
+    queryKey: keys.inventoryRead(household.id, 'groupBy=location'),
+    queryFn: async () => {
+      const result = await api<InventoryRead | Item[]>(
+        `${base}/items?groupBy=location`,
+      );
+      if (Array.isArray(result) || !result || !Array.isArray(result.groups)) {
+        throw new Error('The API did not return Inventory location groups.');
+      }
+      return result;
+    },
+  });
   const trips = useQuery({
     queryKey: keys.trips(household.id),
     queryFn: () => api<TripSummary[]>(`${base}/trips`),
@@ -154,6 +166,10 @@ export function HomePage() {
   const nextTrip = trips.data
     ?.filter((trip) => trip.status !== 'RESTOCKED')
     .sort((a, b) => a.plannedDate.localeCompare(b.plannedDate))[0];
+  const locationGroups =
+    snapshot.data?.groups?.filter(
+      (group): group is typeof group & { id: string } => group.id !== null,
+    ) ?? [];
 
   return (
     <div className="home-page">
@@ -314,6 +330,41 @@ export function HomePage() {
               Plan shopping <span aria-hidden="true">›</span>
             </Link>
           </div>
+        )}
+      </section>
+
+      <section className="home-snapshot" aria-labelledby="home-snapshot-title">
+        <div className="home-section-heading">
+          <h2 id="home-snapshot-title">Inventory by location</h2>
+          <Link to={`${base}/inventory`}>See all</Link>
+        </div>
+        {snapshot.isPending ? (
+          <p className="muted" role="status">
+            Loading locations…
+          </p>
+        ) : snapshot.isError ? (
+          <Notice kind="error">
+            Locations could not be loaded: {snapshot.error.message}
+          </Notice>
+        ) : locationGroups.length ? (
+          <div className="home-snapshot-list">
+            {locationGroups.slice(0, 3).map((group) => (
+              <Link
+                className="home-snapshot-row"
+                key={group.id}
+                to={`${base}/inventory?locationId=${encodeURIComponent(group.id)}`}
+              >
+                <strong>{group.name}</strong>
+                <span>
+                  {group.entries.length}{' '}
+                  {group.entries.length === 1 ? 'item' : 'items'}
+                </span>
+                <span aria-hidden="true">›</span>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="muted">No items at named locations yet.</p>
         )}
       </section>
 

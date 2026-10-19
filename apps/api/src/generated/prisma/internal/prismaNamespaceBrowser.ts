@@ -64,6 +64,7 @@ export const ModelName = {
   Membership: 'Membership',
   HouseholdInvitation: 'HouseholdInvitation',
   InventoryItem: 'InventoryItem',
+  InventoryItemChange: 'InventoryItemChange',
   InventoryItemTag: 'InventoryItemTag',
   InventoryStateAction: 'InventoryStateAction',
   ShoppingTrip: 'ShoppingTrip',
@@ -118,6 +119,7 @@ export const NotificationPreferenceScalarFieldEnum = {
   lowStockAlertsEnabled: 'lowStockAlertsEnabled',
   shoppingRemindersEnabled: 'shoppingRemindersEnabled',
   dailyDigestEnabled: 'dailyDigestEnabled',
+  digestTime: 'digestTime',
   householdEventsEnabled: 'householdEventsEnabled',
   quietHoursStart: 'quietHoursStart',
   quietHoursEnd: 'quietHoursEnd',
@@ -175,7 +177,9 @@ export type NotificationDeliveryScalarFieldEnum = (typeof NotificationDeliverySc
 
 export const HouseholdScalarFieldEnum = {
   id: 'id',
-  name: 'name'
+  name: 'name',
+  defaultShoppingCycleDays: 'defaultShoppingCycleDays',
+  defaultStore: 'defaultStore'
 } as const
 
 export type HouseholdScalarFieldEnum = (typeof HouseholdScalarFieldEnum)[keyof typeof HouseholdScalarFieldEnum]
@@ -185,7 +189,10 @@ export const CategoryScalarFieldEnum = {
   id: 'id',
   householdId: 'householdId',
   name: 'name',
-  nameKey: 'nameKey'
+  nameKey: 'nameKey',
+  shoppingSection: 'shoppingSection',
+  defaultTrackingMode: 'defaultTrackingMode',
+  defaultPrimaryUnit: 'defaultPrimaryUnit'
 } as const
 
 export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
@@ -257,11 +264,26 @@ export const InventoryItemScalarFieldEnum = {
   neverRunOut: 'neverRunOut',
   predictionEnabled: 'predictionEnabled',
   stockRevision: 'stockRevision',
+  archivedAt: 'archivedAt',
   openedTrackingEnabled: 'openedTrackingEnabled',
   recommendedDaysAfterOpening: 'recommendedDaysAfterOpening'
 } as const
 
 export type InventoryItemScalarFieldEnum = (typeof InventoryItemScalarFieldEnum)[keyof typeof InventoryItemScalarFieldEnum]
+
+
+export const InventoryItemChangeScalarFieldEnum = {
+  id: 'id',
+  householdId: 'householdId',
+  itemId: 'itemId',
+  actorId: 'actorId',
+  kind: 'kind',
+  before: 'before',
+  after: 'after',
+  createdAt: 'createdAt'
+} as const
+
+export type InventoryItemChangeScalarFieldEnum = (typeof InventoryItemChangeScalarFieldEnum)[keyof typeof InventoryItemChangeScalarFieldEnum]
 
 
 export const InventoryItemTagScalarFieldEnum = {

@@ -66,6 +66,16 @@ enum ShoppingEntryPriority {
   OPTIONAL
 }
 
+enum ShoppingSection {
+  FRESH_FOOD
+  MEAT_SEAFOOD
+  DAIRY
+  PANTRY
+  DRINKS
+  HOUSEHOLD
+  PERSONAL_CARE
+}
+
 enum NotificationIntentKind {
   IMMEDIATE_ITEM
   DAILY_DIGEST
@@ -96,6 +106,7 @@ model User {
   inventoryActions    InventoryAction[]
   inventoryStateActions InventoryStateAction[]
   inventoryUndos InventoryUndo[]
+  itemChanges InventoryItemChange[]
   sessions            UserSession[]
   createdShoppingTrips ShoppingTrip[] @relation("ShoppingTripCreator")
   completedShoppingTrips ShoppingTrip[] @relation("ShoppingTripFinisher")
@@ -123,6 +134,7 @@ model NotificationPreference {
   lowStockAlertsEnabled Boolean @default(false)
   shoppingRemindersEnabled Boolean @default(false)
   dailyDigestEnabled Boolean @default(false)
+  digestTime String @default("08:00") @db.VarChar(5)
   householdEventsEnabled Boolean @default(false)
   quietHoursStart String? @db.VarChar(5)
   quietHoursEnd String? @db.VarChar(5)
@@ -182,12 +194,15 @@ model NotificationDelivery {
 model Household {
   id               String                @id @default(uuid())
   name             String
+  defaultShoppingCycleDays Int @default(7)
+  defaultStore String? @db.VarChar(120)
   memberships      Membership[]
   invitations      HouseholdInvitation[]
   inventoryItems   InventoryItem[]
   inventoryActions InventoryAction[]
   inventoryStateActions InventoryStateAction[]
   inventoryUndos InventoryUndo[]
+  itemChanges InventoryItemChange[]
   shoppingTrips    ShoppingTrip[]
   categories Category[]
   locations Location[]
@@ -200,6 +215,9 @@ model Category {
   householdId String
   name String
   nameKey String
+  shoppingSection ShoppingSection?
+  defaultTrackingMode TrackingMode?
+  defaultPrimaryUnit String? @db.VarChar(40)
   household Household @relation(fields: [householdId], references: [id])
   items InventoryItem[]
 
@@ -280,6 +298,7 @@ model InventoryItem {
   neverRunOut       Boolean  @default(false)
   predictionEnabled Boolean  @default(false)
   stockRevision Int @default(0)
+  archivedAt DateTime?
   openedTrackingEnabled Boolean @default(false)
   recommendedDaysAfterOpening Int?
   household   Household         @relation(fields: [householdId], references: [id])
@@ -295,6 +314,26 @@ model InventoryItem {
   shoppingEntries ShoppingEntry[]
   stockChecks TripStockCheck[]
   locationStockChecks LocationStockCheck[]
+  changes InventoryItemChange[]
+
+  @@index([householdId, archivedAt])
+}
+
+model InventoryItemChange {
+  id String @id @default(uuid())
+  householdId String
+  itemId String
+  actorId String
+  kind String @db.VarChar(16)
+  before Json?
+  after Json?
+  createdAt DateTime @default(now())
+  household Household @relation(fields: [householdId], references: [id])
+  item InventoryItem @relation(fields: [itemId], references: [id])
+  actor User @relation(fields: [actorId], references: [id])
+
+  @@index([itemId, createdAt])
+  @@index([householdId, createdAt])
 }
 
 model InventoryItemTag {

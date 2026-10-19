@@ -4,11 +4,33 @@ export type NotificationPreferences = {
   lowStockAlertsEnabled: boolean;
   shoppingRemindersEnabled: boolean;
   dailyDigestEnabled: boolean;
+  digestTime: string;
   householdEventsEnabled: boolean;
   quietHours: { start: string; end: string } | null;
   timezone: string;
 };
 export type Household = { id: string; name: string; role: 'ADMIN' | 'MEMBER' };
+export type HouseholdShoppingSettings = {
+  defaultShoppingCycleDays: number;
+  defaultStore: string | null;
+};
+export type HouseholdMember = {
+  id: string;
+  email: string;
+  role: Household['role'];
+};
+export type InvitationStatus = 'ACTIVE' | 'EXPIRED' | 'REVOKED' | 'USED';
+export type HouseholdInvitation = {
+  id: string;
+  createdAt: string;
+  expiresAt: string;
+  status: InvitationStatus;
+};
+export type InvitationPreview = {
+  household: { id: string; name: string };
+  status: InvitationStatus;
+  expiresAt: string;
+};
 export type CatalogOption = { id: string; name: string };
 export type LocationCheckReason =
   | 'STOCK_CHANGED'
@@ -109,6 +131,18 @@ export type ItemStockCheck = {
 export type Item = {
   id: string;
   name: string;
+  archivedAt?: string | null;
+  categoryId?: string | null;
+  category?: CatalogOption | null;
+  tagLinks?: { tagId: string; tag: CatalogOption }[];
+  changes?: {
+    id: string;
+    actorId: string;
+    kind: 'EDIT' | 'ARCHIVE' | 'RESTORE';
+    before: Record<string, unknown> | null;
+    after: Record<string, unknown> | null;
+    createdAt: string;
+  }[];
   primaryUnit: string;
   trackingMode: TrackingMode;
   preferredRestockLocationId?: string | null;

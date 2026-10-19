@@ -8,6 +8,10 @@ import {
   type HouseholdAssessments,
 } from './notification-rules.js';
 
+function localTime(at: Date) {
+  return new Date(at.getTime() + 7 * 60 * 60_000).toISOString().slice(11, 16);
+}
+
 @Injectable()
 export class NotificationEvaluatorService {
   constructor(
@@ -42,12 +46,17 @@ export class NotificationEvaluatorService {
     return households;
   }
 
-  private async currentCandidates(userId: string, at: Date) {
+  private async currentCandidates(
+    userId: string,
+    at: Date,
+    digestDueOnly = false,
+  ) {
     const preference = await this.prisma.notificationPreference.findUnique({
       where: { userId },
     });
     if (
       !preference ||
+      (digestDueOnly && preference.digestTime > localTime(at)) ||
       (!preference.lowStockAlertsEnabled && !preference.expiryAlertsEnabled)
     )
       return { candidates: [], preference };
@@ -101,13 +110,18 @@ export class NotificationEvaluatorService {
     };
   }
 
-  // Internal entry point. No public route or scheduler invokes it in this slice.
+  // Internal candidate evaluator; scheduled selection calls this after finding due users.
   async evaluateUser(
     userId: string,
     at = new Date(),
     kind?: 'IMMEDIATE_ITEM' | 'DAILY_DIGEST',
+    requireDueTime = false,
   ) {
-    const { candidates, preference } = await this.currentCandidates(userId, at);
+    const { candidates, preference } = await this.currentCandidates(
+      userId,
+      at,
+      requireDueTime && kind === 'DAILY_DIGEST',
+    );
     const selected = kind
       ? candidates.filter((candidate) => candidate.kind === kind)
       : candidates;
@@ -143,6 +157,32 @@ export class NotificationEvaluatorService {
     });
     for (const preference of preferences)
       await this.evaluateUser(preference.userId, at, kind);
+  }
+
+  // Run on each scheduler minute so a preference change takes effect without a restart.
+  // The user/day/subject database key remains the final duplicate guard.
+  async evaluateDueDigests(at = new Date()) {
+    const day = localCalendarDate(at);
+    const preferences = await this.prisma.notificationPreference.findMany({
+      where: {
+        dailyDigestEnabled: true,
+        digestTime: { lte: localTime(at) },
+        OR: [{ lowStockAlertsEnabled: true }, { expiryAlertsEnabled: true }],
+        user: {
+          notificationIntents: {
+            none: {
+              kind: 'DAILY_DIGEST',
+              localDay: day,
+              subjectKey: 'all',
+            },
+          },
+        },
+      },
+      select: { userId: true },
+      orderBy: { userId: 'asc' },
+    });
+    for (const preference of preferences)
+      await this.evaluateUser(preference.userId, at, 'DAILY_DIGEST', true);
   }
 
   // A future sender must call this before any delivery; stored content is only a snapshot.

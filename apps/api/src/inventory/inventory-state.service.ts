@@ -75,8 +75,18 @@ export class InventoryStateService {
       throw new ForbiddenException(
         'Household Admin membership is required to change stock settings.',
       );
+    const item = await this.prisma.inventoryItem.findFirst({
+      where: { id: itemId, householdId },
+      select: { archivedAt: true },
+    });
+    if (item?.archivedAt) throw new ConflictException('ITEM_ARCHIVED');
     const updated = await this.prisma.inventoryItem.updateMany({
-      where: { id: itemId, householdId, trackingMode: 'FIVE_LEVEL' },
+      where: {
+        id: itemId,
+        householdId,
+        trackingMode: 'FIVE_LEVEL',
+        archivedAt: null,
+      },
       data: {
         lowAtLevel: lowAtLevel as StockLevel,
         buyAtLevel: buyAtLevel as StockLevel,
@@ -134,8 +144,10 @@ export class InventoryStateService {
       throw new ForbiddenException(
         'Household membership is required for stock actions.',
       );
-    const locked = await tx.$queryRaw<Array<{ id: string }>>`
-        SELECT "id" FROM "InventoryItem"
+    const locked = await tx.$queryRaw<
+      Array<{ id: string; archivedAt: Date | null }>
+    >`
+        SELECT "id", "archivedAt" FROM "InventoryItem"
         WHERE "id" = ${itemId} AND "householdId" = ${householdId}
         FOR UPDATE
       `;
@@ -143,6 +155,7 @@ export class InventoryStateService {
       throw new NotFoundException(
         'Inventory item was not found in this household.',
       );
+    if (locked[0].archivedAt) throw new ConflictException('ITEM_ARCHIVED');
     const item = await tx.inventoryItem.findUniqueOrThrow({
       where: { id: itemId },
     });

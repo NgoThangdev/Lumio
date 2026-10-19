@@ -206,6 +206,7 @@ describe('Notification settings and Push Subscription HTTP (database)', () => {
       lowStockAlertsEnabled: false,
       shoppingRemindersEnabled: false,
       dailyDigestEnabled: false,
+      digestTime: '08:00',
       householdEventsEnabled: false,
       quietHours: null,
       timezone: 'Asia/Ho_Chi_Minh',
@@ -215,6 +216,7 @@ describe('Notification settings and Push Subscription HTTP (database)', () => {
       .set('Cookie', alice.cookie)
       .send({
         expiryAlertsEnabled: true,
+        digestTime: '09:15',
         quietHours: { start: '22:00', end: '07:00' },
       })
       .expect(200);
@@ -235,6 +237,7 @@ describe('Notification settings and Push Subscription HTTP (database)', () => {
       ).body,
     ).toMatchObject({
       expiryAlertsEnabled: true,
+      digestTime: '09:15',
       quietHours: { start: '22:00', end: '07:00' },
     });
     await request(app.getHttpServer())
@@ -242,6 +245,14 @@ describe('Notification settings and Push Subscription HTTP (database)', () => {
       .set('Cookie', alice.cookie)
       .send({ dailyDigestEnabled: 'yes' })
       .expect(400);
+    for (const digestTime of ['8:00', '24:00', '08:60', null]) {
+      const invalid = await request(app.getHttpServer())
+        .patch(url)
+        .set('Cookie', alice.cookie)
+        .send({ digestTime })
+        .expect(400);
+      expect(invalid.body.message).toBe('INVALID_DIGEST_TIME');
+    }
   });
 
   it('supports multiple sessions, endpoint reassignment, sign-out, and expired-session exclusion', async () => {

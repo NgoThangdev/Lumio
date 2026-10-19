@@ -20,40 +20,70 @@ export type HouseholdModel = runtime.Types.Result.DefaultSelection<Prisma.$House
 
 export type AggregateHousehold = {
   _count: HouseholdCountAggregateOutputType | null
+  _avg: HouseholdAvgAggregateOutputType | null
+  _sum: HouseholdSumAggregateOutputType | null
   _min: HouseholdMinAggregateOutputType | null
   _max: HouseholdMaxAggregateOutputType | null
+}
+
+export type HouseholdAvgAggregateOutputType = {
+  defaultShoppingCycleDays: number | null
+}
+
+export type HouseholdSumAggregateOutputType = {
+  defaultShoppingCycleDays: number | null
 }
 
 export type HouseholdMinAggregateOutputType = {
   id: string | null
   name: string | null
+  defaultShoppingCycleDays: number | null
+  defaultStore: string | null
 }
 
 export type HouseholdMaxAggregateOutputType = {
   id: string | null
   name: string | null
+  defaultShoppingCycleDays: number | null
+  defaultStore: string | null
 }
 
 export type HouseholdCountAggregateOutputType = {
   id: number
   name: number
+  defaultShoppingCycleDays: number
+  defaultStore: number
   _all: number
 }
 
 
+export type HouseholdAvgAggregateInputType = {
+  defaultShoppingCycleDays?: true
+}
+
+export type HouseholdSumAggregateInputType = {
+  defaultShoppingCycleDays?: true
+}
+
 export type HouseholdMinAggregateInputType = {
   id?: true
   name?: true
+  defaultShoppingCycleDays?: true
+  defaultStore?: true
 }
 
 export type HouseholdMaxAggregateInputType = {
   id?: true
   name?: true
+  defaultShoppingCycleDays?: true
+  defaultStore?: true
 }
 
 export type HouseholdCountAggregateInputType = {
   id?: true
   name?: true
+  defaultShoppingCycleDays?: true
+  defaultStore?: true
   _all?: true
 }
 
@@ -95,6 +125,18 @@ export type HouseholdAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inte
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: HouseholdAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: HouseholdSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: HouseholdMinAggregateInputType
@@ -125,6 +167,8 @@ export type HouseholdGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   _count?: HouseholdCountAggregateInputType | true
+  _avg?: HouseholdAvgAggregateInputType
+  _sum?: HouseholdSumAggregateInputType
   _min?: HouseholdMinAggregateInputType
   _max?: HouseholdMaxAggregateInputType
 }
@@ -132,7 +176,11 @@ export type HouseholdGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
 export type HouseholdGroupByOutputType = {
   id: string
   name: string
+  defaultShoppingCycleDays: number
+  defaultStore: string | null
   _count: HouseholdCountAggregateOutputType | null
+  _avg: HouseholdAvgAggregateOutputType | null
+  _sum: HouseholdSumAggregateOutputType | null
   _min: HouseholdMinAggregateOutputType | null
   _max: HouseholdMaxAggregateOutputType | null
 }
@@ -158,12 +206,15 @@ export type HouseholdWhereInput = {
   NOT?: Prisma.HouseholdWhereInput | Prisma.HouseholdWhereInput[]
   id?: Prisma.StringFilter<"Household"> | string
   name?: Prisma.StringFilter<"Household"> | string
+  defaultShoppingCycleDays?: Prisma.IntFilter<"Household"> | number
+  defaultStore?: Prisma.StringNullableFilter<"Household"> | string | null
   memberships?: Prisma.MembershipListRelationFilter
   invitations?: Prisma.HouseholdInvitationListRelationFilter
   inventoryItems?: Prisma.InventoryItemListRelationFilter
   inventoryActions?: Prisma.InventoryActionListRelationFilter
   inventoryStateActions?: Prisma.InventoryStateActionListRelationFilter
   inventoryUndos?: Prisma.InventoryUndoListRelationFilter
+  itemChanges?: Prisma.InventoryItemChangeListRelationFilter
   shoppingTrips?: Prisma.ShoppingTripListRelationFilter
   categories?: Prisma.CategoryListRelationFilter
   locations?: Prisma.LocationListRelationFilter
@@ -174,12 +225,15 @@ export type HouseholdWhereInput = {
 export type HouseholdOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  defaultShoppingCycleDays?: Prisma.SortOrder
+  defaultStore?: Prisma.SortOrderInput | Prisma.SortOrder
   memberships?: Prisma.MembershipOrderByRelationAggregateInput
   invitations?: Prisma.HouseholdInvitationOrderByRelationAggregateInput
   inventoryItems?: Prisma.InventoryItemOrderByRelationAggregateInput
   inventoryActions?: Prisma.InventoryActionOrderByRelationAggregateInput
   inventoryStateActions?: Prisma.InventoryStateActionOrderByRelationAggregateInput
   inventoryUndos?: Prisma.InventoryUndoOrderByRelationAggregateInput
+  itemChanges?: Prisma.InventoryItemChangeOrderByRelationAggregateInput
   shoppingTrips?: Prisma.ShoppingTripOrderByRelationAggregateInput
   categories?: Prisma.CategoryOrderByRelationAggregateInput
   locations?: Prisma.LocationOrderByRelationAggregateInput
@@ -193,12 +247,15 @@ export type HouseholdWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.HouseholdWhereInput[]
   NOT?: Prisma.HouseholdWhereInput | Prisma.HouseholdWhereInput[]
   name?: Prisma.StringFilter<"Household"> | string
+  defaultShoppingCycleDays?: Prisma.IntFilter<"Household"> | number
+  defaultStore?: Prisma.StringNullableFilter<"Household"> | string | null
   memberships?: Prisma.MembershipListRelationFilter
   invitations?: Prisma.HouseholdInvitationListRelationFilter
   inventoryItems?: Prisma.InventoryItemListRelationFilter
   inventoryActions?: Prisma.InventoryActionListRelationFilter
   inventoryStateActions?: Prisma.InventoryStateActionListRelationFilter
   inventoryUndos?: Prisma.InventoryUndoListRelationFilter
+  itemChanges?: Prisma.InventoryItemChangeListRelationFilter
   shoppingTrips?: Prisma.ShoppingTripListRelationFilter
   categories?: Prisma.CategoryListRelationFilter
   locations?: Prisma.LocationListRelationFilter
@@ -209,9 +266,13 @@ export type HouseholdWhereUniqueInput = Prisma.AtLeast<{
 export type HouseholdOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  defaultShoppingCycleDays?: Prisma.SortOrder
+  defaultStore?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.HouseholdCountOrderByAggregateInput
+  _avg?: Prisma.HouseholdAvgOrderByAggregateInput
   _max?: Prisma.HouseholdMaxOrderByAggregateInput
   _min?: Prisma.HouseholdMinOrderByAggregateInput
+  _sum?: Prisma.HouseholdSumOrderByAggregateInput
 }
 
 export type HouseholdScalarWhereWithAggregatesInput = {
@@ -220,17 +281,22 @@ export type HouseholdScalarWhereWithAggregatesInput = {
   NOT?: Prisma.HouseholdScalarWhereWithAggregatesInput | Prisma.HouseholdScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Household"> | string
   name?: Prisma.StringWithAggregatesFilter<"Household"> | string
+  defaultShoppingCycleDays?: Prisma.IntWithAggregatesFilter<"Household"> | number
+  defaultStore?: Prisma.StringNullableWithAggregatesFilter<"Household"> | string | null
 }
 
 export type HouseholdCreateInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationCreateNestedManyWithoutHouseholdInput
@@ -241,12 +307,15 @@ export type HouseholdCreateInput = {
 export type HouseholdUncheckedCreateInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutHouseholdInput
@@ -257,12 +326,15 @@ export type HouseholdUncheckedCreateInput = {
 export type HouseholdUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUpdateManyWithoutHouseholdNestedInput
@@ -273,12 +345,15 @@ export type HouseholdUpdateInput = {
 export type HouseholdUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -289,31 +364,51 @@ export type HouseholdUncheckedUpdateInput = {
 export type HouseholdCreateManyInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
 }
 
 export type HouseholdUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type HouseholdUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type HouseholdCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  defaultShoppingCycleDays?: Prisma.SortOrder
+  defaultStore?: Prisma.SortOrder
+}
+
+export type HouseholdAvgOrderByAggregateInput = {
+  defaultShoppingCycleDays?: Prisma.SortOrder
 }
 
 export type HouseholdMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  defaultShoppingCycleDays?: Prisma.SortOrder
+  defaultStore?: Prisma.SortOrder
 }
 
 export type HouseholdMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  defaultShoppingCycleDays?: Prisma.SortOrder
+  defaultStore?: Prisma.SortOrder
+}
+
+export type HouseholdSumOrderByAggregateInput = {
+  defaultShoppingCycleDays?: Prisma.SortOrder
 }
 
 export type HouseholdScalarRelationFilter = {
@@ -405,6 +500,20 @@ export type HouseholdUpdateOneRequiredWithoutInventoryItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.HouseholdUpdateToOneWithWhereWithoutInventoryItemsInput, Prisma.HouseholdUpdateWithoutInventoryItemsInput>, Prisma.HouseholdUncheckedUpdateWithoutInventoryItemsInput>
 }
 
+export type HouseholdCreateNestedOneWithoutItemChangesInput = {
+  create?: Prisma.XOR<Prisma.HouseholdCreateWithoutItemChangesInput, Prisma.HouseholdUncheckedCreateWithoutItemChangesInput>
+  connectOrCreate?: Prisma.HouseholdCreateOrConnectWithoutItemChangesInput
+  connect?: Prisma.HouseholdWhereUniqueInput
+}
+
+export type HouseholdUpdateOneRequiredWithoutItemChangesNestedInput = {
+  create?: Prisma.XOR<Prisma.HouseholdCreateWithoutItemChangesInput, Prisma.HouseholdUncheckedCreateWithoutItemChangesInput>
+  connectOrCreate?: Prisma.HouseholdCreateOrConnectWithoutItemChangesInput
+  upsert?: Prisma.HouseholdUpsertWithoutItemChangesInput
+  connect?: Prisma.HouseholdWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.HouseholdUpdateToOneWithWhereWithoutItemChangesInput, Prisma.HouseholdUpdateWithoutItemChangesInput>, Prisma.HouseholdUncheckedUpdateWithoutItemChangesInput>
+}
+
 export type HouseholdCreateNestedOneWithoutInventoryStateActionsInput = {
   create?: Prisma.XOR<Prisma.HouseholdCreateWithoutInventoryStateActionsInput, Prisma.HouseholdUncheckedCreateWithoutInventoryStateActionsInput>
   connectOrCreate?: Prisma.HouseholdCreateOrConnectWithoutInventoryStateActionsInput
@@ -478,12 +587,15 @@ export type HouseholdUpdateOneRequiredWithoutInventoryUndosNestedInput = {
 export type HouseholdCreateWithoutCategoriesInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationCreateNestedManyWithoutHouseholdInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutHouseholdInput
@@ -493,12 +605,15 @@ export type HouseholdCreateWithoutCategoriesInput = {
 export type HouseholdUncheckedCreateWithoutCategoriesInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutHouseholdInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutHouseholdInput
@@ -524,12 +639,15 @@ export type HouseholdUpdateToOneWithWhereWithoutCategoriesInput = {
 export type HouseholdUpdateWithoutCategoriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUpdateManyWithoutHouseholdNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutHouseholdNestedInput
@@ -539,12 +657,15 @@ export type HouseholdUpdateWithoutCategoriesInput = {
 export type HouseholdUncheckedUpdateWithoutCategoriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUncheckedUpdateManyWithoutHouseholdNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -554,12 +675,15 @@ export type HouseholdUncheckedUpdateWithoutCategoriesInput = {
 export type HouseholdCreateWithoutLocationsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryCreateNestedManyWithoutHouseholdInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutHouseholdInput
@@ -569,12 +693,15 @@ export type HouseholdCreateWithoutLocationsInput = {
 export type HouseholdUncheckedCreateWithoutLocationsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutHouseholdInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutHouseholdInput
@@ -600,12 +727,15 @@ export type HouseholdUpdateToOneWithWhereWithoutLocationsInput = {
 export type HouseholdUpdateWithoutLocationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutHouseholdNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutHouseholdNestedInput
@@ -615,12 +745,15 @@ export type HouseholdUpdateWithoutLocationsInput = {
 export type HouseholdUncheckedUpdateWithoutLocationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutHouseholdNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -630,12 +763,15 @@ export type HouseholdUncheckedUpdateWithoutLocationsInput = {
 export type HouseholdCreateWithoutTagsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationCreateNestedManyWithoutHouseholdInput
@@ -645,12 +781,15 @@ export type HouseholdCreateWithoutTagsInput = {
 export type HouseholdUncheckedCreateWithoutTagsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutHouseholdInput
@@ -676,12 +815,15 @@ export type HouseholdUpdateToOneWithWhereWithoutTagsInput = {
 export type HouseholdUpdateWithoutTagsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUpdateManyWithoutHouseholdNestedInput
@@ -691,12 +833,15 @@ export type HouseholdUpdateWithoutTagsInput = {
 export type HouseholdUncheckedUpdateWithoutTagsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -706,11 +851,14 @@ export type HouseholdUncheckedUpdateWithoutTagsInput = {
 export type HouseholdCreateWithoutMembershipsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationCreateNestedManyWithoutHouseholdInput
@@ -721,11 +869,14 @@ export type HouseholdCreateWithoutMembershipsInput = {
 export type HouseholdUncheckedCreateWithoutMembershipsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutHouseholdInput
@@ -752,11 +903,14 @@ export type HouseholdUpdateToOneWithWhereWithoutMembershipsInput = {
 export type HouseholdUpdateWithoutMembershipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUpdateManyWithoutHouseholdNestedInput
@@ -767,11 +921,14 @@ export type HouseholdUpdateWithoutMembershipsInput = {
 export type HouseholdUncheckedUpdateWithoutMembershipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -782,11 +939,14 @@ export type HouseholdUncheckedUpdateWithoutMembershipsInput = {
 export type HouseholdCreateWithoutInvitationsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationCreateNestedManyWithoutHouseholdInput
@@ -797,11 +957,14 @@ export type HouseholdCreateWithoutInvitationsInput = {
 export type HouseholdUncheckedCreateWithoutInvitationsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutHouseholdInput
@@ -828,11 +991,14 @@ export type HouseholdUpdateToOneWithWhereWithoutInvitationsInput = {
 export type HouseholdUpdateWithoutInvitationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUpdateManyWithoutHouseholdNestedInput
@@ -843,11 +1009,14 @@ export type HouseholdUpdateWithoutInvitationsInput = {
 export type HouseholdUncheckedUpdateWithoutInvitationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -858,11 +1027,14 @@ export type HouseholdUncheckedUpdateWithoutInvitationsInput = {
 export type HouseholdCreateWithoutInventoryItemsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationCreateNestedManyWithoutHouseholdInput
@@ -873,11 +1045,14 @@ export type HouseholdCreateWithoutInventoryItemsInput = {
 export type HouseholdUncheckedCreateWithoutInventoryItemsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutHouseholdInput
@@ -904,11 +1079,14 @@ export type HouseholdUpdateToOneWithWhereWithoutInventoryItemsInput = {
 export type HouseholdUpdateWithoutInventoryItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUpdateManyWithoutHouseholdNestedInput
@@ -919,8 +1097,99 @@ export type HouseholdUpdateWithoutInventoryItemsInput = {
 export type HouseholdUncheckedUpdateWithoutInventoryItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
+  inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutHouseholdNestedInput
+  inventoryStateActions?: Prisma.InventoryStateActionUncheckedUpdateManyWithoutHouseholdNestedInput
+  inventoryUndos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutHouseholdNestedInput
+  shoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutHouseholdNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutHouseholdNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutHouseholdNestedInput
+  locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutHouseholdNestedInput
+  tags?: Prisma.TagUncheckedUpdateManyWithoutHouseholdNestedInput
+}
+
+export type HouseholdCreateWithoutItemChangesInput = {
+  id?: string
+  name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
+  memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
+  invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
+  inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
+  inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutHouseholdInput
+  inventoryStateActions?: Prisma.InventoryStateActionCreateNestedManyWithoutHouseholdInput
+  inventoryUndos?: Prisma.InventoryUndoCreateNestedManyWithoutHouseholdInput
+  shoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutHouseholdInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutHouseholdInput
+  locations?: Prisma.LocationCreateNestedManyWithoutHouseholdInput
+  locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutHouseholdInput
+  tags?: Prisma.TagCreateNestedManyWithoutHouseholdInput
+}
+
+export type HouseholdUncheckedCreateWithoutItemChangesInput = {
+  id?: string
+  name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
+  memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
+  invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
+  inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
+  inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutHouseholdInput
+  inventoryStateActions?: Prisma.InventoryStateActionUncheckedCreateNestedManyWithoutHouseholdInput
+  inventoryUndos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutHouseholdInput
+  shoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutHouseholdInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutHouseholdInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutHouseholdInput
+  locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutHouseholdInput
+  tags?: Prisma.TagUncheckedCreateNestedManyWithoutHouseholdInput
+}
+
+export type HouseholdCreateOrConnectWithoutItemChangesInput = {
+  where: Prisma.HouseholdWhereUniqueInput
+  create: Prisma.XOR<Prisma.HouseholdCreateWithoutItemChangesInput, Prisma.HouseholdUncheckedCreateWithoutItemChangesInput>
+}
+
+export type HouseholdUpsertWithoutItemChangesInput = {
+  update: Prisma.XOR<Prisma.HouseholdUpdateWithoutItemChangesInput, Prisma.HouseholdUncheckedUpdateWithoutItemChangesInput>
+  create: Prisma.XOR<Prisma.HouseholdCreateWithoutItemChangesInput, Prisma.HouseholdUncheckedCreateWithoutItemChangesInput>
+  where?: Prisma.HouseholdWhereInput
+}
+
+export type HouseholdUpdateToOneWithWhereWithoutItemChangesInput = {
+  where?: Prisma.HouseholdWhereInput
+  data: Prisma.XOR<Prisma.HouseholdUpdateWithoutItemChangesInput, Prisma.HouseholdUncheckedUpdateWithoutItemChangesInput>
+}
+
+export type HouseholdUpdateWithoutItemChangesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
+  invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
+  inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
+  inventoryActions?: Prisma.InventoryActionUpdateManyWithoutHouseholdNestedInput
+  inventoryStateActions?: Prisma.InventoryStateActionUpdateManyWithoutHouseholdNestedInput
+  inventoryUndos?: Prisma.InventoryUndoUpdateManyWithoutHouseholdNestedInput
+  shoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutHouseholdNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutHouseholdNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutHouseholdNestedInput
+  locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutHouseholdNestedInput
+  tags?: Prisma.TagUpdateManyWithoutHouseholdNestedInput
+}
+
+export type HouseholdUncheckedUpdateWithoutItemChangesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
+  invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
+  inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -934,11 +1203,14 @@ export type HouseholdUncheckedUpdateWithoutInventoryItemsInput = {
 export type HouseholdCreateWithoutInventoryStateActionsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationCreateNestedManyWithoutHouseholdInput
@@ -949,11 +1221,14 @@ export type HouseholdCreateWithoutInventoryStateActionsInput = {
 export type HouseholdUncheckedCreateWithoutInventoryStateActionsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutHouseholdInput
@@ -980,11 +1255,14 @@ export type HouseholdUpdateToOneWithWhereWithoutInventoryStateActionsInput = {
 export type HouseholdUpdateWithoutInventoryStateActionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUpdateManyWithoutHouseholdNestedInput
@@ -995,11 +1273,14 @@ export type HouseholdUpdateWithoutInventoryStateActionsInput = {
 export type HouseholdUncheckedUpdateWithoutInventoryStateActionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1010,12 +1291,15 @@ export type HouseholdUncheckedUpdateWithoutInventoryStateActionsInput = {
 export type HouseholdCreateWithoutShoppingTripsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationCreateNestedManyWithoutHouseholdInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutHouseholdInput
@@ -1025,12 +1309,15 @@ export type HouseholdCreateWithoutShoppingTripsInput = {
 export type HouseholdUncheckedCreateWithoutShoppingTripsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutHouseholdInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1056,12 +1343,15 @@ export type HouseholdUpdateToOneWithWhereWithoutShoppingTripsInput = {
 export type HouseholdUpdateWithoutShoppingTripsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUpdateManyWithoutHouseholdNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutHouseholdNestedInput
@@ -1071,12 +1361,15 @@ export type HouseholdUpdateWithoutShoppingTripsInput = {
 export type HouseholdUncheckedUpdateWithoutShoppingTripsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUncheckedUpdateManyWithoutHouseholdNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1086,12 +1379,15 @@ export type HouseholdUncheckedUpdateWithoutShoppingTripsInput = {
 export type HouseholdCreateWithoutLocationStockChecksInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationCreateNestedManyWithoutHouseholdInput
@@ -1101,12 +1397,15 @@ export type HouseholdCreateWithoutLocationStockChecksInput = {
 export type HouseholdUncheckedCreateWithoutLocationStockChecksInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1132,12 +1431,15 @@ export type HouseholdUpdateToOneWithWhereWithoutLocationStockChecksInput = {
 export type HouseholdUpdateWithoutLocationStockChecksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUpdateManyWithoutHouseholdNestedInput
@@ -1147,12 +1449,15 @@ export type HouseholdUpdateWithoutLocationStockChecksInput = {
 export type HouseholdUncheckedUpdateWithoutLocationStockChecksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1162,11 +1467,14 @@ export type HouseholdUncheckedUpdateWithoutLocationStockChecksInput = {
 export type HouseholdCreateWithoutInventoryActionsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationCreateNestedManyWithoutHouseholdInput
@@ -1177,11 +1485,14 @@ export type HouseholdCreateWithoutInventoryActionsInput = {
 export type HouseholdUncheckedCreateWithoutInventoryActionsInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1208,11 +1519,14 @@ export type HouseholdUpdateToOneWithWhereWithoutInventoryActionsInput = {
 export type HouseholdUpdateWithoutInventoryActionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUpdateManyWithoutHouseholdNestedInput
@@ -1223,11 +1537,14 @@ export type HouseholdUpdateWithoutInventoryActionsInput = {
 export type HouseholdUncheckedUpdateWithoutInventoryActionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryUndos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1238,11 +1555,14 @@ export type HouseholdUncheckedUpdateWithoutInventoryActionsInput = {
 export type HouseholdCreateWithoutInventoryUndosInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationCreateNestedManyWithoutHouseholdInput
@@ -1253,11 +1573,14 @@ export type HouseholdCreateWithoutInventoryUndosInput = {
 export type HouseholdUncheckedCreateWithoutInventoryUndosInput = {
   id?: string
   name: string
+  defaultShoppingCycleDays?: number
+  defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedCreateNestedManyWithoutHouseholdInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutHouseholdInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutHouseholdInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutHouseholdInput
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1284,11 +1607,14 @@ export type HouseholdUpdateToOneWithWhereWithoutInventoryUndosInput = {
 export type HouseholdUpdateWithoutInventoryUndosInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUpdateManyWithoutHouseholdNestedInput
@@ -1299,11 +1625,14 @@ export type HouseholdUpdateWithoutInventoryUndosInput = {
 export type HouseholdUncheckedUpdateWithoutInventoryUndosInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryStateActions?: Prisma.InventoryStateActionUncheckedUpdateManyWithoutHouseholdNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutHouseholdNestedInput
   shoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutHouseholdNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutHouseholdNestedInput
   locations?: Prisma.LocationUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1323,6 +1652,7 @@ export type HouseholdCountOutputType = {
   inventoryActions: number
   inventoryStateActions: number
   inventoryUndos: number
+  itemChanges: number
   shoppingTrips: number
   categories: number
   locations: number
@@ -1337,6 +1667,7 @@ export type HouseholdCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   inventoryActions?: boolean | HouseholdCountOutputTypeCountInventoryActionsArgs
   inventoryStateActions?: boolean | HouseholdCountOutputTypeCountInventoryStateActionsArgs
   inventoryUndos?: boolean | HouseholdCountOutputTypeCountInventoryUndosArgs
+  itemChanges?: boolean | HouseholdCountOutputTypeCountItemChangesArgs
   shoppingTrips?: boolean | HouseholdCountOutputTypeCountShoppingTripsArgs
   categories?: boolean | HouseholdCountOutputTypeCountCategoriesArgs
   locations?: boolean | HouseholdCountOutputTypeCountLocationsArgs
@@ -1399,6 +1730,13 @@ export type HouseholdCountOutputTypeCountInventoryUndosArgs<ExtArgs extends runt
 /**
  * HouseholdCountOutputType without action
  */
+export type HouseholdCountOutputTypeCountItemChangesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InventoryItemChangeWhereInput
+}
+
+/**
+ * HouseholdCountOutputType without action
+ */
 export type HouseholdCountOutputTypeCountShoppingTripsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ShoppingTripWhereInput
 }
@@ -1435,12 +1773,15 @@ export type HouseholdCountOutputTypeCountTagsArgs<ExtArgs extends runtime.Types.
 export type HouseholdSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  defaultShoppingCycleDays?: boolean
+  defaultStore?: boolean
   memberships?: boolean | Prisma.Household$membershipsArgs<ExtArgs>
   invitations?: boolean | Prisma.Household$invitationsArgs<ExtArgs>
   inventoryItems?: boolean | Prisma.Household$inventoryItemsArgs<ExtArgs>
   inventoryActions?: boolean | Prisma.Household$inventoryActionsArgs<ExtArgs>
   inventoryStateActions?: boolean | Prisma.Household$inventoryStateActionsArgs<ExtArgs>
   inventoryUndos?: boolean | Prisma.Household$inventoryUndosArgs<ExtArgs>
+  itemChanges?: boolean | Prisma.Household$itemChangesArgs<ExtArgs>
   shoppingTrips?: boolean | Prisma.Household$shoppingTripsArgs<ExtArgs>
   categories?: boolean | Prisma.Household$categoriesArgs<ExtArgs>
   locations?: boolean | Prisma.Household$locationsArgs<ExtArgs>
@@ -1452,19 +1793,25 @@ export type HouseholdSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type HouseholdSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  defaultShoppingCycleDays?: boolean
+  defaultStore?: boolean
 }, ExtArgs["result"]["household"]>
 
 export type HouseholdSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  defaultShoppingCycleDays?: boolean
+  defaultStore?: boolean
 }, ExtArgs["result"]["household"]>
 
 export type HouseholdSelectScalar = {
   id?: boolean
   name?: boolean
+  defaultShoppingCycleDays?: boolean
+  defaultStore?: boolean
 }
 
-export type HouseholdOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name", ExtArgs["result"]["household"]>
+export type HouseholdOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "defaultShoppingCycleDays" | "defaultStore", ExtArgs["result"]["household"]>
 export type HouseholdInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   memberships?: boolean | Prisma.Household$membershipsArgs<ExtArgs>
   invitations?: boolean | Prisma.Household$invitationsArgs<ExtArgs>
@@ -1472,6 +1819,7 @@ export type HouseholdInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   inventoryActions?: boolean | Prisma.Household$inventoryActionsArgs<ExtArgs>
   inventoryStateActions?: boolean | Prisma.Household$inventoryStateActionsArgs<ExtArgs>
   inventoryUndos?: boolean | Prisma.Household$inventoryUndosArgs<ExtArgs>
+  itemChanges?: boolean | Prisma.Household$itemChangesArgs<ExtArgs>
   shoppingTrips?: boolean | Prisma.Household$shoppingTripsArgs<ExtArgs>
   categories?: boolean | Prisma.Household$categoriesArgs<ExtArgs>
   locations?: boolean | Prisma.Household$locationsArgs<ExtArgs>
@@ -1491,6 +1839,7 @@ export type $HouseholdPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     inventoryActions: Prisma.$InventoryActionPayload<ExtArgs>[]
     inventoryStateActions: Prisma.$InventoryStateActionPayload<ExtArgs>[]
     inventoryUndos: Prisma.$InventoryUndoPayload<ExtArgs>[]
+    itemChanges: Prisma.$InventoryItemChangePayload<ExtArgs>[]
     shoppingTrips: Prisma.$ShoppingTripPayload<ExtArgs>[]
     categories: Prisma.$CategoryPayload<ExtArgs>[]
     locations: Prisma.$LocationPayload<ExtArgs>[]
@@ -1500,6 +1849,8 @@ export type $HouseholdPayload<ExtArgs extends runtime.Types.Extensions.InternalA
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
+    defaultShoppingCycleDays: number
+    defaultStore: string | null
   }, ExtArgs["result"]["household"]>
   composites: {}
 }
@@ -1900,6 +2251,7 @@ export interface Prisma__HouseholdClient<T, Null = never, ExtArgs extends runtim
   inventoryActions<T extends Prisma.Household$inventoryActionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Household$inventoryActionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InventoryActionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   inventoryStateActions<T extends Prisma.Household$inventoryStateActionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Household$inventoryStateActionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InventoryStateActionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   inventoryUndos<T extends Prisma.Household$inventoryUndosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Household$inventoryUndosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InventoryUndoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  itemChanges<T extends Prisma.Household$itemChangesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Household$itemChangesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InventoryItemChangePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   shoppingTrips<T extends Prisma.Household$shoppingTripsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Household$shoppingTripsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShoppingTripPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   categories<T extends Prisma.Household$categoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Household$categoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   locations<T extends Prisma.Household$locationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Household$locationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1936,6 +2288,8 @@ export interface Prisma__HouseholdClient<T, Null = never, ExtArgs extends runtim
 export interface HouseholdFieldRefs {
   readonly id: Prisma.FieldRef<"Household", 'String'>
   readonly name: Prisma.FieldRef<"Household", 'String'>
+  readonly defaultShoppingCycleDays: Prisma.FieldRef<"Household", 'Int'>
+  readonly defaultStore: Prisma.FieldRef<"Household", 'String'>
 }
     
 
@@ -2470,6 +2824,30 @@ export type Household$inventoryUndosArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.InventoryUndoScalarFieldEnum | Prisma.InventoryUndoScalarFieldEnum[]
+}
+
+/**
+ * Household.itemChanges
+ */
+export type Household$itemChangesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InventoryItemChange
+   */
+  select?: Prisma.InventoryItemChangeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InventoryItemChange
+   */
+  omit?: Prisma.InventoryItemChangeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InventoryItemChangeInclude<ExtArgs> | null
+  where?: Prisma.InventoryItemChangeWhereInput
+  orderBy?: Prisma.InventoryItemChangeOrderByWithRelationInput | Prisma.InventoryItemChangeOrderByWithRelationInput[]
+  cursor?: Prisma.InventoryItemChangeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InventoryItemChangeScalarFieldEnum | Prisma.InventoryItemChangeScalarFieldEnum[]
 }
 
 /**

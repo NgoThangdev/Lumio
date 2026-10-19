@@ -54,6 +54,95 @@ function setup() {
 }
 
 describe('Notification evaluator revalidation', () => {
+  it('rechecks the digest time after due-user selection', async () => {
+    const { service, prisma } = setup();
+    prisma.notificationPreference.findMany.mockResolvedValue([
+      { userId: 'user' },
+    ]);
+    prisma.notificationPreference.findUnique.mockResolvedValue({
+      ...preference,
+      dailyDigestEnabled: true,
+      digestTime: '10:00',
+    });
+    await service.evaluateDueDigests(new Date('2026-10-15T01:00:00.000Z'));
+    expect(prisma.notificationIntent.createMany).not.toHaveBeenCalled();
+  });
+
+  it('selects each opted-in user at their own local time and never reselects an existing day key', async () => {
+    const { service, prisma } = setup();
+    const preferences = [
+      {
+        userId: 'early',
+        digestTime: '08:00',
+        dailyDigestEnabled: true,
+        lowStockAlertsEnabled: true,
+      },
+      {
+        userId: 'late',
+        digestTime: '10:00',
+        dailyDigestEnabled: true,
+        lowStockAlertsEnabled: true,
+      },
+      {
+        userId: 'changed',
+        digestTime: '12:00',
+        dailyDigestEnabled: true,
+        lowStockAlertsEnabled: true,
+      },
+      {
+        userId: 'off',
+        digestTime: '08:00',
+        dailyDigestEnabled: false,
+        lowStockAlertsEnabled: true,
+      },
+      {
+        userId: 'no-category',
+        digestTime: '08:00',
+        dailyDigestEnabled: true,
+        lowStockAlertsEnabled: false,
+      },
+    ];
+    const keys = new Set<string>();
+    prisma.notificationPreference.findMany.mockImplementation(
+      async ({ where }) =>
+        preferences
+          .filter(
+            (row) =>
+              row.dailyDigestEnabled &&
+              row.lowStockAlertsEnabled &&
+              row.digestTime <= where.digestTime.lte &&
+              !keys.has(
+                `${row.userId}:${where.user.notificationIntents.none.localDay}`,
+              ),
+          )
+          .map(({ userId }) => ({ userId })),
+    );
+    const evaluated: string[] = [];
+    vi.spyOn(service, 'evaluateUser').mockImplementation(
+      async (userId, when) => {
+        evaluated.push(userId);
+        keys.add(`${userId}:${new Date(when).toISOString().slice(0, 10)}`);
+        return { created: 1 };
+      },
+    );
+    await service.evaluateDueDigests(new Date('2026-10-15T00:59:00.000Z')); // 07:59
+    expect(evaluated).toEqual([]);
+    await service.evaluateDueDigests(new Date('2026-10-15T01:00:00.000Z'));
+    expect(evaluated).toEqual(['early']);
+    preferences[2].digestTime = '08:00'; // unsent and moved earlier: next tick is due
+    await service.evaluateDueDigests(new Date('2026-10-15T02:00:00.000Z'));
+    expect(evaluated).toEqual(['early', 'changed']);
+    preferences[0].digestTime = '11:00'; // moving it later cannot create a second intent
+    await service.evaluateDueDigests(new Date('2026-10-15T03:00:00.000Z'));
+    expect(evaluated).toEqual(['early', 'changed', 'late']);
+    preferences[1].digestTime = '08:00'; // moving it earlier cannot create a second intent
+    await service.evaluateDueDigests(new Date('2026-10-15T04:00:00.000Z'));
+    expect(evaluated).toEqual(['early', 'changed', 'late']);
+    await service.evaluateDueDigests(new Date('2026-10-15T17:00:00.000Z')); // next local day
+    expect(evaluated).toEqual(['early', 'changed', 'late']);
+    await service.evaluateDueDigests(new Date('2026-10-16T01:00:00.000Z'));
+    expect(evaluated).toEqual(['early', 'changed', 'late', 'late', 'changed']);
+  });
   it('keeps urgent and digest evaluation separate for scheduled runs', async () => {
     const { service, prisma } = setup();
     prisma.notificationPreference.findUnique.mockResolvedValue({

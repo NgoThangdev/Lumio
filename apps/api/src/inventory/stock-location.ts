@@ -3,7 +3,7 @@ import type { PrismaService } from '../prisma/prisma.service.js';
 
 export type StockLocationClient = Pick<
   PrismaService,
-  'location' | 'stockBatch' | 'inventoryItem'
+  '$queryRaw' | 'stockBatch' | 'inventoryItem'
 >;
 
 export async function resolveRestockLocation(
@@ -55,10 +55,13 @@ export async function resolveRestockLocation(
       itemId: input.itemId,
     });
   }
-  const location = await tx.location.findFirst({
-    where: { id: locationId, householdId: input.householdId },
-    select: { id: true },
-  });
+  // Serialize with catalog deletion before persisting the preferred location
+  // or creating a batch. The caller already owns this transaction.
+  const [location] = await tx.$queryRaw<Array<{ id: string }>>`
+    SELECT "id" FROM "Location"
+    WHERE "id" = ${locationId} AND "householdId" = ${input.householdId}
+    FOR KEY SHARE
+  `;
   if (!location) {
     throw new BadRequestException({
       statusCode: 400,

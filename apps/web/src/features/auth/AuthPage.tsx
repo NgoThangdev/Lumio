@@ -1,19 +1,15 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
 import { api } from '../../shared/api/client';
 import type { User } from '../../shared/api/types';
 import { Brand, Doodle } from '../../shared/ui/Doodle';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
 
 export function AuthPage({ onAuthed }: { onAuthed: (user: User) => void }) {
-  const navigate = useNavigate();
-  const location = useLocation();
   const [mode, setMode] = useState<'sign-in' | 'register'>('sign-in');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const from = (location.state as { from?: string } | null)?.from;
   return (
     <div className="shell">
       <header className="topbar">
@@ -71,18 +67,6 @@ export function AuthPage({ onAuthed }: { onAuthed: (user: User) => void }) {
                   .then((user) => {
                     onAuthed(user);
                     setPassword('');
-                    void navigate(
-                      from &&
-                        (from === '/households' ||
-                          from.startsWith('/households/') ||
-                          from === '/settings' ||
-                          from === '/attention' ||
-                          from.startsWith('/attention?') ||
-                          from.startsWith('/attention#'))
-                        ? from
-                        : '/households',
-                      { replace: true },
-                    );
                   })
                   .catch((cause: unknown) =>
                     setError(

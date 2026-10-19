@@ -131,6 +131,9 @@ export class ShoppingService {
                 primaryUnit: true,
                 trackingMode: true,
                 openedTrackingEnabled: true,
+                category: {
+                  select: { householdId: true, shoppingSection: true },
+                },
                 preferredRestockLocationId: true,
                 preferredRestockLocation: { select: { id: true, name: true } },
               },
@@ -144,7 +147,20 @@ export class ShoppingService {
       throw new NotFoundException(
         'Shopping trip was not found in this household.',
       );
-    return trip;
+    return {
+      ...trip,
+      entries: trip.entries.map((entry) => {
+        const { category, ...item } = entry.item;
+        return {
+          ...entry,
+          item,
+          shoppingSection:
+            category?.householdId === householdId
+              ? (category.shoppingSection ?? 'OTHER')
+              : 'OTHER',
+        };
+      }),
+    };
   }
 
   async create(
@@ -220,6 +236,13 @@ export class ShoppingService {
         });
         return;
       }
+      // Serialize candidate assessment and insertion with item Archive.
+      // Archive also locks its item row before checking active entries.
+      await tx.$queryRaw<Array<{ id: string }>>`
+        SELECT "id" FROM "InventoryItem"
+        WHERE "householdId" = ${householdId} AND "archivedAt" IS NULL
+        ORDER BY "id" FOR UPDATE
+      `;
       const previousTrip = await tx.shoppingTrip.findFirst({
         where: {
           householdId,
@@ -247,7 +270,11 @@ export class ShoppingService {
       );
       const skippedTargets = skippedIds.size
         ? await tx.inventoryItem.findMany({
-            where: { householdId, id: { in: [...skippedIds] } },
+            where: {
+              householdId,
+              archivedAt: null,
+              id: { in: [...skippedIds] },
+            },
             select: {
               id: true,
               targetStock: true,
@@ -366,14 +393,18 @@ export class ShoppingService {
         if (!['DRAFT', 'SHOPPING'].includes(locked[0].status)) {
           throw new ConflictException('This trip is already finished.');
         }
-        const item = await tx.inventoryItem.findFirst({
-          where: { id: itemId, householdId },
-          select: { id: true },
-        });
-        if (!item)
+        const item = await tx.$queryRaw<
+          Array<{ id: string; archivedAt: Date | null }>
+        >`
+          SELECT "id", "archivedAt" FROM "InventoryItem"
+          WHERE "id" = ${itemId} AND "householdId" = ${householdId}
+          FOR UPDATE
+        `;
+        if (!item.length)
           throw new NotFoundException(
             'Inventory item was not found in this household.',
           );
+        if (item[0].archivedAt) throw new ConflictException('ITEM_ARCHIVED');
         await tx.shoppingEntry.create({
           data: { tripId, itemId, source: 'MANUAL', priority: 'OPTIONAL' },
         });
@@ -408,6 +439,30 @@ export class ShoppingService {
         where: { id: tripId },
         data: { status: 'SHOPPING' },
       });
+    });
+    return this.read(actorId, householdId, tripId);
+  }
+
+  async removeEntry(
+    actorId: string,
+    householdId: string,
+    tripId: string,
+    entryId: string,
+  ) {
+    await this.requireMember(actorId, householdId);
+    await this.prisma.$transaction(async (tx) => {
+      const locked = await tx.$queryRaw<Array<{ status: string }>>`
+        SELECT "status" FROM "ShoppingTrip"
+        WHERE "id" = ${tripId} AND "householdId" = ${householdId}
+        FOR UPDATE
+      `;
+      if (!locked.length) throw new NotFoundException('TRIP_NOT_FOUND');
+      if (!['DRAFT', 'SHOPPING'].includes(locked[0].status))
+        throw new ConflictException('TRIP_ALREADY_FINISHED');
+      const removed = await tx.shoppingEntry.deleteMany({
+        where: { id: entryId, tripId },
+      });
+      if (removed.count !== 1) throw new NotFoundException('ENTRY_NOT_FOUND');
     });
     return this.read(actorId, householdId, tripId);
   }
@@ -498,10 +553,11 @@ export class ShoppingService {
           } else if (locationIdInput === null || locationIdInput === '') {
             locationId = null;
           } else if (typeof locationIdInput === 'string') {
-            const location = await tx.location.findFirst({
-              where: { id: locationIdInput, householdId },
-              select: { id: true },
-            });
+            const [location] = await tx.$queryRaw<Array<{ id: string }>>`
+              SELECT "id" FROM "Location"
+              WHERE "id" = ${locationIdInput} AND "householdId" = ${householdId}
+              FOR KEY SHARE
+            `;
             if (!location) {
               throw new BadRequestException({
                 statusCode: 400,

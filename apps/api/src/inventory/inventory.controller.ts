@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Param,
   Query,
   Post,
@@ -16,6 +17,7 @@ import { InventoryService } from './inventory.service.js';
 import { InventoryStateService } from './inventory-state.service.js';
 import { InventoryReadService } from './inventory-read.service.js';
 import { InventoryUndoService } from './inventory-undo.service.js';
+import { InventoryItemLifecycleService } from './inventory-item-lifecycle.service.js';
 
 function requiredString(value: unknown, label: string): string {
   if (typeof value !== 'string') {
@@ -47,6 +49,7 @@ export class InventoryController {
     private readonly state: InventoryStateService,
     private readonly readService: InventoryReadService,
     private readonly undoService: InventoryUndoService,
+    private readonly lifecycle: InventoryItemLifecycleService,
   ) {}
 
   @Get()
@@ -59,6 +62,14 @@ export class InventoryController {
       return this.readService.inventory(request.actorId, householdId, query);
     }
     return this.inventory.listItems(request.actorId, householdId);
+  }
+
+  @Get('archived')
+  archived(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+  ) {
+    return this.lifecycle.archived(request.actorId, householdId);
   }
 
   @Post()
@@ -107,6 +118,39 @@ export class InventoryController {
       householdId,
       itemId,
     });
+  }
+
+  @Patch(':itemId')
+  edit(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Param('itemId') itemId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.lifecycle.edit(
+      request.actorId,
+      householdId,
+      itemId,
+      body ?? {},
+    );
+  }
+
+  @Post(':itemId/archive')
+  archive(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Param('itemId') itemId: string,
+  ) {
+    return this.lifecycle.archive(request.actorId, householdId, itemId);
+  }
+
+  @Post(':itemId/restore')
+  restore(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Param('itemId') itemId: string,
+  ) {
+    return this.lifecycle.restore(request.actorId, householdId, itemId);
   }
 
   @Put(':itemId/config')

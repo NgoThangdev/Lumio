@@ -28,7 +28,7 @@ export function AttentionPage({ user }: { user: User }) {
   });
 
   return (
-    <main className="attention-page narrow">
+    <section className="attention-page narrow">
       <header className="attention-heading">
         <p className="eyebrow">Across your households</p>
         <h1>Current attention</h1>
@@ -69,7 +69,7 @@ export function AttentionPage({ user }: { user: User }) {
               <h2>{household.name}</h2>
               <ul className="attention-items">
                 {household.items.map((item) => (
-                  <li key={item.itemId}>
+                  <li className="attention-list-item" key={item.itemId}>
                     <Link
                       className="attention-item"
                       to={`/households/${household.householdId}/inventory/${item.itemId}`}
@@ -90,13 +90,18 @@ export function AttentionPage({ user }: { user: User }) {
                             </span>
                           ))}
                         </span>
-                        <small>Stock assessment: {item.lowStockRisk}</small>
-                        <small>Expiry assessment: {item.expiryRisk}</small>
                       </span>
                       <span className="attention-arrow" aria-hidden="true">
                         ›
                       </span>
                     </Link>
+                    <details className="attention-assessment">
+                      <summary>Assessment details</summary>
+                      <div>
+                        <small>Stock assessment: {item.lowStockRisk}</small>
+                        <small>Expiry assessment: {item.expiryRisk}</small>
+                      </div>
+                    </details>
                   </li>
                 ))}
               </ul>
@@ -104,6 +109,6 @@ export function AttentionPage({ user }: { user: User }) {
           ))}
         </div>
       )}
-    </main>
+    </section>
   );
 }

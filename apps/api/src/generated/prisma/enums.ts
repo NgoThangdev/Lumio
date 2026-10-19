@@ -95,6 +95,19 @@ export const ShoppingEntryPriority = {
 export type ShoppingEntryPriority = (typeof ShoppingEntryPriority)[keyof typeof ShoppingEntryPriority]
 
 
+export const ShoppingSection = {
+  FRESH_FOOD: 'FRESH_FOOD',
+  MEAT_SEAFOOD: 'MEAT_SEAFOOD',
+  DAIRY: 'DAIRY',
+  PANTRY: 'PANTRY',
+  DRINKS: 'DRINKS',
+  HOUSEHOLD: 'HOUSEHOLD',
+  PERSONAL_CARE: 'PERSONAL_CARE'
+} as const
+
+export type ShoppingSection = (typeof ShoppingSection)[keyof typeof ShoppingSection]
+
+
 export const NotificationIntentKind = {
   IMMEDIATE_ITEM: 'IMMEDIATE_ITEM',
   DAILY_DIGEST: 'DAILY_DIGEST'
