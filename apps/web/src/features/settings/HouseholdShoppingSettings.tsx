@@ -15,6 +15,7 @@ import type {
 import { Button, Card, Notice } from '../../shared/ui/primitives';
 import { CategorySectionSettings } from './CategorySectionSettings';
 import { CatalogManagement } from './CatalogManagement';
+import { CategoryInventoryDefaults } from './CategoryInventoryDefaults';
 
 import { tr } from '../../shared/i18n';
 import { localizedError } from '../../shared/i18n';
@@ -266,6 +267,7 @@ export function HouseholdShoppingSettings() {
                     key={`${selected.id}-sections`}
                     household={selected}
                   />
+                  <CategoryInventoryDefaults household={selected} />
                 </div>
               </details>
             </>

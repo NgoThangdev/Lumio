@@ -86,7 +86,7 @@ export function QuickPurchasePage() {
         });
       }
       return api<unknown>(`${base}/items/${itemId}/state/backups`, 'POST', {
-        count: amount,
+        count: quantity,
       });
     },
   });

@@ -32,6 +32,10 @@ export type InvitationPreview = {
   expiresAt: string;
 };
 export type CatalogOption = { id: string; name: string };
+export type CategoryOption = CatalogOption & {
+  defaultTrackingMode: TrackingMode | null;
+  defaultPrimaryUnit: string | null;
+};
 export type LocationCheckReason =
   | 'STOCK_CHANGED'
   | 'MISSING_STATE'
