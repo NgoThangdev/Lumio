@@ -33,6 +33,8 @@ import { keys } from '../shared/api/keys';
 import type { Household, User } from '../shared/api/types';
 import { Brand, Doodle } from '../shared/ui/Doodle';
 import { Button, Notice } from '../shared/ui/primitives';
+import { localizedError, tr } from '../shared/i18n';
+import { useTranslation } from 'react-i18next';
 
 function setSession(queryClient: QueryClient, user: User | null) {
   queryClient.removeQueries({
@@ -68,13 +70,13 @@ function SessionRoutes() {
   }, [queryClient]);
 
   if (session.isPending)
-    return <main className="loading">Checking your session…</main>;
+    return <main className="loading">{tr('common:checkingSession')}</main>;
   if (session.isError)
     return (
       <main className="loading">
-        <Notice kind="error">{session.error.message}</Notice>
+        <Notice kind="error">{localizedError(session.error)}</Notice>
         <Button onClick={() => void session.refetch()}>
-          Retry session check
+          {tr('common:retrySessionCheck')}
         </Button>
       </main>
     );
@@ -175,9 +177,13 @@ function SignedInShell({ user }: { user: User }) {
   return (
     <div className="shell">
       <header className="topbar">
-        <Link className="brand" to="/households" aria-label="Lumio households">
+        <Link
+          className="brand"
+          to="/households"
+          aria-label={tr('common:lumioHouseholdsTitle')}
+        >
           <Brand />
-          <span className="brand-tagline">Home stuff, happier days.</span>
+          <span className="brand-tagline">{tr('common:homeStuffHappier')}</span>
         </Link>
         <div className="top-actions">
           <small>{user.email}</small>
@@ -189,14 +195,14 @@ function SignedInShell({ user }: { user: User }) {
                 : '/settings'
             }
           >
-            Settings
+            {tr('common:settings')}
           </Link>
           <Button
             variant="link"
             disabled={signingOut}
             onClick={() => void signOut()}
           >
-            Sign out
+            {tr('common:signOut')}
           </Button>
         </div>
       </header>
@@ -214,9 +220,10 @@ function HouseholdBoundary() {
     queryKey: keys.households,
     queryFn: () => api<Household[]>('/households'),
   });
-  if (households.isPending) return <p className="muted">Loading household…</p>;
+  if (households.isPending)
+    return <p className="muted">{tr('common:loadingHousehold')}</p>;
   if (households.isError)
-    return <Notice kind="error">{households.error.message}</Notice>;
+    return <Notice kind="error">{localizedError(households.error)}</Notice>;
   const household = households.data.find((entry) => entry.id === householdId);
   if (!household) return <Navigate to="/households" replace />;
   return <HouseholdWorkspace key={household.id} household={household} />;
@@ -242,41 +249,41 @@ function HouseholdWorkspace({ household }: { household: Household }) {
         >
           <div>
             <Link className="link household-link" to="/households">
-              ← Households
+              {tr('common:households3')}
             </Link>
             <p className="eyebrow">{household.name}</p>
             <h1>
               {home
-                ? 'Home'
+                ? tr('common:home')
                 : shopping
-                  ? 'Shopping'
+                  ? tr('common:shopping2')
                   : item
-                    ? 'Item detail'
+                    ? tr('common:itemDetail')
                     : locationCheck
-                      ? 'Location check'
+                      ? tr('common:locationCheck')
                       : members
-                        ? 'Members & invites'
-                        : 'Inventory'}
+                        ? tr('common:membersInvites')
+                        : tr('common:inventory')}
             </h1>
             {!item && (
               <p className="page-subtitle">
                 {home
-                  ? 'A calmer way to care for what’s at home.'
+                  ? tr('common:calmerWayCare')
                   : shopping
-                    ? 'A little planning. A happier home.'
+                    ? tr('common:littlePlanningHappier')
                     : members
-                      ? 'Manage who shares this household.'
-                      : 'What’s at home, and what needs attention?'}
+                      ? tr('common:manageSharesHousehold')
+                      : tr('common:sHomeNeeds')}
               </p>
             )}
           </div>
           {item ? (
             <Link className="secondary" to={`${base}/inventory`}>
-              ← All items
+              {tr('common:allItems')}
             </Link>
           ) : household.role === 'ADMIN' && !members ? (
             <Link className="secondary" to={`${base}/members`}>
-              Members & invites
+              {tr('common:membersInvites')}
             </Link>
           ) : (
             <Doodle
@@ -288,7 +295,7 @@ function HouseholdWorkspace({ household }: { household: Household }) {
       )}
       <nav
         className={`workspace-nav${home ? ' home-nav' : ''}`}
-        aria-label="Household sections"
+        aria-label={tr('common:householdSectionsTitle')}
       >
         <Link
           className={home ? 'selected' : ''}
@@ -296,7 +303,7 @@ function HouseholdWorkspace({ household }: { household: Household }) {
           to={`${base}/home`}
         >
           <Doodle kind="home" />
-          <span>Home</span>
+          <span>{tr('common:home')}</span>
         </Link>
         <Link
           className={!home && !shopping && !members ? 'selected' : ''}
@@ -304,7 +311,7 @@ function HouseholdWorkspace({ household }: { household: Household }) {
           to={`${base}/inventory`}
         >
           <Doodle kind="inventory" />
-          <span>Inventory</span>
+          <span>{tr('common:inventory')}</span>
         </Link>
         <Link
           className={shopping ? 'selected' : ''}
@@ -312,11 +319,11 @@ function HouseholdWorkspace({ household }: { household: Household }) {
           to={`${base}/shopping`}
         >
           <Doodle kind="basket" />
-          <span>Shopping</span>
+          <span>{tr('common:shopping2')}</span>
         </Link>
         <Link to="/households">
           <Doodle kind="household" />
-          <span>Households</span>
+          <span>{tr('common:households')}</span>
         </Link>
       </nav>
       <Outlet context={{ household }} />
@@ -325,6 +332,7 @@ function HouseholdWorkspace({ household }: { household: Household }) {
 }
 
 export function App() {
+  useTranslation();
   return (
     <BrowserRouter>
       <NetworkStatus />
@@ -348,8 +356,7 @@ function NetworkStatus() {
   }, []);
   return online ? null : (
     <div className="offline-banner" role="status">
-      You’re offline. Live household data is unavailable, and changes are never
-      queued for later.
+      {tr('common:reOfflineLive')}
     </div>
   );
 }

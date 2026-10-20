@@ -1,0 +1,12 @@
+{
+  "liveViewItems": "A live view of items the server has marked for review.",
+  "acrossHouseholds": "Across your households",
+  "assessmentDetails": "Assessment details",
+  "currentAttention": "Current attention",
+  "currentAttentionLoaded": "Current attention could not be loaded:",
+  "expiryAssessment": "Expiry assessment: {{value}}",
+  "loadingCurrentAttention": "Loading current attention…",
+  "nothingNeedsAttention": "Nothing needs attention right now",
+  "stockAssessment": "Stock assessment: {{value}}",
+  "serverFindsItem": "When the server finds an item to review in one of your households, it will appear here."
+}

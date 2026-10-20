@@ -24,6 +24,17 @@
         (choice !== 'light' &&
           matchMedia('(prefers-color-scheme: dark)').matches);
       document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      let language = null;
+      try {
+        language = localStorage.getItem('lumio-language');
+      } catch {
+        // Browser language negotiation remains available without storage.
+      }
+      if (language !== 'en' && language !== 'vi') {
+        const browserLanguage = navigator.language.toLowerCase();
+        language = browserLanguage.startsWith('vi') ? 'vi' : 'en';
+      }
+      document.documentElement.lang = language;
       document
         .querySelector('meta[name="theme-color"]')
         ?.setAttribute('content', dark ? '#121a15' : '#faf9f5');

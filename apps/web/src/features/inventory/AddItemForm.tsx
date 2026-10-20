@@ -9,6 +9,7 @@ import {
 import { keys } from '../../shared/api/keys';
 import type {
   CatalogOption,
+  CategoryOption,
   Household,
   Item,
   StockLevel,
@@ -16,6 +17,8 @@ import type {
 } from '../../shared/api/types';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
 
+import { tr } from '../../shared/i18n';
+import { localizedError } from '../../shared/i18n';
 type CatalogKind = 'categories' | 'locations' | 'tags';
 
 export type QuickPurchaseSeed = { name: string; quantity: string };
@@ -52,9 +55,11 @@ function CatalogCreate({
   });
   return (
     <div className="catalog-create">
-      {create.isError && <Notice kind="error">{create.error.message}</Notice>}
+      {create.isError && (
+        <Notice kind="error">{localizedError(create.error)}</Notice>
+      )}
       <label>
-        New {singular} name
+        {tr('common:new')} {singular} {tr('common:name2')}
         <input
           value={name}
           onChange={(event) => setName(event.target.value)}
@@ -65,7 +70,7 @@ function CatalogCreate({
             }
           }}
           maxLength={80}
-          placeholder={`e.g. ${kind === 'categories' ? 'Food' : kind === 'locations' ? 'Pantry' : 'Everyday'}`}
+          placeholder={`e.g. ${kind === 'categories' ? 'Food' : kind === 'locations' ? tr('common:pantry') : 'Everyday'}`}
         />
       </label>
       <Button
@@ -74,7 +79,7 @@ function CatalogCreate({
         disabled={create.isPending || !name.trim()}
         onClick={() => create.mutate()}
       >
-        {create.isPending ? 'Adding…' : `Add ${singular}`}
+        {create.isPending ? tr('inventory:adding') : `Add ${singular}`}
       </Button>
     </div>
   );
@@ -90,8 +95,8 @@ export function AddItemForm({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [name, setName] = useState(quickPurchaseSeed?.name ?? '');
-  const [unit, setUnit] = useState('');
-  const [mode, setMode] = useState<TrackingMode>('QUANTITY');
+  const [manualUnit, setManualUnit] = useState<string | null>(null);
+  const [manualMode, setManualMode] = useState<TrackingMode | null>(null);
   const [categoryId, setCategoryId] = useState('');
   const [locationId, setLocationId] = useState('');
   const [tagIds, setTagIds] = useState<string[]>([]);
@@ -103,8 +108,14 @@ export function AddItemForm({
   const base = `/households/${household.id}`;
   const categories = useQuery({
     queryKey: keys.catalog(household.id, 'categories'),
-    queryFn: () => api<CatalogOption[]>(`${base}/categories`),
+    queryFn: () => api<CategoryOption[]>(`${base}/categories`),
   });
+  const selectedCategory = categories.data?.find(
+    (entry) => entry.id === categoryId,
+  );
+  const mode =
+    manualMode ?? selectedCategory?.defaultTrackingMode ?? 'QUANTITY';
+  const unit = manualUnit ?? selectedCategory?.defaultPrimaryUnit ?? '';
   const locations = useQuery({
     queryKey: keys.catalog(household.id, 'locations'),
     queryFn: () => api<CatalogOption[]>(`${base}/locations`),
@@ -177,7 +188,7 @@ export function AddItemForm({
       const refreshWarning = refreshes.some(
         (result) => result.status === 'rejected',
       )
-        ? ' The item was created, but some views could not refresh; check Inventory and Item Detail.'
+        ? tr('inventory:itemCreatedRefreshWarning')
         : '';
       void navigate(`${base}/inventory/${created.id}`, {
         state: { notice: `Item created.${refreshWarning}` },
@@ -204,61 +215,65 @@ export function AddItemForm({
 
   return (
     <Card className="create-card" id="add-item">
-      <p className="eyebrow">Make a little room</p>
-      <h2>Add something to your home</h2>
-      <p className="muted">
-        Choose its place and starting stock. Everything is saved together.
-      </p>
+      <p className="eyebrow">{tr('inventory:makeLittleRoom')}</p>
+      <h2>{tr('inventory:addSomethingHome')}</h2>
+      <p className="muted">{tr('inventory:choosePlaceStarting')}</p>
       {create.isError && (
         <Notice kind="error">
           {create.error instanceof OfflineBeforeSendError
-            ? create.error.message
+            ? localizedError(create.error)
             : isMutationOutcomeUnknown(create.error)
-              ? `The item request outcome is unknown. It may already have been saved. Check Inventory or Item Detail activity before choosing to retry. ${create.error.message}`
-              : `Item creation was rejected. The form is still available. ${create.error.message}`}
+              ? `The item request outcome is unknown. It may already have been saved. Check Inventory or Item Detail activity before choosing to retry. ${localizedError(create.error)}`
+              : `Item creation was rejected. The form is still available. ${localizedError(create.error)}`}
         </Notice>
       )}
       <form onSubmit={submit}>
         <label>
-          Item name
+          {tr('common:itemName')}
           <input
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder="e.g. Rice"
+            placeholder={tr('inventory:riceExample')}
             required
           />
         </label>
         <label>
-          Tracking mode
+          {tr('inventory:trackingMode')}
           <select
             value={mode}
-            onChange={(event) => setMode(event.target.value as TrackingMode)}
+            onChange={(event) =>
+              setManualMode(event.target.value as TrackingMode)
+            }
           >
-            <option value="QUANTITY">Quantity</option>
-            <option value="FIVE_LEVEL">Five levels</option>
-            <option value="PRESENCE_BACKUP">Present + backups</option>
+            <option value="QUANTITY">{tr('common:quantity')}</option>
+            <option value="FIVE_LEVEL">{tr('inventory:fiveLevels')}</option>
+            <option value="PRESENCE_BACKUP">
+              {tr('inventory:presentBackups')}
+            </option>
           </select>
         </label>
         <label>
-          Primary unit
+          {tr('common:primaryUnit')}
           <input
             value={unit}
-            onChange={(event) => setUnit(event.target.value)}
+            onChange={(event) => setManualUnit(event.target.value)}
             placeholder={
-              mode === 'QUANTITY' ? 'e.g. kg, bottle' : 'e.g. bottle, pack'
+              mode === 'QUANTITY'
+                ? tr('inventory:unitExample')
+                : 'e.g. bottle, pack'
             }
             required
           />
         </label>
         <label>
-          Category
+          {tr('common:category')}
           <select
             value={categoryId}
             onChange={(event) => setCategoryId(event.target.value)}
             required
             disabled={categories.isPending || categories.isError}
           >
-            <option value="">Choose a category</option>
+            <option value="">{tr('inventory:chooseCategory')}</option>
             {categories.data?.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
@@ -266,17 +281,16 @@ export function AddItemForm({
             ))}
           </select>
         </label>
-        {categories.isPending && <p className="muted">Loading categories…</p>}
+        {categories.isPending && (
+          <p className="muted">{tr('common:loadingCategories')}</p>
+        )}
         {categories.isError && (
           <Notice kind="error">
-            Categories could not be loaded: {categories.error.message}
+            {tr('common:categoriesLoaded')} {localizedError(categories.error)}
           </Notice>
         )}
         {categories.data?.length === 0 && household.role === 'MEMBER' && (
-          <p className="muted">
-            A household Admin needs to add a category before you can create an
-            item.
-          </p>
+          <p className="muted">{tr('inventory:householdAdminNeeds')}</p>
         )}
         {household.role === 'ADMIN' &&
           (categories.data?.length === 0 ? (
@@ -287,7 +301,7 @@ export function AddItemForm({
             />
           ) : (
             <details className="catalog-disclosure">
-              <summary>Add a category</summary>
+              <summary>{tr('inventory:addCategory')}</summary>
               <CatalogCreate
                 householdId={household.id}
                 kind="categories"
@@ -296,14 +310,14 @@ export function AddItemForm({
             </details>
           ))}
         <label>
-          Location
+          {tr('common:location')}
           <select
             value={locationId}
             onChange={(event) => setLocationId(event.target.value)}
             required
             disabled={locations.isPending || locations.isError}
           >
-            <option value="">Choose a location</option>
+            <option value="">{tr('common:chooseLocation')}</option>
             {locations.data?.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
@@ -311,17 +325,16 @@ export function AddItemForm({
             ))}
           </select>
         </label>
-        {locations.isPending && <p className="muted">Loading locations…</p>}
+        {locations.isPending && (
+          <p className="muted">{tr('common:loadingLocations2')}</p>
+        )}
         {locations.isError && (
           <Notice kind="error">
-            Locations could not be loaded: {locations.error.message}
+            {tr('common:locationsLoaded')} {localizedError(locations.error)}
           </Notice>
         )}
         {locations.data?.length === 0 && household.role === 'MEMBER' && (
-          <p className="muted">
-            A household Admin needs to add a location before you can create an
-            item.
-          </p>
+          <p className="muted">{tr('inventory:householdAdminNeeds2')}</p>
         )}
         {household.role === 'ADMIN' &&
           (locations.data?.length === 0 ? (
@@ -332,7 +345,7 @@ export function AddItemForm({
             />
           ) : (
             <details className="catalog-disclosure">
-              <summary>Add a location</summary>
+              <summary>{tr('inventory:addLocation')}</summary>
               <CatalogCreate
                 householdId={household.id}
                 kind="locations"
@@ -344,7 +357,7 @@ export function AddItemForm({
         {mode === 'QUANTITY' ? (
           <>
             <label>
-              Starting quantity
+              {tr('inventory:startingQuantity')}
               <input
                 type="text"
                 inputMode="decimal"
@@ -356,16 +369,16 @@ export function AddItemForm({
             </label>
             <p className="muted">
               {quickPurchaseSeed
-                ? 'This is the amount you bought; it will be saved as initial stock in the same request.'
-                : 'Have none at home? Enter 0 and restock later.'}
+                ? tr('inventory:amountBoughtSaved')
+                : tr('inventory:haveNoneHome')}
             </p>
             {quantity !== '0' && (
               <details className="catalog-disclosure">
                 <summary>
-                  Expiry date <em>optional</em>
+                  {tr('common:expiryDate')} <em>{tr('common:optional2')}</em>
                 </summary>
                 <label>
-                  Expiry date
+                  {tr('common:expiryDate')}
                   <input
                     type="date"
                     value={expiry}
@@ -379,7 +392,7 @@ export function AddItemForm({
           <>
             {mode === 'FIVE_LEVEL' ? (
               <label>
-                Current level
+                {tr('common:currentLevel')}
                 <select
                   value={level}
                   onChange={(event) =>
@@ -387,30 +400,30 @@ export function AddItemForm({
                   }
                   required
                 >
-                  <option value="">Choose a level</option>
-                  <option value="FULL">Full</option>
+                  <option value="">{tr('common:chooseLevel')}</option>
+                  <option value="FULL">{tr('common:full2')}</option>
                   <option value="THREE_QUARTERS">¾</option>
                   <option value="HALF">½</option>
                   <option value="QUARTER">¼</option>
-                  <option value="EMPTY">Empty</option>
+                  <option value="EMPTY">{tr('common:empty2')}</option>
                 </select>
               </label>
             ) : (
               <label>
-                Current item
+                {tr('common:currentItem')}
                 <select
                   value={present}
                   onChange={(event) => setPresent(event.target.value)}
                   required
                 >
-                  <option value="">Choose a state</option>
-                  <option value="true">Present</option>
-                  <option value="false">Absent</option>
+                  <option value="">{tr('common:chooseState')}</option>
+                  <option value="true">{tr('common:present')}</option>
+                  <option value="false">{tr('common:absent')}</option>
                 </select>
               </label>
             )}
             <label>
-              Backup count
+              {tr('common:backupCount')}
               <input
                 type="number"
                 inputMode="numeric"
@@ -426,17 +439,17 @@ export function AddItemForm({
 
         <details className="catalog-disclosure">
           <summary>
-            Tags <em>optional</em>
+            {tr('common:tags')} <em>{tr('common:optional2')}</em>
             {tagIds.length > 0 ? ` · ${tagIds.length} selected` : ''}
           </summary>
           {tags.isPending ? (
-            <p className="muted">Loading tags…</p>
+            <p className="muted">{tr('inventory:loadingTags')}</p>
           ) : tags.isError ? (
             <Notice kind="error">
-              Tags could not be loaded: {tags.error.message}
+              {tr('inventory:tagsLoaded')} {localizedError(tags.error)}
             </Notice>
           ) : tags.data.length === 0 ? (
-            <p className="muted">No tags yet.</p>
+            <p className="muted">{tr('common:tagsYet')}</p>
           ) : (
             tags.data.map((option) => (
               <label className="check-label" key={option.id}>
@@ -465,19 +478,19 @@ export function AddItemForm({
         </details>
         <p className="form-guidance" id="catalog-guidance" aria-live="polite">
           {categories.isPending || locations.isPending
-            ? 'Loading your household’s categories and locations…'
+            ? tr('common:loadingHouseholdS')
             : categories.isError || locations.isError
-              ? 'Categories and locations must load before you can create an item.'
+              ? tr('inventory:categoriesLocationsLoad')
               : !categoryId || !locationId
-                ? `Choose ${!categoryId && !locationId ? 'a category and a location' : !categoryId ? 'a category' : 'a location'} to continue. ${household.role === 'ADMIN' ? 'If there are no options, add one above.' : 'Ask a household Admin if an option is missing.'}`
-                : 'Ready when you are. Check the details above, then create your item.'}
+                ? `Choose ${!categoryId && !locationId ? 'a category and a location' : !categoryId ? 'a category' : 'a location'} to continue. ${household.role === 'ADMIN' ? tr('inventory:ifThereOptions') : tr('inventory:askHouseholdAdmin')}`
+                : tr('inventory:readyCheckDetails')}
         </p>
         <Button
           className="wide"
           aria-describedby="catalog-guidance"
           disabled={!canSubmit}
         >
-          {create.isPending ? 'Creating…' : 'Create item'}
+          {create.isPending ? tr('common:creating') : tr('common:createItem')}
         </Button>
       </form>
     </Card>

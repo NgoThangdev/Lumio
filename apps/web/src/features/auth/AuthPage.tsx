@@ -4,6 +4,7 @@ import type { User } from '../../shared/api/types';
 import { Brand, Doodle } from '../../shared/ui/Doodle';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
 
+import { localizedError, tr } from '../../shared/i18n';
 export function AuthPage({ onAuthed }: { onAuthed: (user: User) => void }) {
   const [mode, setMode] = useState<'sign-in' | 'register'>('sign-in');
   const [email, setEmail] = useState('');
@@ -15,27 +16,28 @@ export function AuthPage({ onAuthed }: { onAuthed: (user: User) => void }) {
       <header className="topbar">
         <div className="brand">
           <Brand />
-          <span className="brand-tagline">Home stuff, happier days.</span>
+          <span className="brand-tagline">{tr('common:homeStuffHappier')}</span>
         </div>
       </header>
       <main className="content">
         <div className="auth-layout">
           <div className="intro">
             <Doodle kind="basket" className="auth-doodle" />
-            <p className="eyebrow">A little less to think about</p>
+            <p className="eyebrow">{tr('auth:littleThinkAbout')}</p>
             <h1>
-              Know what you have.
+              {tr('common:knowHave')}
               <br />
-              Use it well.
+              {tr('common:useWell')}
             </h1>
-            <p>
-              A happy little place for everything at home. Keep track of what
-              you have, use it well, and shop with a little less guesswork.
-            </p>
+            <p>{tr('auth:happyLittlePlace')}</p>
           </div>
           <Card className="auth-card">
             {error && <Notice kind="error">{error}</Notice>}
-            <div className="tabs" role="tablist" aria-label="Account access">
+            <div
+              className="tabs"
+              role="tablist"
+              aria-label={tr('auth:accountAccess')}
+            >
               <button
                 type="button"
                 role="tab"
@@ -43,7 +45,7 @@ export function AuthPage({ onAuthed }: { onAuthed: (user: User) => void }) {
                 className={mode === 'sign-in' ? 'active' : ''}
                 onClick={() => setMode('sign-in')}
               >
-                Sign in
+                {tr('common:sign')}
               </button>
               <button
                 type="button"
@@ -52,11 +54,13 @@ export function AuthPage({ onAuthed }: { onAuthed: (user: User) => void }) {
                 className={mode === 'register' ? 'active' : ''}
                 onClick={() => setMode('register')}
               >
-                Sign up
+                {tr('common:signUp')}
               </button>
             </div>
             <h2>
-              {mode === 'register' ? 'Create your account' : 'Welcome back'}
+              {mode === 'register'
+                ? tr('common:createAccount2')
+                : tr('common:welcomeBack')}
             </h2>
             <form
               onSubmit={(event) => {
@@ -68,18 +72,12 @@ export function AuthPage({ onAuthed }: { onAuthed: (user: User) => void }) {
                     onAuthed(user);
                     setPassword('');
                   })
-                  .catch((cause: unknown) =>
-                    setError(
-                      cause instanceof Error
-                        ? cause.message
-                        : 'Sign in failed.',
-                    ),
-                  )
+                  .catch((cause: unknown) => setError(localizedError(cause)))
                   .finally(() => setBusy(false));
               }}
             >
               <label>
-                Email
+                {tr('common:email')}
                 <input
                   type="email"
                   autoComplete="email"
@@ -89,7 +87,7 @@ export function AuthPage({ onAuthed }: { onAuthed: (user: User) => void }) {
                 />
               </label>
               <label>
-                Password
+                {tr('common:password')}
                 <input
                   type="password"
                   minLength={8}
@@ -103,10 +101,10 @@ export function AuthPage({ onAuthed }: { onAuthed: (user: User) => void }) {
               </label>
               <Button disabled={busy}>
                 {busy
-                  ? 'Please wait…'
+                  ? tr('auth:wait')
                   : mode === 'register'
-                    ? 'Create account'
-                    : 'Sign in'}
+                    ? tr('common:createAccount')
+                    : tr('common:sign')}
               </Button>
             </form>
           </Card>

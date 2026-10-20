@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import {
@@ -17,28 +17,38 @@ import {
   type AppearanceChoice,
 } from '../../shared/ui/appearance';
 import { HouseholdShoppingSettings } from './HouseholdShoppingSettings';
+import i18n, {
+  saveLanguageChoice,
+  type AppLanguage,
+  tr,
+} from '../../shared/i18n';
 
+import { localizedError, localizedEnum } from '../../shared/i18n';
 const categories = [
-  ['expiryAlertsEnabled', 'Expiry alerts', 'When stock is close to expiring.'],
+  [
+    'expiryAlertsEnabled',
+    'notifications:expiryAlerts',
+    'notifications:expiryAlertDescription',
+  ],
   [
     'lowStockAlertsEnabled',
-    'Low stock alerts',
-    'When the backend marks stock as low or out.',
+    'notifications:lowStockAlerts',
+    'notifications:lowStockAlertDescription',
   ],
   [
     'shoppingRemindersEnabled',
-    'Shopping reminders',
-    'Shopping reminders, when available.',
+    'notifications:shoppingReminders',
+    'notifications:shoppingReminderDescription',
   ],
   [
     'dailyDigestEnabled',
-    'Daily digest',
-    'A daily summary, when delivery is available.',
+    'notifications:dailyDigest',
+    'notifications:dailyDigestDescription',
   ],
   [
     'householdEventsEnabled',
-    'Household events',
-    'Optional household event alerts, when available.',
+    'notifications:householdEvents',
+    'notifications:householdEventDescription',
   ],
 ] as const;
 
@@ -213,7 +223,7 @@ export function SettingsPage({ user }: { user: User }) {
       setOfflineShellError(
         detail instanceof Error
           ? detail.message
-          : 'The browser did not activate the service worker.',
+          : tr('notifications:serviceWorkerActivationFailed'),
       );
     };
     navigator.serviceWorker
@@ -223,14 +233,10 @@ export function SettingsPage({ user }: { user: User }) {
         if (registration?.active) ready();
         else if (!registration) {
           setOfflineShell('unavailable');
-          setOfflineShellError(
-            'The app service worker is not registered in this build.',
-          );
+          setOfflineShellError(tr('notifications:serviceWorkerNotRegistered'));
         } else {
           setOfflineShell('unavailable');
-          setOfflineShellError(
-            'The app service worker is still installing. Reload after it becomes active.',
-          );
+          setOfflineShellError(tr('notifications:serviceWorkerInstalling'));
         }
       })
       .catch(unavailable);
@@ -271,9 +277,7 @@ export function SettingsPage({ user }: { user: User }) {
         .then(() => true)
         .catch(() => false);
       if (!refresh)
-        setRefreshWarning(
-          'Your preferences were saved, but readback could not refresh. Reopen Settings to verify them.',
-        );
+        setRefreshWarning(tr('notifications:preferencesSavedRefreshWarning'));
       else setDraft(result);
     } catch {
       // The mutation error below distinguishes rejection, pre-send offline, and uncertain outcome.
@@ -286,27 +290,29 @@ export function SettingsPage({ user }: { user: User }) {
     setAppearanceNotice(
       persisted
         ? choice === 'system'
-          ? 'Lumio is following this device’s appearance setting.'
-          : `${choice === 'dark' ? 'Dark' : 'Light'} Mode is saved in this browser.`
-        : 'Appearance changed for this page, but this browser could not save the choice. It may reset after reload.',
+          ? tr('notifications:appearanceFollowingDevice')
+          : choice === 'dark'
+            ? tr('notifications:darkModeSaved')
+            : tr('notifications:lightModeSaved')
+        : tr('notifications:appearanceSaveFailed'),
     );
   }
 
   const pushSupported = permission !== 'unsupported';
   const pushKey = publicKeyQuery.data;
   const pushStatus = !pushSupported
-    ? 'This browser does not support Web Push.'
+    ? tr('notifications:pushUnsupported')
     : permission === 'denied'
-      ? 'Browser permission is denied. Change it in browser settings if you want to allow notifications later.'
+      ? tr('notifications:pushPermissionDenied')
       : permission === 'granted'
         ? registrationStatus === 'registered'
-          ? 'Registered for this signed-in session on this browser.'
+          ? tr('notifications:pushRegistered')
           : registrationStatus === 'checking'
-            ? 'Checking this browser’s registration for your account…'
+            ? tr('notifications:pushCheckingRegistration')
             : registrationStatus === 'error'
-              ? 'Registration status could not be confirmed for this session.'
-              : 'This browser is not registered for this signed-in session.'
-        : 'Browser permission has not been requested.';
+              ? tr('notifications:pushRegistrationUnconfirmed')
+              : tr('notifications:pushNotRegistered')
+        : tr('notifications:pushPermissionNotRequested');
 
   function decodePublicKey(value: string) {
     const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
@@ -338,7 +344,7 @@ export function SettingsPage({ user }: { user: User }) {
                 () =>
                   reject(
                     new Error(
-                      'The Lumio service worker did not activate. Reload and try again.',
+                      tr('notifications:pushServiceWorkerActivationFailed'),
                     ),
                   ),
                 10000,
@@ -358,8 +364,8 @@ export function SettingsPage({ user }: { user: User }) {
           kind: 'error',
           text:
             currentPermission === 'denied'
-              ? 'Browser permission was denied. Change it in browser settings before enabling Push.'
-              : 'Push permission was not granted, so this browser was not registered.',
+              ? tr('notifications:pushPermissionDeniedEnable')
+              : tr('notifications:pushPermissionNotGranted'),
         });
         return;
       }
@@ -378,9 +384,7 @@ export function SettingsPage({ user }: { user: User }) {
         !serialized.keys?.p256dh ||
         !serialized.keys.auth
       )
-        throw new Error(
-          'The browser did not provide the required subscription fields.',
-        );
+        throw new Error(tr('notifications:pushSubscriptionFieldsMissing'));
       const result = await api<PushSubscriptionStatus>(
         '/me/push-subscription',
         'PUT',
@@ -394,7 +398,7 @@ export function SettingsPage({ user }: { user: User }) {
         setRegistrationStatus('unregistered');
         setPushMessage({
           kind: 'error',
-          text: 'The server did not confirm registration for this session.',
+          text: tr('notifications:pushServerDidNotConfirm'),
         });
         return;
       }
@@ -408,26 +412,31 @@ export function SettingsPage({ user }: { user: User }) {
         status.registered
           ? {
               kind: 'success',
-              text: 'This browser is registered for your current session.',
+              text: tr('notifications:pushRegisteredCurrentSession'),
             }
           : {
               kind: 'error',
-              text: 'The server accepted the request, but current-session status did not confirm registration.',
+              text: tr('notifications:pushStatusNotConfirmed'),
             },
       );
     } catch (error) {
       setRegistrationStatus('error');
-      const reason = error instanceof Error ? error.message : 'Unknown error';
+      const reason = localizedError(error);
       const text =
         error instanceof MutationOutcomeUnknownError
-          ? `The registration request outcome is uncertain. Reload Settings to check this session’s status before choosing whether to retry.`
+          ? tr('notifications:pushRegistrationResult')
           : serverAcceptedRegistration
-            ? `The server accepted registration, but this session’s status could not be confirmed: ${reason}. Reload Settings to check before choosing whether to retry.`
+            ? tr('notifications:serverAcceptedPush', { reason })
             : error instanceof ApiError
-              ? `The server rejected Push registration (${error.status}): ${reason}`
+              ? tr('notifications:serverRejectedPush', {
+                  status: error.status,
+                  reason,
+                })
               : browserCreatedSubscription
-                ? `The browser subscription was created, but server registration was not confirmed: ${reason}. Check this browser’s status before choosing whether to try again.`
-                : `Push setup could not be completed: ${reason}`;
+                ? tr('notifications:browserSubscriptionCreated', { reason })
+                : tr('notifications:pushSetupCompleted', {
+                    reason,
+                  });
       setPushMessage({ kind: 'error', text });
     } finally {
       setPushBusy(false);
@@ -459,8 +468,7 @@ export function SettingsPage({ user }: { user: User }) {
           );
         } catch (error) {
           serverOutcomeUnknown = error instanceof MutationOutcomeUnknownError;
-          serverError =
-            error instanceof Error ? error.message : 'Server removal failed.';
+          serverError = localizedError(error);
         }
         try {
           const unsubscribed = await candidate.unsubscribe();
@@ -469,10 +477,7 @@ export function SettingsPage({ user }: { user: User }) {
             (!!registration &&
               !(await registration.pushManager.getSubscription()));
         } catch (error) {
-          browserError =
-            error instanceof Error
-              ? error.message
-              : 'Browser unsubscribe failed.';
+          browserError = localizedError(error);
         }
       } else {
         browserIsInactive = true;
@@ -484,23 +489,23 @@ export function SettingsPage({ user }: { user: User }) {
           kind: 'success',
           text:
             serverResult && !serverResult.removed
-              ? 'This browser was unsubscribed. The current session had no server registration to remove.'
-              : 'Push was disabled for this browser and session.',
+              ? tr('notifications:pushUnsubscribedNoRegistration')
+              : tr('notifications:pushDisabled'),
         });
       } else {
         setRegistrationStatus('error');
         const serverSummary = serverOutcomeUnknown
-          ? 'Server removal outcome is uncertain; check registration status after reload. '
+          ? tr('notifications:pushRemovalUncertain')
           : serverError
             ? `Server removal failed: ${serverError}. `
             : serverResult?.removed
-              ? 'Server registration was removed. '
-              : 'The current session had no server registration to remove. ';
+              ? tr('notifications:pushServerRegistrationRemoved')
+              : tr('notifications:pushNoServerRegistration');
         const browserSummary = browserError
           ? `Browser unsubscribe failed: ${browserError}.`
           : browserIsInactive
-            ? 'The browser subscription is inactive.'
-            : 'The browser subscription may still be active.';
+            ? tr('notifications:browserSubscriptionInactive')
+            : tr('notifications:browserSubscriptionMayBeActive');
         setPushMessage({
           kind: 'error',
           text: `Push disable was only partially completed. ${serverSummary}${browserSummary}`,
@@ -510,7 +515,9 @@ export function SettingsPage({ user }: { user: User }) {
       setRegistrationStatus('error');
       setPushMessage({
         kind: 'error',
-        text: `Push disable could not be completed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        text: tr('notifications:pushDisableCompleted', {
+          error: localizedError(error),
+        }),
       });
     } finally {
       setPushBusy(false);
@@ -521,37 +528,41 @@ export function SettingsPage({ user }: { user: User }) {
     <section className="settings-page narrow">
       <div className="settings-heading">
         <div>
-          <p className="eyebrow">Your account</p>
-          <h1>Settings</h1>
-          <p className="muted">
-            Manage household shopping defaults and your own notification
-            choices.
-          </p>
+          <p className="eyebrow">{tr('common:account')}</p>
+          <h1>{tr('common:settings')}</h1>
+          <p className="muted">{tr('settings:manageHouseholdShopping')}</p>
         </div>
         <Button variant="secondary" onClick={() => navigate(-1)}>
-          Back
+          {tr('common:back')}
         </Button>
       </div>
-      <nav className="settings-jump-links" aria-label="Settings sections">
-        <a href="#appearance-settings">Appearance</a>
-        <a href="#household-settings">Household</a>
-        <a href="#notification-settings">Notifications</a>
-        <a href="#push-settings">Browser Push</a>
-        <a href="#offline-settings">Offline app</a>
+      <nav
+        className="settings-jump-links"
+        aria-label={tr('settings:settingsSections')}
+      >
+        <a href="#appearance-settings">{tr('settings:appearance')}</a>
+        <a href="#household-settings">{tr('common:household')}</a>
+        <a href="#notification-settings">{tr('notifications:notifications')}</a>
+        <a href="#push-settings">{tr('notifications:browserPush')}</a>
+        <a href="#offline-settings">{tr('settings:offlineApp')}</a>
       </nav>
       <Card id="appearance-settings" className="appearance-settings">
-        <p className="eyebrow">This browser</p>
-        <h2>Appearance</h2>
-        <p className="muted">
-          Choose Dark Mode, keep Light Mode, or return to your device setting.
-        </p>
+        <p className="eyebrow">{tr('notifications:browser')}</p>
+        <h2>{tr('settings:appearance')}</h2>
+        <p className="muted">{tr('settings:chooseDarkMode')}</p>
         <label className="preference-row appearance-switch">
           <span>
-            <strong>Dark Mode</strong>
+            <strong>{tr('settings:darkMode')}</strong>
             <small>
               {appearance === 'system'
-                ? `Following device appearance (${systemDark ? 'Dark' : 'Light'}).`
-                : `${appearance === 'dark' ? 'Dark' : 'Light'} Mode is selected in this browser.`}
+                ? tr('settings:followingDeviceAppearance', {
+                    mode: tr(systemDark ? 'common:dark' : 'settings:light'),
+                  })
+                : tr('notifications:modeSelectedBrowser', {
+                    mode: tr(
+                      appearance === 'dark' ? 'common:dark' : 'settings:light',
+                    ),
+                  })}
             </small>
           </span>
           <input
@@ -571,31 +582,43 @@ export function SettingsPage({ user }: { user: User }) {
           disabled={appearance === 'system'}
           onClick={() => chooseAppearance('system')}
         >
-          Use device setting
+          {tr('settings:useDeviceSetting')}
         </Button>
         {appearanceNotice && (
           <p className="muted" role="status">
-            {appearanceNotice}
+            {tr(appearanceNotice as Parameters<typeof tr>[0])}
           </p>
         )}
+        <label>
+          {tr('settings:language')}
+          <select
+            value={i18n.resolvedLanguage === 'vi' ? 'vi' : 'en'}
+            onChange={(event) =>
+              saveLanguageChoice(event.target.value as AppLanguage)
+            }
+          >
+            <option value="en">{tr('settings:english')}</option>
+            <option value="vi">{tr('settings:vietnamese')}</option>
+          </select>
+        </label>
       </Card>
       <section id="household-settings" className="settings-scope">
         <div className="settings-scope-heading">
-          <p className="eyebrow">Household-specific</p>
-          <h2>Household settings</h2>
+          <p className="eyebrow">{tr('settings:householdSpecific')}</p>
+          <h2>{tr('settings:householdSettings')}</h2>
         </div>
         <HouseholdShoppingSettings />
       </section>
       <Card id="offline-settings">
-        <h2>Offline app shell</h2>
+        <h2>{tr('settings:offlineAppShell')}</h2>
         <p>
           {offlineShell === 'ready'
-            ? 'The service worker is active on this browser.'
+            ? tr('notifications:serviceWorkerActive')
             : offlineShell === 'unsupported'
-              ? 'This browser does not support offline app shells.'
+              ? tr('notifications:browserSupportOffline')
               : offlineShell === 'unavailable'
-                ? 'Offline shell setup could not be confirmed. Keep a connection available to use Lumio.'
-                : 'Checking offline support…'}
+                ? tr('settings:offlineShellSetup')
+                : tr('notifications:checkingOfflineSupport')}
         </p>
         {offlineShellError && <p className="muted">{offlineShellError}</p>}
       </Card>
@@ -606,20 +629,20 @@ export function SettingsPage({ user }: { user: User }) {
       />
       {preferences.isPending && (
         <p className="muted" role="status">
-          Loading your notification preferences…
+          {tr('notifications:loadingNotificationPreferences')}
         </p>
       )}
       {preferences.isError && (
         <>
           <Notice kind="error">
-            Notification preferences could not be loaded:{' '}
-            {preferences.error.message}
+            {tr('notifications:notificationPreferencesLoaded')}{' '}
+            {localizedError(preferences.error)}
           </Notice>
           <Button
             variant="secondary"
             onClick={() => void preferences.refetch()}
           >
-            Retry preferences
+            {tr('notifications:retryPreferences')}
           </Button>
         </>
       )}
@@ -630,39 +653,41 @@ export function SettingsPage({ user }: { user: User }) {
         !preferences.data.shoppingRemindersEnabled &&
         !preferences.data.dailyDigestEnabled &&
         !preferences.data.householdEventsEnabled && (
-          <p className="muted">
-            All alert categories are currently off according to your saved
-            preferences.
-          </p>
+          <p className="muted">{tr('notifications:allAlertCategories')}</p>
         )}
-      {saved && <Notice kind="success">Notification preferences saved.</Notice>}
+      {saved && (
+        <Notice kind="success">
+          {tr('notifications:notificationPreferencesSaved')}
+        </Notice>
+      )}
       {refreshWarning && <Notice kind="error">{refreshWarning}</Notice>}
       {save.isError && (
         <Notice kind="error">
           {save.error instanceof OfflineBeforeSendError
-            ? save.error.message
+            ? localizedError(save.error)
             : save.error instanceof MutationOutcomeUnknownError
-              ? 'The save result is uncertain because the connection failed. Reload Settings and check the saved values before choosing to retry.'
+              ? tr('notifications:saveResultUncertain')
               : save.error instanceof ApiError &&
                   save.error.status === 400 &&
                   save.error.code === 'INVALID_DIGEST_TIME'
-                ? `Digest time was not saved: ${save.error.message}. Choose a time in 24-hour HH:mm format.`
-                : `Preferences were not saved: ${save.error.message}`}
+                ? tr('notifications:digestTimeSaved', {
+                    error: localizedError(save.error),
+                  })
+                : tr('settings:preferencesSaved', {
+                    error: localizedError(save.error),
+                  })}
         </Notice>
       )}
       {draft && (
         <Card>
-          <p className="eyebrow">Your account · across households</p>
-          <h2>Notifications</h2>
-          <p className="muted">
-            These preferences are saved to your account. Automatic notification
-            delivery depends on server setup.
-          </p>
+          <p className="eyebrow">{tr('settings:accountAcrossHouseholds')}</p>
+          <h2>{tr('notifications:notifications')}</h2>
+          <p className="muted">{tr('notifications:preferencesSavedAccount')}</p>
           {categories.map(([key, title, help]) => (
             <label className="preference-row" key={key}>
               <span>
-                <strong>{title}</strong>
-                <small>{help}</small>
+                <strong>{tr(title)}</strong>
+                <small>{tr(help)}</small>
               </span>
               <input
                 type="checkbox"
@@ -681,7 +706,7 @@ export function SettingsPage({ user }: { user: User }) {
           ))}
           {draft.dailyDigestEnabled && (
             <label>
-              Daily digest time
+              {tr('notifications:dailyDigestTime')}
               <input
                 type="time"
                 value={draft.digestTime}
@@ -696,7 +721,9 @@ export function SettingsPage({ user }: { user: User }) {
                   );
                 }}
               />
-              <small className="muted">Timezone: {draft.timezone}</small>
+              <small className="muted">
+                {tr('notifications:timezone')} {draft.timezone}
+              </small>
             </label>
           )}
           <section className="quiet-hours">
@@ -714,12 +741,12 @@ export function SettingsPage({ user }: { user: User }) {
                     );
                 }}
               />
-              Quiet hours
+              {tr('notifications:quietHours')}
             </label>
             {quietHoursEnabled && (
               <div className="quiet-hours-times">
                 <label>
-                  Start
+                  {tr('common:start')}
                   <input
                     ref={quietStartInput}
                     type="time"
@@ -735,7 +762,7 @@ export function SettingsPage({ user }: { user: User }) {
                   />
                 </label>
                 <label>
-                  End
+                  {tr('settings:end')}
                   <input
                     ref={quietEndInput}
                     type="time"
@@ -750,7 +777,9 @@ export function SettingsPage({ user }: { user: User }) {
                     }}
                   />
                 </label>
-                <p className="muted">Timezone: {draft.timezone}</p>
+                <p className="muted">
+                  {tr('notifications:timezone')} {draft.timezone}
+                </p>
               </div>
             )}
           </section>
@@ -763,30 +792,32 @@ export function SettingsPage({ user }: { user: User }) {
             }
             onClick={() => void submit()}
           >
-            {save.isPending ? 'Saving…' : 'Save preferences'}
+            {save.isPending
+              ? tr('common:saving')
+              : tr('notifications:savePreferences')}
           </Button>
         </Card>
       )}
       <Card id="push-settings">
-        <p className="eyebrow">This browser</p>
-        <h2>Push notifications</h2>
+        <p className="eyebrow">{tr('notifications:browser')}</p>
+        <h2>{tr('notifications:pushNotifications')}</h2>
         <p>{pushStatus}</p>
         {publicKeyQuery.isPending && (
           <p className="muted" role="status">
-            Checking Push availability…
+            {tr('notifications:checkingPushAvailability')}
           </p>
         )}
         {publicKeyQuery.isError && (
           <Notice kind="error">
-            Push availability could not be checked:{' '}
-            {publicKeyQuery.error.message}
+            {tr('notifications:pushAvailabilityChecked')}{' '}
+            {localizedError(publicKeyQuery.error)}
           </Notice>
         )}
         {pushKey && !pushKey.available && (
           <p className="muted">
-            Push registration is unavailable (
-            {pushKey.reason ?? 'WEB_PUSH_UNAVAILABLE'}). Notification permission
-            will not be requested.
+            {tr('notifications:pushRegistrationUnavailable')}
+            {localizedEnum(pushKey.reason ?? 'WEB_PUSH_UNAVAILABLE')}
+            {tr('notifications:notificationPermissionRequested')}
           </p>
         )}
         {pushKey?.available &&
@@ -794,7 +825,9 @@ export function SettingsPage({ user }: { user: User }) {
           permission !== 'denied' &&
           registrationStatus !== 'registered' && (
             <Button disabled={pushBusy} onClick={() => void enablePush()}>
-              {pushBusy ? 'Enabling…' : 'Enable Push on this browser'}
+              {pushBusy
+                ? tr('notifications:enabling')
+                : tr('notifications:enablePushBrowser')}
             </Button>
           )}
         {browserSubscription && (
@@ -803,16 +836,15 @@ export function SettingsPage({ user }: { user: User }) {
             disabled={pushBusy}
             onClick={() => void disablePush()}
           >
-            {pushBusy ? 'Updating…' : 'Disable Push on this browser'}
+            {pushBusy
+              ? tr('common:updating')
+              : tr('notifications:disablePushBrowser')}
           </Button>
         )}
         {pushMessage && (
           <Notice kind={pushMessage.kind}>{pushMessage.text}</Notice>
         )}
-        <p className="muted">
-          Permission is requested only after you choose Enable. Notification
-          delivery is not active in this local setup.
-        </p>
+        <p className="muted">{tr('notifications:permissionRequestedOnly')}</p>
       </Card>
     </section>
   );

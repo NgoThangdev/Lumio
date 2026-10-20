@@ -16,6 +16,8 @@ import { Button, Card, Notice } from '../../shared/ui/primitives';
 import { CategorySectionSettings } from './CategorySectionSettings';
 import { CatalogManagement } from './CatalogManagement';
 
+import { tr } from '../../shared/i18n';
+import { localizedError } from '../../shared/i18n';
 function SettingsForHousehold({ household }: { household: Household }) {
   const queryClient = useQueryClient();
   const settingsKey = keys.shoppingSettings(household.id);
@@ -27,19 +29,21 @@ function SettingsForHousehold({ household }: { household: Household }) {
 
   return (
     <Card>
-      <h2>Shopping defaults for {household.name}</h2>
-      <p className="muted">
-        These apply to this household's new trips. Existing trips and imported
-        suggestions keep their saved values.
-      </p>
-      {settings.isPending && <p role="status">Loading shopping defaults…</p>}
+      <h2>
+        {tr('common:shoppingDefaults')} {household.name}
+      </h2>
+      <p className="muted">{tr('settings:applyHouseholdS')}</p>
+      {settings.isPending && (
+        <p role="status">{tr('settings:loadingShoppingDefaults')}</p>
+      )}
       {settings.isError && (
         <>
           <Notice kind="error">
-            Shopping defaults could not be loaded: {settings.error.message}
+            {tr('common:shoppingDefaultsLoaded')}{' '}
+            {localizedError(settings.error)}
           </Notice>
           <Button variant="secondary" onClick={() => void settings.refetch()}>
-            Retry defaults
+            {tr('common:retryDefaults')}
           </Button>
         </>
       )}
@@ -66,13 +70,14 @@ function SettingsForHousehold({ household }: { household: Household }) {
         ) : (
           <>
             <p>
-              Shopping cycle: every {settings.data.defaultShoppingCycleDays}{' '}
-              days
+              {tr('settings:shoppingCycleEvery')}{' '}
+              {settings.data.defaultShoppingCycleDays} {tr('settings:days')}
             </p>
-            <p>Default store: {settings.data.defaultStore ?? 'None set'}</p>
-            <p className="muted">
-              Only a household Admin can change these defaults.
+            <p>
+              {tr('settings:defaultStore2')}{' '}
+              {settings.data.defaultStore ?? tr('settings:noneSet')}
             </p>
+            <p className="muted">{tr('settings:onlyHouseholdAdmin2')}</p>
           </>
         ))}
     </Card>
@@ -118,20 +123,18 @@ function ShoppingSettingsEditor({
       } catch {
         // The PATCH succeeded; a failed readback does not undo the saved values.
       }
-      setRefreshWarning(
-        'Defaults were saved, but current assessments could not refresh. Reload to check them.',
-      );
+      setRefreshWarning(tr('settings:shoppingDefaultsRefreshWarning'));
     } catch (cause) {
       setError(
         cause instanceof OfflineBeforeSendError
-          ? cause.message
+          ? localizedError(cause)
           : cause instanceof MutationOutcomeUnknownError
-            ? 'The save result is uncertain. Reload these defaults before choosing to retry.'
+            ? tr('settings:shoppingDefaultsSaveUncertain')
             : cause instanceof ApiError
-              ? `Defaults were not saved: ${cause.message}`
+              ? `Defaults were not saved: ${localizedError(cause)}`
               : cause instanceof Error
-                ? cause.message
-                : 'Defaults could not be saved.',
+                ? localizedError(cause)
+                : tr('settings:shoppingDefaultsSaveFailed'),
       );
     } finally {
       setBusy(false);
@@ -140,11 +143,13 @@ function ShoppingSettingsEditor({
 
   return (
     <div className="field-stack">
-      {saved && <Notice kind="success">Shopping defaults saved.</Notice>}
+      {saved && (
+        <Notice kind="success">{tr('settings:shoppingDefaultsSaved')}</Notice>
+      )}
       {error && <Notice kind="error">{error}</Notice>}
       {refreshWarning && <Notice kind="error">{refreshWarning}</Notice>}
       <label>
-        Days until the next shopping trip
+        {tr('settings:daysUntilNext')}
         <input
           type="number"
           min="1"
@@ -159,11 +164,11 @@ function ShoppingSettingsEditor({
         />
       </label>
       <label>
-        Default store
+        {tr('settings:defaultStore')}
         <input
           value={store}
           maxLength={120}
-          placeholder="No default store"
+          placeholder={tr('settings:noDefaultStore')}
           disabled={busy}
           onChange={(event) => {
             setSaved(false);
@@ -171,11 +176,9 @@ function ShoppingSettingsEditor({
           }}
         />
       </label>
-      <p className="muted">
-        Clear the store field and save to remove its default.
-      </p>
+      <p className="muted">{tr('settings:clearStoreField')}</p>
       <Button disabled={busy} onClick={() => void save()}>
-        {busy ? 'Saving…' : 'Save shopping defaults'}
+        {busy ? tr('common:saving') : tr('settings:saveShoppingDefaults')}
       </Button>
     </div>
   );
@@ -199,31 +202,31 @@ export function HouseholdShoppingSettings() {
 
   return (
     <section className="household-shopping-settings">
-      {households.isPending && <p role="status">Loading households…</p>}
+      {households.isPending && (
+        <p role="status">{tr('common:loadingHouseholds')}</p>
+      )}
       {households.isError && (
         <>
           <Notice kind="error">
-            Households could not be loaded: {households.error.message}
+            {tr('settings:householdsLoaded')} {localizedError(households.error)}
           </Notice>
           <Button variant="secondary" onClick={() => void households.refetch()}>
-            Retry households
+            {tr('settings:retryHouseholds')}
           </Button>
         </>
       )}
       {households.data?.length === 0 && (
-        <p className="muted">
-          Join or create a household to see shopping defaults.
-        </p>
+        <p className="muted">{tr('settings:joinCreateHousehold')}</p>
       )}
       {households.data && households.data.length > 0 && (
         <>
           <label>
-            Household for shopping settings
+            {tr('settings:householdShoppingSettings')}
             <select
               value={selected?.id ?? ''}
               onChange={(event) => chooseHousehold(event.target.value)}
             >
-              <option value="">Choose a household</option>
+              <option value="">{tr('common:chooseHousehold')}</option>
               {households.data.map((entry) => (
                 <option value={entry.id} key={entry.id}>
                   {entry.name}
@@ -233,29 +236,28 @@ export function HouseholdShoppingSettings() {
           </label>
           {requestedId && !selected && (
             <Notice kind="error">
-              This household is not available to your account. Choose a
-              household you belong to before editing its settings.
+              {tr('settings:householdAvailableAccount')}
             </Notice>
           )}
           {!requestedId && (
-            <p className="muted">
-              Choose a household to view its shopping defaults and catalog.
-            </p>
+            <p className="muted">{tr('settings:chooseHouseholdView')}</p>
           )}
           {selected && (
             <>
               <p>
-                <strong>Household settings for {selected.name}</strong> ·{' '}
-                {selected.role === 'ADMIN' ? 'Admin' : 'Member, view only'}
+                <strong>
+                  {tr('settings:householdSettings2')} {selected.name}
+                </strong>{' '}
+                ·{' '}
+                {selected.role === 'ADMIN'
+                  ? tr('common:admin')
+                  : tr('settings:memberViewOnly')}
               </p>
               <SettingsForHousehold key={selected.id} household={selected} />
               <details className="settings-disclosure">
-                <summary>Manage catalog and category sections</summary>
+                <summary>{tr('settings:manageCatalogCategory')}</summary>
                 <div className="settings-disclosure-content">
-                  <p className="muted">
-                    Rename or remove catalog entries and choose how categories
-                    are grouped in Shopping.
-                  </p>
+                  <p className="muted">{tr('settings:renameRemoveCatalog')}</p>
                   <CatalogManagement
                     key={`${selected.id}-catalog`}
                     household={selected}

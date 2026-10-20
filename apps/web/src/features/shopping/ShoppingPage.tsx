@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from 'react-router';
 import { useHousehold } from '../../app/useHousehold';
@@ -23,6 +23,13 @@ import {
 } from '../../shared/shoppingSections';
 import { StockCheckPanel } from './StockCheckPanel';
 
+import { tr } from '../../shared/i18n';
+import {
+  localizedError,
+  localizedEnum,
+  formatNumber,
+  formatDateOnly,
+} from '../../shared/i18n';
 type TripSummary = {
   id: string;
   store: string;
@@ -74,10 +81,10 @@ const priorityOrder = ['MUST_BUY', 'SHOULD_BUY', 'OPTIONAL'] as const;
 
 function priorityLabel(priority: Entry['priority']) {
   return priority === 'MUST_BUY'
-    ? 'Must buy'
+    ? tr('shopping:must')
     : priority === 'SHOULD_BUY'
-      ? 'Should buy'
-      : 'Manual / optional';
+      ? tr('shopping:should')
+      : tr('common:optional');
 }
 
 function validPurchaseAmount(
@@ -241,21 +248,19 @@ export function ShoppingPage() {
       await work();
     } catch (cause) {
       if (cause instanceof ApiError && cause.code === 'DESTINATION_NOT_DRAFT') {
-        setError(
-          'That destination is no longer a draft. Draft trips were refreshed; choose another destination and select Move again.',
-        );
+        setError(tr('shopping:destinationNoLongerDraft'));
         await queryClient.invalidateQueries({
           queryKey: keys.trips(householdId),
         });
       } else {
         setError(
           cause instanceof OfflineBeforeSendError
-            ? cause.message
+            ? localizedError(cause)
             : isMutationOutcomeUnknown(cause)
-              ? "We couldn't confirm the result. Check this trip and Inventory before choosing to retry."
+              ? tr('shopping:tripChangeOutcomeUncertain')
               : cause instanceof Error
-                ? cause.message
-                : 'The change was not saved.',
+                ? localizedError(cause)
+                : 'common:changeSaved',
         );
       }
       if (
@@ -336,8 +341,8 @@ export function ShoppingPage() {
           className="primary quick-purchase-entry"
           to={`${routeBase}/quick-purchase`}
         >
-          <span aria-hidden="true">＋</span> Quick Purchase{' '}
-          <small>Save an unplanned purchase straight to inventory</small>
+          <span aria-hidden="true">ï¼‹</span> {tr('shopping:quickPurchase')}{' '}
+          <small>{tr('shopping:saveUnplannedPurchase')}</small>
         </Link>
       )}
       {error && (
@@ -352,40 +357,38 @@ export function ShoppingPage() {
       )}
       {tripId && trips.isError && (
         <Notice kind="error">
-          Draft trips could not be refreshed: {trips.error.message}. Move is
-          unavailable until the list loads.
+          {tr('shopping:draftTripsRefreshed')} {localizedError(trips.error)}
+          {tr('shopping:moveUnavailableUntil')}
         </Notice>
       )}
       {items.isError && (
         <Notice kind="error">
-          Inventory choices could not be loaded: {items.error.message}
+          {tr('shopping:inventoryChoicesLoaded')} {localizedError(items.error)}
         </Notice>
       )}
       {intelligence.isError && !tripId && (
         <Notice kind="error">
-          The default shopping date could not be loaded:{' '}
-          {intelligence.error.message}
+          {tr('shopping:defaultShoppingDate')}{' '}
+          {localizedError(intelligence.error)}
         </Notice>
       )}
       {tripId && tripQuery.isPending ? (
         <section className="card">
-          <p className="muted">Loading trip…</p>
+          <p className="muted">{tr('common:loadingTrip')}</p>
         </section>
       ) : tripId && tripQuery.isError ? (
-        <Notice kind="error">{tripQuery.error.message}</Notice>
+        <Notice kind="error">{localizedError(tripQuery.error)}</Notice>
       ) : !trip ? (
         <div className="grid">
           <section className="card">
-            <p className="eyebrow">Shopping trips</p>
-            <h2>Your plans</h2>
+            <p className="eyebrow">{tr('common:shoppingTrips')}</p>
+            <h2>{tr('common:plans')}</h2>
             {trips.isPending ? (
-              <p className="muted">Loading trips…</p>
+              <p className="muted">{tr('common:loadingTrips')}</p>
             ) : trips.isError ? (
-              <Notice kind="error">{trips.error.message}</Notice>
+              <Notice kind="error">{localizedError(trips.error)}</Notice>
             ) : trips.data.length === 0 ? (
-              <p className="muted">
-                No trips yet. Create one for your next shop.
-              </p>
+              <p className="muted">{tr('common:tripsYetCreate')}</p>
             ) : (
               trips.data.map((entry) => (
                 <button
@@ -402,11 +405,12 @@ export function ShoppingPage() {
                   <span className="item-identity">
                     <strong>{entry.store}</strong>
                     <small>
-                      {entry.plannedDate.slice(0, 10)} ·{' '}
-                      {entry._count?.entries ?? 0} items
+                      {formatDateOnly(entry.plannedDate)} ·{' '}
+                      {formatNumber(entry._count?.entries ?? 0)}{' '}
+                      {tr('common:items')}
                     </small>
                   </span>
-                  <span className="pill">{entry.status.toLowerCase()}</span>
+                  <span className="pill">{localizedEnum(entry.status)}</span>
                 </button>
               ))
             )}
@@ -428,39 +432,39 @@ export function ShoppingPage() {
               });
             }}
           >
-            <p className="eyebrow">Plan</p>
-            <h2>Create a trip</h2>
+            <p className="eyebrow">{tr('common:plan')}</p>
+            <h2>{tr('common:createTrip')}</h2>
             {shoppingSettings.isPending && (
               <p className="muted" role="status">
-                Loading household shopping defaults…
+                {tr('shopping:loadingHouseholdShopping')}
               </p>
             )}
             {shoppingSettings.isError && (
               <Notice kind="error">
-                Shopping defaults could not be loaded:{' '}
-                {shoppingSettings.error.message}. Enter the store and date
-                yourself, or{' '}
+                {tr('common:shoppingDefaultsLoaded')}{' '}
+                {localizedError(shoppingSettings.error)}
+                {tr('shopping:enterStoreDate')}{' '}
                 <button
                   type="button"
                   className="link"
                   onClick={() => void shoppingSettings.refetch()}
                 >
-                  retry defaults
+                  {tr('shopping:retryDefaults2')}
                 </button>
                 .
               </Notice>
             )}
             <label>
-              Primary store
+              {tr('common:primaryStore')}
               <input
                 value={store}
                 onChange={(event) => setStoreDraft(event.target.value)}
-                placeholder="e.g. Winmart"
+                placeholder={tr('shopping:storeExample')}
                 required
               />
             </label>
             <label>
-              Planned date
+              {tr('common:plannedDate')}
               <input
                 type="date"
                 value={plannedDate}
@@ -470,13 +474,13 @@ export function ShoppingPage() {
             </label>
             {shoppingSettings.data && (
               <p className="muted">
-                Suggested from this household's{' '}
-                {`${shoppingSettings.data.defaultShoppingCycleDays}-day`} cycle
-                in Asia/Ho_Chi_Minh. You can change both fields.
+                {tr('shopping:suggestedHouseholdS')}{' '}
+                {`${formatNumber(shoppingSettings.data.defaultShoppingCycleDays)}-day`}{' '}
+                {tr('shopping:cycleAsiaHo')}
               </p>
             )}
             <button className="primary" disabled={busy}>
-              Create trip
+              {tr('common:createTrip2')}
             </button>
           </form>
         </div>
@@ -484,27 +488,27 @@ export function ShoppingPage() {
         <>
           <div className="trip-header">
             <button className="link" onClick={() => navigate(routeBase)}>
-              ← All trips
+              {tr('common:allTrips')}
             </button>
             <div>
               <p className="eyebrow">
                 {trip.status === 'DRAFT'
-                  ? 'Plan'
+                  ? tr('common:plan')
                   : trip.status === 'SHOPPING'
-                    ? 'Shopping mode'
-                    : 'Finished'}
+                    ? tr('common:shoppingMode')
+                    : tr('common:finished')}
               </p>
               <h1>{trip.store}</h1>
               <div className="trip-header-meta">
                 <p>
-                  {trip.plannedDate.slice(0, 10)} · {purchasedCount} /{' '}
-                  {trip.entries.length} purchased
+                  {formatDateOnly(trip.plannedDate)} · {purchasedCount} /{' '}
+                  {trip.entries.length} {tr('common:purchased2')}
                 </p>
                 <Link
                   className="secondary trip-quick-purchase"
                   to={`${routeBase}/quick-purchase`}
                 >
-                  Quick Purchase
+                  {tr('shopping:quickPurchase')}
                 </Link>
               </div>
             </div>
@@ -512,9 +516,7 @@ export function ShoppingPage() {
           {trip.status === 'DRAFT' &&
             (suggestionsAlreadyImported ? (
               <p className="muted stock-check-imported-note" role="status">
-                This draft already has its first suggestions snapshot. A stock
-                check cannot refresh that snapshot, so no recheck or re-import
-                action is offered here.
+                {tr('shopping:draftAlreadyHas')}
               </p>
             ) : (
               <>
@@ -532,15 +534,13 @@ export function ShoppingPage() {
                         setLocallyImportedTripIds((current) =>
                           new Set(current).add(trip.id),
                         );
-                        setNotice(
-                          'Suggestions imported from the current backend assessment.',
-                        );
+                        setNotice(tr('shopping:suggestionsImportedNotice'));
                       })
                     }
                   >
                     {busy
-                      ? 'Importing…'
-                      : 'Import suggestions from current stock'}
+                      ? tr('shopping:importing')
+                      : tr('shopping:importSuggestionsCurrent')}
                   </button>
                 </div>
               </>
@@ -555,7 +555,7 @@ export function ShoppingPage() {
                 )
               }
             >
-              Start shopping
+              {tr('common:startShopping')}
             </button>
           )}
           {trip.status !== 'RESTOCKED' && available.length > 0 && (
@@ -573,21 +573,21 @@ export function ShoppingPage() {
               }}
             >
               <div>
-                <p className="eyebrow">Add an existing item</p>
+                <p className="eyebrow">{tr('common:addExistingItem')}</p>
               </div>
               <select
-                aria-label="Existing item"
+                aria-label={tr('shopping:existingItem')}
                 value={manualItemId}
                 onChange={(event) => setManualItemId(event.target.value)}
                 required
               >
-                <option value="">Choose item</option>
+                <option value="">{tr('common:chooseItem')}</option>
                 {available.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.name} ·{' '}
                     {item.trackingMode === 'QUANTITY'
                       ? item.primaryUnit
-                      : 'backup units'}
+                      : tr('shopping:backupUnits')}
                   </option>
                 ))}
               </select>
@@ -595,26 +595,24 @@ export function ShoppingPage() {
                 className="secondary"
                 disabled={busy || !validManualSelection}
               >
-                Add
+                {tr('common:add')}
               </button>
             </form>
           )}
           <div className="trip-checklist">
             {unsupportedSection ? (
               <Notice kind="error">
-                The API returned an unsupported shopping section for{' '}
-                {unsupportedSection.item.name}. Reload this trip after the API
-                is updated.
+                {tr('shopping:apiReturnedUnsupported')}{' '}
+                {unsupportedSection.item.name}
+                {tr('shopping:reloadTripApi')}
               </Notice>
             ) : trip.entries.length === 0 ? (
               <section className="card">
-                <p className="muted">
-                  The checklist is empty. Add suggestions or an existing item.
-                </p>
+                <p className="muted">{tr('common:checklistEmptyAdd')}</p>
               </section>
             ) : (
               shoppingSections.map(
-                ({ code, label }: (typeof shoppingSections)[number]) => {
+                ({ code }: (typeof shoppingSections)[number]) => {
                   const entries = trip.entries
                     .filter((entry) => entry.shoppingSection === code)
                     .sort(
@@ -625,7 +623,9 @@ export function ShoppingPage() {
                   return (
                     entries.length > 0 && (
                       <section className="card" key={code}>
-                        <h3 className="shopping-section-title">{label}</h3>
+                        <h3 className="shopping-section-title">
+                          {localizedEnum(code)}
+                        </h3>
                         {entries.map((entry) => {
                           const mode = entryMode(entry);
                           const packageCount = entryUsesPackages(entry);
@@ -659,7 +659,7 @@ export function ShoppingPage() {
                                 <span
                                   className={`health ${entry.status === 'PURCHASED' ? 'health-ok' : 'health-unknown'}`}
                                 >
-                                  {entry.status.toLowerCase()}
+                                  {localizedEnum(entry.status)}
                                 </span>
                               </div>
                               <p className="eyebrow">
@@ -667,21 +667,26 @@ export function ShoppingPage() {
                               </p>
                               {entry.status === 'MOVED' && (
                                 <p className="move-saved" role="status">
-                                  Will move when this trip is finished
+                                  {tr('shopping:moveTripFinished')}
                                   {entry.moveToTrip?.store
-                                    ? ` · ${entry.moveToTrip.store} (${entry.moveToTrip.plannedDate.slice(0, 10)})`
-                                    : ' · selected draft trip'}
+                                    ? ` · ${entry.moveToTrip.store} (${formatDateOnly(entry.moveToTrip.plannedDate)})`
+                                    : ` · ${tr('shopping:selectedDraftTripLabel')}`}
                                   .
                                 </p>
                               )}
                               <p className="muted">
                                 {entry.suggestedQuantity
-                                  ? `Suggested ${entry.suggestedQuantity} ${entry.item.primaryUnit}`
+                                  ? tr('shopping:suggested', {
+                                      quantity: formatNumber(
+                                        entry.suggestedQuantity,
+                                      ),
+                                      unit: entry.item.primaryUnit,
+                                    })
                                   : mode === 'QUANTITY'
-                                    ? `No suggested quantity · ${entry.item.primaryUnit}`
+                                    ? `${tr('shopping:noSuggestedQuantity')} · ${entry.item.primaryUnit}`
                                     : mode
-                                      ? 'Choose how many backup units to buy'
-                                      : 'Item mode unavailable'}
+                                      ? tr('shopping:chooseHowMany')
+                                      : tr('shopping:itemModeUnavailable')}
                               </p>
                               {trip.status === 'DRAFT' &&
                                 entry.suggestedReason && (
@@ -691,17 +696,14 @@ export function ShoppingPage() {
                                 )}
                               {trip.status === 'SHOPPING' && !mode && (
                                 <Notice kind="error">
-                                  Item mode could not be loaded. Retry Inventory
-                                  before recording this purchase.
+                                  {tr('shopping:itemModeLoaded')}
                                 </Notice>
                               )}
                               {trip.status === 'SHOPPING' &&
                                 mode === 'QUANTITY' &&
                                 !openingInfoAvailable && (
                                   <Notice kind="error">
-                                    Opening policy could not be loaded. Retry
-                                    Inventory before recording this quantity
-                                    purchase.
+                                    {tr('shopping:openingPolicyLoaded')}
                                   </Notice>
                                 )}
                               {trip.status === 'SHOPPING' && mode ? (
@@ -711,7 +713,7 @@ export function ShoppingPage() {
                                       ? packageCount
                                         ? `Whole packages bought (${entry.item.primaryUnit})`
                                         : `Actual bought (${entry.item.primaryUnit})`
-                                      : 'Backup units bought'}
+                                      : tr('shopping:backupUnitsBought')}
                                     <input
                                       type="number"
                                       disabled={
@@ -759,21 +761,25 @@ export function ShoppingPage() {
                                       placeholder={
                                         mode === 'QUANTITY'
                                           ? packageCount
-                                            ? 'Enter whole package count'
-                                            : 'Enter actual quantity'
-                                          : 'Enter whole backup units'
+                                            ? tr(
+                                                'shopping:enterWholePackageCount',
+                                              )
+                                            : tr(
+                                                'shopping:enterActualQuantityPrompt',
+                                              )
+                                          : tr('shopping:enterWholeBackupUnits')
                                       }
                                     />
                                   </label>
                                   {mode === 'QUANTITY' && packageCount && (
                                     <p className="muted">
-                                      This item tracks unopened stock by whole
-                                      package count.
+                                      {tr('shopping:itemTracksUnopened')}
                                     </p>
                                   )}
                                   {mode === 'QUANTITY' && (
                                     <label>
-                                      Expiry <em>optional</em>
+                                      {tr('common:expiry')}{' '}
+                                      <em>{tr('common:optional2')}</em>
                                       <input
                                         type="date"
                                         value={
@@ -801,7 +807,7 @@ export function ShoppingPage() {
                                   )}
                                   {mode === 'QUANTITY' && (
                                     <label>
-                                      Location for this purchase
+                                      {tr('shopping:locationPurchase')}
                                       <select
                                         value={
                                           drafts[entry.id]?.locationId ?? ''
@@ -827,7 +833,7 @@ export function ShoppingPage() {
                                         }
                                       >
                                         <option value="">
-                                          Choose when needed
+                                          {tr('shopping:chooseNeeded')}
                                         </option>
                                         {locations.data?.map((option) => (
                                           <option
@@ -838,7 +844,7 @@ export function ShoppingPage() {
                                             {option.id ===
                                             entry.item.preferredRestockLocation
                                               ?.id
-                                              ? ' · preferred'
+                                              ? ` · ${tr('common:preferred')}`
                                               : ''}
                                           </option>
                                         ))}
@@ -846,12 +852,14 @@ export function ShoppingPage() {
                                       {entry.item.preferredRestockLocation
                                         ?.name && (
                                         <small className="muted">
-                                          Preferred for future stock writes:{' '}
+                                          {tr('shopping:preferredFutureStock')}{' '}
                                           {
                                             entry.item.preferredRestockLocation
                                               .name
                                           }
-                                          ; existing batches may be elsewhere.
+                                          {tr(
+                                            'shopping:existingBatchesElsewhere',
+                                          )}
                                         </small>
                                       )}
                                     </label>
@@ -893,8 +901,8 @@ export function ShoppingPage() {
                                     }
                                   >
                                     {entry.status === 'PURCHASED'
-                                      ? 'Save purchase'
-                                      : 'Mark purchased'}
+                                      ? tr('common:savePurchase')
+                                      : tr('common:markPurchased')}
                                   </button>
                                   <button
                                     className="secondary"
@@ -915,12 +923,12 @@ export function ShoppingPage() {
                                     }
                                   >
                                     {entry.status === 'SKIPPED'
-                                      ? 'Leave pending'
-                                      : 'Skip'}
+                                      ? tr('common:leavePending')
+                                      : tr('common:skip')}
                                   </button>
                                   {eligibleDraftTrips.length > 1 && (
                                     <label className="move-trip-choice">
-                                      Move to draft trip
+                                      {tr('shopping:moveDraftTrip')}
                                       <select
                                         aria-label={`Destination trip for ${entry.item.name}`}
                                         value={selectedMoveId}
@@ -935,7 +943,7 @@ export function ShoppingPage() {
                                         }
                                       >
                                         <option value="">
-                                          Choose a draft trip
+                                          {tr('shopping:chooseDraftTrip')}
                                         </option>
                                         {eligibleDraftTrips.map((candidate) => (
                                           <option
@@ -943,7 +951,9 @@ export function ShoppingPage() {
                                             value={candidate.id}
                                           >
                                             {candidate.store} ·{' '}
-                                            {candidate.plannedDate.slice(0, 10)}
+                                            {formatDateOnly(
+                                              candidate.plannedDate,
+                                            )}
                                           </option>
                                         ))}
                                       </select>
@@ -951,20 +961,19 @@ export function ShoppingPage() {
                                   )}
                                   {trips.isPending ? (
                                     <p className="muted">
-                                      Loading draft trips…
+                                      {tr('shopping:loadingDraftTrips')}
                                     </p>
                                   ) : trips.isError ? null : eligibleDraftTrips.length ===
                                     0 ? (
                                     <div className="move-no-drafts">
                                       <p className="muted">
-                                        Create a draft trip before moving this
-                                        item.
+                                        {tr('shopping:createDraftTrip2')}
                                       </p>
                                       <Link
                                         className="secondary"
                                         to={routeBase}
                                       >
-                                        Create a draft trip
+                                        {tr('shopping:createDraftTrip')}
                                       </Link>
                                     </div>
                                   ) : (
@@ -988,18 +997,20 @@ export function ShoppingPage() {
                                             },
                                           );
                                           setNotice(
-                                            `Move saved for ${entry.item.name}. It will move when this trip is finished.`,
+                                            tr('shopping:moveSavedNotice', {
+                                              item: entry.item.name,
+                                            }),
                                           );
                                         })
                                       }
                                     >
                                       {moveAlreadySaved
-                                        ? 'Move saved'
+                                        ? tr('shopping:moveSaved')
                                         : entry.status === 'MOVED'
-                                          ? 'Change destination'
+                                          ? tr('shopping:changeDestination')
                                           : eligibleDraftTrips.length === 1
                                             ? `Move to ${eligibleDraftTrips[0].store}`
-                                            : 'Move to next trip'}
+                                            : tr('shopping:moveNextTrip')}
                                     </button>
                                   )}
                                 </div>
@@ -1008,22 +1019,56 @@ export function ShoppingPage() {
                                   <p className="muted">
                                     {entry.status === 'PURCHASED'
                                       ? mode === 'QUANTITY'
-                                        ? `Bought ${entry.actualQuantity} ${entry.item.primaryUnit}${entry.expiryDate ? ` · expires ${entry.expiryDate.slice(0, 10)}` : ''}`
+                                        ? tr('shopping:bought', {
+                                            quantity:
+                                              entry.actualQuantity === null
+                                                ? '\u2014'
+                                                : formatNumber(
+                                                    entry.actualQuantity,
+                                                  ),
+                                            unit: entry.item.primaryUnit,
+                                            expiry: entry.expiryDate
+                                              ? tr('common:expires2', {
+                                                  date: formatDateOnly(
+                                                    entry.expiryDate,
+                                                  ),
+                                                })
+                                              : '',
+                                          })
                                         : mode
-                                          ? `Bought ${entry.actualQuantity} backup ${entry.actualQuantity === '1' ? 'unit' : 'units'} · current item unchanged`
-                                          : 'Purchase recorded; item mode unavailable.'
+                                          ? tr(
+                                              entry.actualQuantity === '1'
+                                                ? 'shopping:boughtBackupUnit'
+                                                : 'shopping:boughtBackupUnits',
+                                              {
+                                                quantity:
+                                                  entry.actualQuantity === null
+                                                    ? '\u2014'
+                                                    : formatNumber(
+                                                        entry.actualQuantity,
+                                                      ),
+                                              },
+                                            )
+                                          : tr('shopping:purchaseRecordedItem')
                                       : entry.status === 'MOVED'
-                                        ? `Moved to ${entry.moveToTrip?.store ?? 'the selected draft trip'}; carryover added no stock.`
-                                        : 'Not purchased; no stock added.'}
+                                        ? tr('shopping:movedCarryoverAdded', {
+                                            trip:
+                                              entry.moveToTrip?.store ??
+                                              tr('shopping:selectedDraftTrip'),
+                                          })
+                                        : tr('common:purchasedStockAdded')}
                                   </p>
                                 )
                               )}
                               {trip.status !== 'RESTOCKED' && (
                                 <details>
-                                  <summary>Remove entry</summary>
+                                  <summary>
+                                    {tr('shopping:removeEntry')}
+                                  </summary>
                                   <p className="muted">
-                                    Remove only {entry.item.name} from this
-                                    trip. Stock and the item remain unchanged.
+                                    {tr('shopping:removeOnly')}{' '}
+                                    {entry.item.name}{' '}
+                                    {tr('shopping:tripStockItem')}
                                   </p>
                                   <button
                                     type="button"
@@ -1036,12 +1081,15 @@ export function ShoppingPage() {
                                           'DELETE',
                                         );
                                         setNotice(
-                                          `${entry.item.name} removed from this trip.`,
+                                          tr('shopping:itemRemovedNotice', {
+                                            item: entry.item.name,
+                                          }),
                                         );
                                       })
                                     }
                                   >
-                                    Confirm removal of {entry.item.name}
+                                    {tr('shopping:confirmRemoval2')}{' '}
+                                    {entry.item.name}
                                   </button>
                                 </details>
                               )}
@@ -1058,16 +1106,16 @@ export function ShoppingPage() {
           {trip.status === 'SHOPPING' && (
             <section className="card finish-panel">
               <div>
-                <h2>Finish shopping</h2>
+                <h2>{tr('common:finishShopping')}</h2>
                 <p className="muted">
-                  Only the {purchasedCount} purchased{' '}
-                  {purchasedCount === 1 ? 'item' : 'items'} with saved actual
-                  amounts will be added to inventory. Backup purchases increase
-                  backup count without opening a refill. Pending entries become
-                  skipped.
+                  {tr('common:only')} {purchasedCount} {tr('common:purchased2')}{' '}
+                  {purchasedCount === 1
+                    ? tr('common:item')
+                    : tr('common:items')}{' '}
+                  {tr('shopping:savedActualAmounts')}
                   {movedCount > 0 &&
-                    ` ${movedCount} moved ${movedCount === 1 ? 'item is' : 'items are'} carried into selected drafts without adding stock.`}
-                  {unsavedPurchase && ' Save edited purchases first.'}
+                    ` ${movedCount} ${tr(movedCount === 1 ? 'shopping:movedItemCarried' : 'shopping:movedItemsCarried')}`}
+                  {unsavedPurchase && ` ${tr('shopping:saveEditedPurchases')}`}
                 </p>
               </div>
               <button
@@ -1076,9 +1124,7 @@ export function ShoppingPage() {
                 onClick={() =>
                   void run(async () => {
                     await updateTrip(`${base}/${trip.id}/finish`, 'POST');
-                    setNotice(
-                      'Shopping finished. Purchased items were recorded.',
-                    );
+                    setNotice(tr('shopping:shoppingFinishedNotice'));
                     await queryClient.invalidateQueries({
                       queryKey: keys.household(householdId),
                       refetchType: 'all',
@@ -1086,24 +1132,23 @@ export function ShoppingPage() {
                   })
                 }
               >
-                Finish shopping
+                {tr('common:finishShopping')}
               </button>
               {requiredLocationItemId && (
                 <div className="location-retry-panel">
                   <Notice kind="error">
-                    The API requires a location for item{' '}
-                    {requiredLocationItemId}. No trip stock was committed.
-                    Choose a household location, save that entry location, then
-                    explicitly retry Finish.
+                    {tr('shopping:apiRequiresLocation')}{' '}
+                    {requiredLocationItemId}
+                    {tr('shopping:tripStockCommitted')}
                   </Notice>
                   {locations.isError && (
                     <Notice kind="error">
-                      Household locations could not be loaded:{' '}
-                      {locations.error.message}
+                      {tr('common:householdLocationsLoaded')}{' '}
+                      {localizedError(locations.error)}
                     </Notice>
                   )}
                   <label>
-                    Location for item {requiredLocationItemId}
+                    {tr('shopping:locationItem')} {requiredLocationItemId}
                     <select
                       value={retryLocationId}
                       onChange={(event) =>
@@ -1113,7 +1158,7 @@ export function ShoppingPage() {
                         busy || locations.isPending || locations.isError
                       }
                     >
-                      <option value="">Choose a location</option>
+                      <option value="">{tr('common:chooseLocation')}</option>
                       {locations.data?.map((option) => (
                         <option key={option.id} value={option.id}>
                           {option.name}
@@ -1131,15 +1176,13 @@ export function ShoppingPage() {
                             candidate.item.id === requiredLocationItemId,
                         );
                         if (!entry)
-                          throw new Error(
-                            'The affected trip item is no longer available. Reload the trip before retrying.',
-                          );
+                          throw new Error(tr('shopping:tripItemUnavailable'));
                         if (
                           entry.status !== 'PURCHASED' ||
                           !entry.actualQuantity
                         ) {
                           throw new Error(
-                            'The purchase details changed. Reload the trip before retrying.',
+                            tr('shopping:purchaseDetailsChanged'),
                           );
                         }
                         await updateTrip(
@@ -1155,9 +1198,7 @@ export function ShoppingPage() {
                         await updateTrip(`${base}/${trip.id}/finish`, 'POST');
                         setRequiredLocationItemId('');
                         setRetryLocationId('');
-                        setNotice(
-                          'Shopping finished. Purchased items were recorded.',
-                        );
+                        setNotice(tr('shopping:shoppingFinishedNotice'));
                         await queryClient.invalidateQueries({
                           queryKey: keys.household(householdId),
                           refetchType: 'all',
@@ -1165,7 +1206,7 @@ export function ShoppingPage() {
                       })
                     }
                   >
-                    Confirm location and retry Finish
+                    {tr('common:confirmLocationRetry')}
                   </button>
                 </div>
               )}
@@ -1173,12 +1214,13 @@ export function ShoppingPage() {
           )}
           {trip.status === 'RESTOCKED' && (
             <div className="message success" role="status">
-              Finished.{' '}
-              {purchasedQuantityCount > 0 && 'Quantity purchases added stock. '}
+              {tr('shopping:finished2')}{' '}
+              {purchasedQuantityCount > 0 &&
+                `${tr('shopping:quantityPurchasesAdded')} `}
               {purchasedBackupCount > 0 &&
-                'Backup purchases increased backup count without changing the current level or presence. '}
-              {purchasedCount === 0 && 'No stock was added. '}
-              Skipped and moved items did not add stock.
+                `${tr('shopping:backupPurchasesIncreased')} `}
+              {purchasedCount === 0 && `${tr('shopping:stockAdded')} `}
+              {tr('shopping:skippedMovedItems')}
             </div>
           )}
         </>

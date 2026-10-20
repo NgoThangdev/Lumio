@@ -9,7 +9,10 @@ import type {
 } from '../../shared/api/types';
 import { Doodle } from '../../shared/ui/Doodle';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
+import { localizedEnum } from '../../shared/i18n';
 
+import { tr } from '../../shared/i18n';
+import { localizedError } from '../../shared/i18n';
 const signalLabels: Record<CurrentAttentionSignal, string> = {
   LOW_STOCK: 'Low stock',
   USE_SOON: 'Use soon',
@@ -30,36 +33,32 @@ export function AttentionPage({ user }: { user: User }) {
   return (
     <section className="attention-page narrow">
       <header className="attention-heading">
-        <p className="eyebrow">Across your households</p>
-        <h1>Current attention</h1>
-        <p className="muted">
-          A live view of items the server has marked for review.
-        </p>
+        <p className="eyebrow">{tr('attention:acrossHouseholds')}</p>
+        <h1>{tr('attention:currentAttention')}</h1>
+        <p className="muted">{tr('attention:liveViewItems')}</p>
       </header>
 
       {attention.isPending && (
         <p className="muted" role="status">
-          Loading current attention…
+          {tr('attention:loadingCurrentAttention')}
         </p>
       )}
       {attention.isError && (
         <Card>
           <Notice kind="error">
-            Current attention could not be loaded: {attention.error.message}
+            {tr('attention:currentAttentionLoaded')}{' '}
+            {localizedError(attention.error)}
           </Notice>
           <Button variant="secondary" onClick={() => void attention.refetch()}>
-            Retry
+            {tr('common:retry')}
           </Button>
         </Card>
       )}
       {attention.data && attention.data.households.length === 0 && (
         <Card className="attention-empty">
           <Doodle kind="inventory" />
-          <h2>Nothing needs attention right now</h2>
-          <p className="muted">
-            When the server finds an item to review in one of your households,
-            it will appear here.
-          </p>
+          <h2>{tr('attention:nothingNeedsAttention')}</h2>
+          <p className="muted">{tr('attention:serverFindsItem')}</p>
         </Card>
       )}
       {attention.data && attention.data.households.length > 0 && (
@@ -79,14 +78,24 @@ export function AttentionPage({ user }: { user: User }) {
                       </span>
                       <span className="attention-item-content">
                         <strong>{item.name}</strong>
-                        <small>{trackingModeLabels[item.trackingMode]}</small>
+                        <small>
+                          {tr(
+                            trackingModeLabels[item.trackingMode] as Parameters<
+                              typeof tr
+                            >[0],
+                          )}
+                        </small>
                         <span className="attention-signals">
                           {item.signals.map((signal) => (
                             <span
                               className={`attention-signal attention-signal-${signal.toLowerCase()}`}
                               key={signal}
                             >
-                              {signalLabels[signal] ?? signal}
+                              {tr(
+                                (signalLabels[signal] ?? signal) as Parameters<
+                                  typeof tr
+                                >[0],
+                              )}
                             </span>
                           ))}
                         </span>
@@ -96,10 +105,18 @@ export function AttentionPage({ user }: { user: User }) {
                       </span>
                     </Link>
                     <details className="attention-assessment">
-                      <summary>Assessment details</summary>
+                      <summary>{tr('attention:assessmentDetails')}</summary>
                       <div>
-                        <small>Stock assessment: {item.lowStockRisk}</small>
-                        <small>Expiry assessment: {item.expiryRisk}</small>
+                        <small>
+                          {tr('attention:stockAssessment', {
+                            value: localizedEnum(item.lowStockRisk),
+                          })}
+                        </small>
+                        <small>
+                          {tr('attention:expiryAssessment', {
+                            value: localizedEnum(item.expiryRisk),
+                          })}
+                        </small>
                       </div>
                     </details>
                   </li>

@@ -15,14 +15,14 @@ import type {
 } from '../../shared/api/types';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
 
+import { tr } from '../../shared/i18n';
+import { formatDate, localizedError, localizedEnum } from '../../shared/i18n';
 function failureMessage(error: unknown) {
   if (error instanceof ApiError && error.code === 'LAST_ADMIN')
-    return 'The last Admin cannot be removed (LAST_ADMIN).';
+    return tr('households:lastAdminCannot');
   if (isMutationOutcomeUnknown(error))
-    return 'The result could not be confirmed. Refresh the server list before choosing to try again.';
-  return error instanceof Error
-    ? error.message
-    : 'The request could not be completed.';
+    return tr('households:resultConfirmedRefresh');
+  return localizedError(error);
 }
 
 export function HouseholdMembersPage({ user }: { user: User }) {
@@ -70,9 +70,7 @@ export function HouseholdMembersPage({ user }: { user: User }) {
       );
       return true;
     } catch {
-      setRefreshWarning(
-        'The change was saved, but the server list could not refresh. Reload this page to check its current status.',
-      );
+      setRefreshWarning(tr('households:changeSavedRefreshFailed'));
       return false;
     }
   }
@@ -92,9 +90,7 @@ export function HouseholdMembersPage({ user }: { user: User }) {
         expiresAt: string;
       }>(`${base}/invitations`, 'POST');
       setCreatedInvitePath(result.invitePath);
-      setNotice(
-        'Invitation created. Copy this one-time link now; it will not appear in the invitation list.',
-      );
+      setNotice(tr('households:invitationCreatedCopy'));
       await refreshList('invitations');
     } catch (cause) {
       setError(failureMessage(cause));
@@ -107,13 +103,9 @@ export function HouseholdMembersPage({ user }: { user: User }) {
     if (!createdLink) return;
     try {
       await navigator.clipboard.writeText(createdLink);
-      setCopyMessage(
-        'Link copied. Share it manually with the person you want to invite.',
-      );
+      setCopyMessage(tr('households:inviteLinkCopied'));
     } catch {
-      setCopyMessage(
-        'Copy was unavailable. Select and copy the link above manually.',
-      );
+      setCopyMessage(tr('households:inviteLinkCopyUnavailable'));
     }
   }
 
@@ -132,7 +124,7 @@ export function HouseholdMembersPage({ user }: { user: User }) {
       setNotice(
         result.revoked
           ? 'Invitation revoked.'
-          : 'The invitation was already revoked.',
+          : tr('households:invitationAlreadyRevoked'),
       );
       await refreshList('invitations');
     } catch (cause) {
@@ -172,11 +164,7 @@ export function HouseholdMembersPage({ user }: { user: User }) {
   }
 
   if (!isAdmin)
-    return (
-      <Notice kind="error">
-        Only a household Admin can manage members and invitations.
-      </Notice>
-    );
+    return <Notice kind="error">{tr('households:onlyHouseholdAdmin4')}</Notice>;
 
   return (
     <div className="narrow household-members-page">
@@ -184,32 +172,34 @@ export function HouseholdMembersPage({ user }: { user: User }) {
       {notice && <Notice kind="success">{notice}</Notice>}
       {refreshWarning && <Notice kind="error">{refreshWarning}</Notice>}
       <Card>
-        <h2>Members</h2>
+        <h2>{tr('common:members')}</h2>
         {members.isPending && (
           <p className="muted" role="status">
-            Loading members…
+            {tr('households:loadingMembers')}
           </p>
         )}
         {members.isError && (
           <>
             <Notice kind="error">
-              Members could not be loaded: {members.error.message}
+              {tr('households:membersLoaded')} {localizedError(members.error)}
             </Notice>
             <Button variant="secondary" onClick={() => void members.refetch()}>
-              Retry
+              {tr('common:retry')}
             </Button>
           </>
         )}
         {members.data?.length === 0 && (
-          <p className="muted">No members were returned for this household.</p>
+          <p className="muted">{tr('households:membersReturnedHousehold')}</p>
         )}
         {members.data?.map((member) => (
           <div className="row household-management-row" key={member.id}>
             <span className="item-identity">
               <strong>{member.email}</strong>
               <small>
-                {member.role === 'ADMIN' ? 'Admin' : 'Member'}
-                {member.id === user.id ? ' · You' : ''}
+                {member.role === 'ADMIN'
+                  ? tr('common:admin')
+                  : tr('common:member')}
+                {member.id === user.id ? tr('households:you2') : ''}
               </small>
             </span>
             {removeTargetId === member.id ? (
@@ -219,13 +209,15 @@ export function HouseholdMembersPage({ user }: { user: User }) {
                   disabled={pendingId !== null}
                   onClick={() => setRemoveTargetId(null)}
                 >
-                  Cancel
+                  {tr('households:cancel')}
                 </Button>
                 <Button
                   disabled={pendingId !== null}
                   onClick={() => void removeMember(member.id)}
                 >
-                  {pendingId === member.id ? 'Removing…' : 'Confirm removal'}
+                  {pendingId === member.id
+                    ? tr('households:removing')
+                    : tr('common:confirmRemoval')}
                 </Button>
               </span>
             ) : (
@@ -234,28 +226,25 @@ export function HouseholdMembersPage({ user }: { user: User }) {
                 disabled={pendingId !== null}
                 onClick={() => setRemoveTargetId(member.id)}
               >
-                Remove
+                {tr('common:remove')}
               </Button>
             )}
           </div>
         ))}
       </Card>
       <Card>
-        <h2>Invite a member</h2>
-        <p className="muted">
-          Create a one-time link, then share it yourself. The link is available
-          only immediately after creation.
-        </p>
+        <h2>{tr('households:inviteMember')}</h2>
+        <p className="muted">{tr('households:createOneTime')}</p>
         <Button
           disabled={creating || pendingId !== null}
           onClick={() => void createInvitation()}
         >
-          {creating ? 'Creating…' : 'Create invitation'}
+          {creating ? tr('common:creating') : tr('households:createInvitation')}
         </Button>
         {createdLink && (
           <div className="invitation-created">
             <label>
-              New invitation link
+              {tr('households:newInvitationLink')}
               <input
                 readOnly
                 value={createdLink}
@@ -263,7 +252,7 @@ export function HouseholdMembersPage({ user }: { user: User }) {
               />
             </label>
             <Button variant="secondary" onClick={() => void copyLink()}>
-              Copy link
+              {tr('households:copyLink')}
             </Button>
             {copyMessage && (
               <p className="muted" role="status">
@@ -274,41 +263,39 @@ export function HouseholdMembersPage({ user }: { user: User }) {
         )}
       </Card>
       <Card>
-        <h2>Invitations</h2>
-        <p className="muted">
-          The server reports each status. Previous invitation links cannot be
-          retrieved here.
-        </p>
+        <h2>{tr('households:invitations')}</h2>
+        <p className="muted">{tr('households:serverReportsEach')}</p>
         {invitations.isPending && (
           <p className="muted" role="status">
-            Loading invitations…
+            {tr('households:loadingInvitations')}
           </p>
         )}
         {invitations.isError && (
           <>
             <Notice kind="error">
-              Invitations could not be loaded: {invitations.error.message}
+              {tr('households:invitationsLoaded')}{' '}
+              {localizedError(invitations.error)}
             </Notice>
             <Button
               variant="secondary"
               onClick={() => void invitations.refetch()}
             >
-              Retry
+              {tr('common:retry')}
             </Button>
           </>
         )}
         {invitations.data?.length === 0 && (
-          <p className="muted">No invitations yet.</p>
+          <p className="muted">{tr('households:invitationsYet')}</p>
         )}
         {invitations.data?.map((invitation) => (
           <div className="row household-management-row" key={invitation.id}>
             <span className="item-identity">
-              <strong>{invitation.status}</strong>
+              <strong>{localizedEnum(invitation.status)}</strong>
               <small>
-                Created {new Date(invitation.createdAt).toLocaleString()}
+                {tr('households:created')} {formatDate(invitation.createdAt)}
               </small>
               <small>
-                Expires {new Date(invitation.expiresAt).toLocaleString()}
+                {tr('common:expires')} {formatDate(invitation.expiresAt)}
               </small>
             </span>
             {invitation.status === 'ACTIVE' &&
@@ -319,15 +306,15 @@ export function HouseholdMembersPage({ user }: { user: User }) {
                     disabled={pendingId !== null}
                     onClick={() => setRevokeTargetId(null)}
                   >
-                    Cancel
+                    {tr('households:cancel')}
                   </Button>
                   <Button
                     disabled={pendingId !== null}
                     onClick={() => void revokeInvitation(invitation.id)}
                   >
                     {pendingId === invitation.id
-                      ? 'Revoking…'
-                      : 'Confirm revoke'}
+                      ? tr('households:revoking')
+                      : tr('households:confirmRevoke')}
                   </Button>
                 </span>
               ) : (
@@ -336,7 +323,7 @@ export function HouseholdMembersPage({ user }: { user: User }) {
                   disabled={pendingId !== null}
                   onClick={() => setRevokeTargetId(invitation.id)}
                 >
-                  Revoke
+                  {tr('common:revoke')}
                 </Button>
               ))}
           </div>

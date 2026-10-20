@@ -10,6 +10,7 @@ import { keys } from '../../shared/api/keys';
 import type { Household } from '../../shared/api/types';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
 
+import { localizedError, tr, type TranslationKey } from '../../shared/i18n';
 type Kind = 'categories' | 'locations' | 'tags';
 type CatalogEntry = {
   id: string;
@@ -18,9 +19,9 @@ type CatalogEntry = {
 };
 
 const catalogKinds: { kind: Kind; label: string; singular: string }[] = [
-  { kind: 'categories', label: 'Categories', singular: 'category' },
-  { kind: 'locations', label: 'Locations', singular: 'location' },
-  { kind: 'tags', label: 'Tags', singular: 'tag' },
+  { kind: 'categories', label: 'Categories', singular: 'Category' },
+  { kind: 'locations', label: 'Locations', singular: 'Location' },
+  { kind: 'tags', label: 'Tags', singular: 'Tag' },
 ];
 
 function CatalogList({
@@ -34,6 +35,8 @@ function CatalogList({
   label: string;
   singular: string;
 }) {
+  const displayLabel = tr(label as TranslationKey);
+  const displaySingular = tr(singular as TranslationKey);
   const queryClient = useQueryClient();
   const catalogKey = keys.catalog(household.id, kind);
   const catalog = useQuery({
@@ -54,32 +57,32 @@ function CatalogList({
         { throwOnError: true },
       );
     } catch {
-      setError(
-        'The change was saved, but related views could not refresh. Reload to check them.',
-      );
+      setError(tr('settings:catalogSavedRefreshWarning'));
     }
   }
 
-  function mutationError(cause: unknown, action: string) {
+  function mutationError(cause: unknown) {
     if (
       cause instanceof ApiError &&
       (cause.code === 'CATEGORY_IN_USE' || cause.code === 'LOCATION_IN_USE')
     ) {
       setReferences(cause.references);
       setError(
-        `This ${singular} is still referenced and was not removed. Rename it instead if needed.`,
+        tr('settings:stillReferencedRemoved', {
+          catalog: displaySingular.toLocaleLowerCase(),
+        }),
       );
     } else {
       setError(
         cause instanceof OfflineBeforeSendError
-          ? cause.message
+          ? localizedError(cause)
           : isMutationOutcomeUnknown(cause)
-            ? `The ${action} result is uncertain. Reload the catalog before choosing to retry.`
+            ? tr('settings:catalogChangeResult')
             : cause instanceof ApiError
-              ? `${action} failed: ${cause.message}`
+              ? localizedError(cause)
               : cause instanceof Error
-                ? cause.message
-                : `${action} failed.`,
+                ? localizedError(cause)
+                : tr('common:changeSaved'),
       );
     }
   }
@@ -100,11 +103,14 @@ function CatalogList({
         current?.map((value) => (value.id === saved.id ? saved : value)),
       );
       setMessage(
-        `${singular[0].toUpperCase()}${singular.slice(1)} renamed to ${saved.name}.`,
+        tr('settings:renamed', {
+          catalog: displaySingular,
+          name: saved.name,
+        }),
       );
       await refresh();
     } catch (cause) {
-      mutationError(cause, 'Rename');
+      mutationError(cause);
     } finally {
       setBusyId('');
     }
@@ -124,10 +130,10 @@ function CatalogList({
       queryClient.setQueryData<CatalogEntry[]>(catalogKey, (current) =>
         current?.filter((value) => value.id !== entry.id),
       );
-      setMessage(`${entry.name} was permanently removed.`);
+      setMessage(tr('settings:permanentlyRemoved', { name: entry.name }));
       await refresh();
     } catch (cause) {
-      mutationError(cause, 'Remove');
+      mutationError(cause);
     } finally {
       setBusyId('');
     }
@@ -135,20 +141,33 @@ function CatalogList({
 
   return (
     <div className="field-stack">
-      <h3>{label}</h3>
-      {catalog.isPending && <p role="status">Loading {label.toLowerCase()}…</p>}
+      <h3>{displayLabel}</h3>
+      {catalog.isPending && (
+        <p role="status">
+          {tr('common:loading', {
+            catalog: displayLabel.toLocaleLowerCase(),
+          })}
+        </p>
+      )}
       {catalog.isError && (
         <>
           <Notice kind="error">
-            {label} could not be loaded: {catalog.error.message}
+            {tr('settings:loaded', { catalog: displayLabel })}{' '}
+            {localizedError(catalog.error)}
           </Notice>
           <Button variant="secondary" onClick={() => void catalog.refetch()}>
-            Retry {label.toLowerCase()}
+            {tr('settings:retry2', {
+              catalog: displayLabel.toLocaleLowerCase(),
+            })}
           </Button>
         </>
       )}
       {catalog.data?.length === 0 && (
-        <p className="muted">No {label.toLowerCase()} yet.</p>
+        <p className="muted">
+          {tr('settings:yet', {
+            catalog: displayLabel.toLocaleLowerCase(),
+          })}
+        </p>
       )}
       {message && <Notice kind="success">{message}</Notice>}
       {error && (
@@ -166,7 +185,7 @@ function CatalogList({
             </ul>
           )}
           {references && kind === 'locations' && (
-            <p>Even a zero-quantity historical batch may prevent removal.</p>
+            <p>{tr('settings:evenZeroQuantity')}</p>
           )}
         </Notice>
       )}
@@ -203,6 +222,7 @@ function CatalogRow({
   onRename: (name: string) => void;
   onRemove: () => void;
 }) {
+  const displaySingular = tr(singular as TranslationKey);
   const [name, setName] = useState(entry.name);
   return (
     <div className="category-section-row">
@@ -216,8 +236,7 @@ function CatalogRow({
             }}
           >
             <label>
-              {singular[0].toUpperCase()}
-              {singular.slice(1)} name
+              {displaySingular} {tr('common:name2')}
               <input
                 value={name}
                 maxLength={80}
@@ -231,18 +250,20 @@ function CatalogRow({
               variant="secondary"
               disabled={busy || !name.trim() || name === entry.name}
             >
-              Rename
+              {tr('settings:rename')}
             </Button>
           </form>
           {canRemove && (
             <details>
-              <summary>Remove {entry.name}</summary>
+              <summary>
+                {tr('common:remove')} {entry.name}
+              </summary>
               <p className="muted">
-                Removal is permanent and works only when this {singular} has no
-                references. Items, batches, and trips will not be detached.
+                {tr('settings:removalPermanentWorks')} {displaySingular}{' '}
+                {tr('settings:hasReferencesItems')}
               </p>
               <Button variant="secondary" disabled={busy} onClick={onRemove}>
-                Permanently remove {entry.name}
+                {tr('settings:permanentlyRemove')} {entry.name}
               </Button>
             </details>
           )}
@@ -257,15 +278,12 @@ function CatalogRow({
 export function CatalogManagement({ household }: { household: Household }) {
   return (
     <Card>
-      <h2>Catalog for {household.name}</h2>
-      <p className="muted">
-        Names appear throughout Inventory and Shopping. Category shopping
-        sections are managed separately below.
-      </p>
+      <h2>
+        {tr('common:catalog')} {household.name}
+      </h2>
+      <p className="muted">{tr('settings:namesAppearThroughout')}</p>
       {household.role !== 'ADMIN' && (
-        <p className="muted">
-          Only a household Admin can rename or remove catalog entries.
-        </p>
+        <p className="muted">{tr('settings:onlyHouseholdAdmin5')}</p>
       )}
       {catalogKinds.map((item) => (
         <CatalogList

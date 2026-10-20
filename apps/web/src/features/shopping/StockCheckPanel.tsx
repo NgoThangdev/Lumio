@@ -5,6 +5,14 @@ import { keys } from '../../shared/api/keys';
 import type { StockLevel } from '../../shared/api/types';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
 
+import { tr } from '../../shared/i18n';
+import {
+  formatDate,
+  formatDateOnly,
+  localizedEnum,
+  localizedError,
+  formatNumber,
+} from '../../shared/i18n';
 type CheckStatus = 'PENDING' | 'CONFIRM' | 'CORRECT' | 'STALE';
 type CheckReason =
   'MISSING_STATE' | 'NO_STOCK_RECORD' | 'STALE_RECORD' | 'STOCK_CHANGED';
@@ -132,18 +140,14 @@ function StockCheckEntry({
       });
       if (result.conflict) {
         setStockConflict(true);
-        setError(
-          'Stock changed since this check. Review the refreshed stock above, then choose Confirm or Correct again.',
-        );
+        setError(tr('shopping:stockChangedReviewAgain'));
       } else {
         setStockConflict(false);
         setNotice(
           decision === 'CONFIRM' ? 'Stock confirmed.' : 'Correction saved.',
         );
         if (result.refreshFailed)
-          setError(
-            'Saved successfully, but some inventory views did not refresh. Reload Inventory to verify current stock.',
-          );
+          setError(tr('shopping:stockCheckSavedRefreshWarning'));
       }
     } catch (cause) {
       if (
@@ -162,14 +166,12 @@ function StockCheckEntry({
             ).map((batch) => [batch.id, batch.quantity]),
           ),
         );
-        setError(
-          'The API needs batch-level detail to preserve expiry and opened-stock accounting. Review the returned batches and enter each observed count.',
-        );
+        setError(tr('shopping:batchDetailCorrectionGuidance'));
       } else {
         setError(
           cause instanceof Error
-            ? cause.message
-            : 'This stock check could not be saved.',
+            ? localizedError(cause)
+            : tr('shopping:stockCheckSaveFailed'),
         );
       }
     } finally {
@@ -212,61 +214,51 @@ function StockCheckEntry({
         <div>
           <strong>{entry.name}</strong>
           <small>
-            {entry.trackingMode === 'QUANTITY'
-              ? 'Quantity'
-              : entry.trackingMode === 'FIVE_LEVEL'
-                ? 'Five-level'
-                : 'Presence + backups'}{' '}
-            · {entry.reason.replaceAll('_', ' ').toLowerCase()}
+            {localizedEnum(entry.trackingMode)} · {localizedEnum(entry.reason)}
           </small>
         </div>
         <span
           className={`pill ${entry.status === 'STALE' ? 'stock-check-stale' : ''}`}
         >
-          {entry.status.toLowerCase()}
+          {localizedEnum(entry.status)}
         </span>
       </div>
       {quantityStock ? (
         <>
           <p className="muted">
-            Current total: <strong>{entry.stock.quantity}</strong>
+            {tr('shopping:currentTotal')}{' '}
+            <strong>{formatNumber(entry.stock.quantity)}</strong>
           </p>
           {entry.openedTrackingEnabled && (
-            <p className="muted">
-              Opening tracking is enabled. The API validates package counts.
-            </p>
+            <p className="muted">{tr('shopping:openingTrackingEnabled')}</p>
           )}
         </>
       ) : (
         <p className="muted">
-          Current state:{' '}
+          {tr('shopping:currentState')}{' '}
           <strong>
             {entry.trackingMode === 'FIVE_LEVEL'
-              ? (entry.stock.currentLevel ?? 'Not set')
+              ? localizedEnum(entry.stock.currentLevel ?? 'Not set')
               : entry.stock.isPresent === null
-                ? 'Not set'
-                : entry.stock.isPresent
-                  ? 'Present'
-                  : 'Absent'}
+                ? tr('common:set')
+                : tr(
+                    entry.stock.isPresent ? 'common:present' : 'common:absent',
+                  )}
           </strong>{' '}
-          · Backups: <strong>{stateStock?.backupCount ?? 0}</strong>
+          {tr('shopping:backups3')}{' '}
+          <strong>{formatNumber(stateStock?.backupCount ?? 0)}</strong>
         </p>
       )}
       {entry.checkedAt && (
         <small className="muted">
-          Last saved {new Date(entry.checkedAt).toLocaleString()}
+          {tr('shopping:lastSaved', { date: formatDate(entry.checkedAt) })}
         </small>
       )}
       {entry.status === 'STALE' && (
-        <Notice kind="error">
-          Inventory changed after the saved check. Review this latest stock
-          before confirming or correcting again.
-        </Notice>
+        <Notice kind="error">{tr('shopping:inventoryChangedSaved')}</Notice>
       )}
       {stockConflict && entry.status !== 'STALE' && (
-        <Notice kind="error">
-          Review the latest stock before saving this check again.
-        </Notice>
+        <Notice kind="error">{tr('shopping:reviewLatestStock2')}</Notice>
       )}
       {error && <Notice kind="error">{error}</Notice>}
       {notice && <Notice kind="success">{notice}</Notice>}
@@ -277,7 +269,7 @@ function StockCheckEntry({
           disabled={pending}
           onClick={() => void save('CONFIRM')}
         >
-          {pending ? 'Saving…' : 'Confirm'}
+          {pending ? tr('common:saving') : tr('common:confirm')}
         </Button>
         <Button
           type="button"
@@ -285,7 +277,7 @@ function StockCheckEntry({
           disabled={pending}
           onClick={() => setShowCorrection((current) => !current)}
         >
-          {showCorrection ? 'Close correction' : 'Correct'}
+          {showCorrection ? tr('common:closeCorrection') : tr('common:correct')}
         </Button>
       </div>
       {showCorrection && (
@@ -293,7 +285,7 @@ function StockCheckEntry({
           {entry.trackingMode === 'QUANTITY' ? (
             <>
               <label>
-                Observed total quantity
+                {tr('shopping:observedTotalQuantity')}
                 <input
                   type="number"
                   min="0"
@@ -306,25 +298,24 @@ function StockCheckEntry({
               </label>
               {batchDetailRequired && quantityStock && (
                 <>
-                  <p className="muted">
-                    Enter the observed count for each positive batch from the
-                    API response. Batch identity stays attached to its
-                    expiry/opened dates. Any extra stock is recorded as unopened
-                    and undated.
-                  </p>
+                  <p className="muted">{tr('shopping:enterObservedCount')}</p>
                   {entry.trackingMode === 'QUANTITY' &&
                     entry.stock.batches
                       .filter((batch) => Number(batch.quantity) > 0)
                       .map((batch) => (
                         <label className="stock-check-batch" key={batch.id}>
                           <span>
-                            Batch ·{' '}
+                            {tr('shopping:batch2')}{' '}
                             {batch.expiryDate
-                              ? `expires ${batch.expiryDate}`
-                              : 'no expiry'}
+                              ? tr('shopping:expires3', {
+                                  date: formatDateOnly(batch.expiryDate),
+                                })
+                              : tr('common:expiry2')}
                             {batch.openedAt
-                              ? ` · opened ${batch.openedAt.slice(0, 10)}`
-                              : ' · unopened'}
+                              ? tr('shopping:opened2', {
+                                  date: formatDateOnly(batch.openedAt),
+                                })
+                              : ` · ${tr('common:unopened')}`}
                           </span>
                           <input
                             type="number"
@@ -343,7 +334,7 @@ function StockCheckEntry({
                         </label>
                       ))}
                   <label>
-                    Extra unopened quantity
+                    {tr('shopping:extraUnopenedQuantity')}
                     <input
                       type="number"
                       min="0"
@@ -356,17 +347,14 @@ function StockCheckEntry({
                       required
                     />
                   </label>
-                  <p className="muted">
-                    Batch counts plus extra unopened quantity must equal the
-                    observed total. The API will validate the correction.
-                  </p>
+                  <p className="muted">{tr('shopping:batchCountsPlus')}</p>
                 </>
               )}
             </>
           ) : entry.trackingMode === 'FIVE_LEVEL' ? (
             <>
               <label>
-                Current level
+                {tr('common:currentLevel')}
                 <select
                   value={currentLevel}
                   onChange={(event) =>
@@ -374,16 +362,16 @@ function StockCheckEntry({
                   }
                   required
                 >
-                  <option value="">Choose level</option>
+                  <option value="">{tr('shopping:chooseLevel2')}</option>
                   {levels.map((level) => (
                     <option value={level.value} key={level.value}>
-                      {level.label}
+                      {localizedEnum(level.value)}
                     </option>
                   ))}
                 </select>
               </label>
               <label>
-                Backup count
+                {tr('common:backupCount')}
                 <input
                   type="number"
                   min="0"
@@ -398,19 +386,19 @@ function StockCheckEntry({
           ) : (
             <>
               <label>
-                Current item
+                {tr('common:currentItem')}
                 <select
                   value={isPresent}
                   onChange={(event) => setIsPresent(event.target.value)}
                   required
                 >
-                  <option value="">Choose state</option>
-                  <option value="true">Present</option>
-                  <option value="false">Absent</option>
+                  <option value="">{tr('shopping:chooseState2')}</option>
+                  <option value="true">{tr('common:present')}</option>
+                  <option value="false">{tr('common:absent')}</option>
                 </select>
               </label>
               <label>
-                Backup count
+                {tr('common:backupCount')}
                 <input
                   type="number"
                   min="0"
@@ -424,7 +412,7 @@ function StockCheckEntry({
             </>
           )}
           <Button type="submit" disabled={pending}>
-            {pending ? 'Saving…' : 'Save correction'}
+            {pending ? tr('common:saving') : tr('common:saveCorrection')}
           </Button>
         </form>
       )}
@@ -517,22 +505,22 @@ export function StockCheckPanel({
   if (checkQuery.isPending)
     return (
       <Card>
-        <p className="muted">Loading pre-shopping stock check…</p>
+        <p className="muted">{tr('shopping:loadingPreShopping')}</p>
       </Card>
     );
   if (checkQuery.isError)
     return (
       <Card>
-        <p className="eyebrow">Check what is at home</p>
+        <p className="eyebrow">{tr('shopping:checkHome')}</p>
         <Notice kind="error">
-          The stock check could not load: {checkQuery.error.message}
+          {tr('shopping:stockCheckLoad')} {localizedError(checkQuery.error)}
         </Notice>
         <Button
           type="button"
           variant="secondary"
           onClick={() => void checkQuery.refetch()}
         >
-          Retry stock check
+          {tr('shopping:retryStockCheck')}
         </Button>
       </Card>
     );
@@ -542,18 +530,16 @@ export function StockCheckPanel({
   ).length;
   return (
     <Card className="stock-check-panel">
-      <p className="eyebrow">Before shopping</p>
-      <h3>Check what is at home</h3>
-      <p className="muted">
-        Review the API-ranked shortlist. Each result saves separately, so you
-        can leave and resume. Import remains available without completing every
-        check.
-      </p>
+      <p className="eyebrow">{tr('common:shopping')}</p>
+      <h3>{tr('shopping:checkHome')}</h3>
+      <p className="muted">{tr('shopping:reviewApiRanked')}</p>
       <p className="stock-check-progress" role="status">
-        {checkedCount} of {checkQuery.data.items.length} checks saved
+        {formatNumber(checkedCount)} {tr('common:of')}{' '}
+        {formatNumber(checkQuery.data.items.length)}{' '}
+        {tr('shopping:checksSaved')}
       </p>
       {checkQuery.data.items.length === 0 ? (
-        <p className="muted">The API returned no items for this stock check.</p>
+        <p className="muted">{tr('shopping:apiReturnedItems')}</p>
       ) : (
         <div className="stock-check-list">
           {checkQuery.data.items.map((entry) => (

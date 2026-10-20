@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react';
 import { Doodle, type IllustrationKey } from './Doodle';
+import { tr, type TranslationKey } from '../i18n';
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary' | 'link';
@@ -33,7 +34,7 @@ export function Notice({
       className={`message ${kind}`}
       role={kind === 'error' ? 'alert' : 'status'}
     >
-      {children}
+      {typeof children === 'string' ? tr(children as TranslationKey) : children}
     </div>
   );
 }
@@ -63,11 +64,11 @@ export function ItemVisual({
 
 export function StockBadge({ status }: { status?: string }) {
   const labels: Record<string, string> = {
-    OK: 'In stock',
-    LOW: 'Low stock',
-    BUY: 'Time to buy',
-    OUT: 'Out of stock',
-    USE_SOON: 'Use soon',
+    OK: tr('common:stock'),
+    LOW: tr('common:lowStock'),
+    BUY: tr('common:timeBuy'),
+    OUT: tr('common:outStock'),
+    USE_SOON: tr('common:useSoon3'),
   };
   return (
     <span className={`health health-${status?.toLowerCase() ?? 'unknown'}`}>
@@ -80,7 +81,7 @@ export function StockBadge({ status }: { status?: string }) {
               ? '!'
               : '·'}
       </span>
-      {status ? (labels[status] ?? status) : 'Status unavailable'}
+      {status ? (labels[status] ?? status) : tr('common:statusUnavailable')}
     </span>
   );
 }

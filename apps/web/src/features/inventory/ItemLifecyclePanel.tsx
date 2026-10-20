@@ -12,6 +12,8 @@ import type { CatalogOption, Item } from '../../shared/api/types';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
 import { refreshItemLifecycle } from './itemLifecycle';
 
+import { tr } from '../../shared/i18n';
+import { localizedError } from '../../shared/i18n';
 export function ItemLifecyclePanel({
   householdId,
   item,
@@ -70,25 +72,21 @@ export function ItemLifecyclePanel({
             : 'Item restored';
       setNotice(`${action}.`);
       if (!(await refreshItemLifecycle(queryClient, householdId, item.id))) {
-        setError(
-          'Saved, but some views could not refresh. Reload to check the latest Inventory and Shopping data.',
-        );
+        setError(tr('item-detail:lifecycleSavedRefreshWarning'));
       }
     } catch (cause) {
       if (cause instanceof ApiError && cause.code === 'ACTIVE_TRIP_ENTRY') {
         setBlockers(cause.tripIds);
-        setError(
-          'Archive was not saved. Remove this item from each active trip explicitly, then choose Archive again.',
-        );
+        setError(tr('item-detail:archiveBlockedGuidance'));
       } else {
         setError(
           cause instanceof OfflineBeforeSendError
-            ? cause.message
+            ? localizedError(cause)
             : isMutationOutcomeUnknown(cause)
-              ? 'The result is uncertain. Reload Item Detail and check history before choosing to retry.'
+              ? tr('item-detail:lifecycleOutcomeUncertain')
               : cause instanceof Error
-                ? `Change was not saved: ${cause.message}`
-                : 'Change was not saved.',
+                ? `Change was not saved: ${localizedError(cause)}`
+                : tr('item-detail:lifecycleChangeRejected'),
         );
       }
     } finally {
@@ -99,7 +97,11 @@ export function ItemLifecyclePanel({
   const base = `/households/${householdId}/items/${item.id}`;
   return (
     <Card>
-      <h2>{item.archivedAt ? 'Archived item' : 'Manage item'}</h2>
+      <h2>
+        {item.archivedAt
+          ? tr('common:archivedItem')
+          : tr('item-detail:manageItem')}
+      </h2>
       {notice && <Notice kind="success">{notice}</Notice>}
       {error && <Notice kind="error">{error}</Notice>}
       {blockers.length > 0 && (
@@ -107,7 +109,7 @@ export function ItemLifecyclePanel({
           {blockers.map((tripId) => (
             <li key={tripId}>
               <Link to={`/households/${householdId}/shopping/${tripId}`}>
-                Open blocking trip {tripId}
+                {tr('item-detail:openBlockingTrip')} {tripId}
               </Link>
             </li>
           ))}
@@ -118,12 +120,14 @@ export function ItemLifecyclePanel({
           disabled={busy}
           onClick={() => void submit(`${base}/restore`, 'POST')}
         >
-          {busy ? 'Restoring…' : 'Restore to active Inventory'}
+          {busy
+            ? tr('common:restoring')
+            : tr('item-detail:restoreActiveInventory')}
         </Button>
       ) : (
         <>
           <details>
-            <summary>Edit name and organization</summary>
+            <summary>{tr('item-detail:editNameOrganization')}</summary>
             <form
               className="field-stack"
               onSubmit={(event) => {
@@ -137,7 +141,7 @@ export function ItemLifecyclePanel({
               }}
             >
               <label>
-                Name
+                {tr('common:name')}
                 <input
                   value={name}
                   maxLength={120}
@@ -148,17 +152,18 @@ export function ItemLifecyclePanel({
               </label>
               {categories.isError && (
                 <Notice kind="error">
-                  Categories could not load: {categories.error.message}
+                  {tr('common:categoriesLoad')}{' '}
+                  {localizedError(categories.error)}
                 </Notice>
               )}
               <label>
-                Category
+                {tr('common:category')}
                 <select
                   value={categoryId}
                   disabled={busy || !categories.data}
                   onChange={(event) => setCategoryId(event.target.value)}
                 >
-                  <option value="">No category</option>
+                  <option value="">{tr('item-detail:category2')}</option>
                   {categories.data?.map((entry) => (
                     <option key={entry.id} value={entry.id}>
                       {entry.name}
@@ -168,11 +173,11 @@ export function ItemLifecyclePanel({
               </label>
               {tags.isError && (
                 <Notice kind="error">
-                  Tags could not load: {tags.error.message}
+                  {tr('common:tagsLoad')} {localizedError(tags.error)}
                 </Notice>
               )}
               <fieldset disabled={busy || !tags.data}>
-                <legend>Tags</legend>
+                <legend>{tr('common:tags')}</legend>
                 {tags.data?.length ? (
                   tags.data.map((entry) => (
                     <label className="check-label" key={entry.id}>
@@ -191,22 +196,22 @@ export function ItemLifecyclePanel({
                     </label>
                   ))
                 ) : (
-                  <p className="muted">No tags yet.</p>
+                  <p className="muted">{tr('common:tagsYet')}</p>
                 )}
               </fieldset>
               {locations.isError && (
                 <Notice kind="error">
-                  Locations could not load: {locations.error.message}
+                  {tr('common:locationsLoad')} {localizedError(locations.error)}
                 </Notice>
               )}
               <label>
-                Preferred restock location
+                {tr('item-detail:preferredRestockLocation')}
                 <select
                   value={preferredId}
                   disabled={busy || !locations.data}
                   onChange={(event) => setPreferredId(event.target.value)}
                 >
-                  <option value="">No preference</option>
+                  <option value="">{tr('common:preference')}</option>
                   {locations.data?.map((entry) => (
                     <option key={entry.id} value={entry.id}>
                       {entry.name}
@@ -215,8 +220,7 @@ export function ItemLifecyclePanel({
                 </select>
               </label>
               <p className="muted">
-                This preference affects future stock writes. Existing batch
-                locations stay as recorded.
+                {tr('item-detail:preferenceAffectsFuture')}
               </p>
               <Button
                 disabled={
@@ -227,22 +231,19 @@ export function ItemLifecyclePanel({
                   !name.trim()
                 }
               >
-                {busy ? 'Saving…' : 'Save item details'}
+                {busy ? tr('common:saving') : tr('item-detail:saveItemDetails')}
               </Button>
             </form>
           </details>
           <details>
-            <summary>Archive item</summary>
-            <p className="muted">
-              Remove from active Inventory. Stock, batches, and history are
-              retained; active stock actions become unavailable.
-            </p>
+            <summary>{tr('item-detail:archiveItem')}</summary>
+            <p className="muted">{tr('item-detail:removeActiveInventory')}</p>
             <Button
               variant="secondary"
               disabled={busy}
               onClick={() => void submit(`${base}/archive`, 'POST')}
             >
-              {busy ? 'Archiving…' : 'Archive'}
+              {busy ? tr('item-detail:archiving') : tr('common:archive')}
             </Button>
           </details>
         </>

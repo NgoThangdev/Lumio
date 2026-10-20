@@ -14,6 +14,14 @@ import type {
 import { Doodle } from '../../shared/ui/Doodle';
 import { Notice } from '../../shared/ui/primitives';
 
+import { tr } from '../../shared/i18n';
+import {
+  formatDate,
+  formatDateOnly,
+  localizedError,
+  formatNumber,
+  localizedEnum,
+} from '../../shared/i18n';
 type TripSummary = {
   id: string;
   store: string;
@@ -41,22 +49,22 @@ function alertTone(entry: AttentionItem) {
 
 function activityTypeLabel(event: RecentActivityEvent) {
   const labels: Record<RecentActivityEvent['type'], string> = {
-    USE: 'Used',
-    RESTOCK: 'Restocked',
-    INITIAL_STOCK: 'Initial stock added',
-    OPEN: 'Opened a package',
-    FINISH_OPENED: 'Finished opened stock',
-    INITIALIZE: 'Initial state recorded',
-    UPDATE_LEVEL: 'Level updated',
-    ADD_BACKUP: 'Backup added',
-    OPEN_REFILL: 'Opened refill',
-    SET_PRESENCE: 'Presence updated',
-    UNDO: 'Undo',
-    SHOPPING_TRIP_COMPLETED: 'Shopping trip finished',
-    TRIP_STOCK_CORRECTED: 'Shopping stock check corrected',
-    LOCATION_STOCK_CORRECTED: 'Location stock corrected',
+    USE: 'common:used2',
+    RESTOCK: 'common:restocked2',
+    INITIAL_STOCK: 'home:initialStockAdded',
+    OPEN: 'home:openedPackage',
+    FINISH_OPENED: 'common:finishedOpenedStock',
+    INITIALIZE: 'home:initialStateRecorded',
+    UPDATE_LEVEL: 'common:levelUpdated',
+    ADD_BACKUP: 'home:backupAdded',
+    OPEN_REFILL: 'home:openedRefill',
+    SET_PRESENCE: 'home:presenceUpdated',
+    UNDO: 'common:undo',
+    SHOPPING_TRIP_COMPLETED: 'home:shoppingTripFinished',
+    TRIP_STOCK_CORRECTED: 'home:shoppingStockCheck',
+    LOCATION_STOCK_CORRECTED: 'home:locationStockCorrected',
   };
-  return labels[event.type];
+  return tr(labels[event.type] as Parameters<typeof tr>[0]);
 }
 
 function activityChangeText(event: RecentActivityEvent) {
@@ -77,11 +85,10 @@ function activityChangeText(event: RecentActivityEvent) {
     const entry = value[field];
     if (entry === undefined || entry === null) return 'not set';
     if (field === 'quantity')
-      return `${entry}${event.item?.primaryUnit ? ` ${event.item.primaryUnit}` : ''}`;
-    if (field === 'currentLevel')
-      return String(entry).replaceAll('_', ' ').toLowerCase();
+      return `${formatNumber(String(entry))}${event.item?.primaryUnit ? ` ${event.item.primaryUnit}` : ''}`;
+    if (field === 'currentLevel') return localizedEnum(String(entry));
     if (field === 'isPresent') return entry ? 'present' : 'absent';
-    return `${entry} ${entry === 1 ? 'backup' : 'backups'}`;
+    return `${formatNumber(Number(entry))} ${tr(entry === 1 ? 'common:backup' : 'common:backups2')}`;
   };
   const before = describe(change.before);
   const after = describe(change.after);
@@ -89,28 +96,28 @@ function activityChangeText(event: RecentActivityEvent) {
 }
 
 function activityDetail(event: RecentActivityEvent) {
-  if (event.isUndone) return 'Đã hoàn tác';
+  if (event.isUndone) return tr('home:undone');
   if (event.type === 'UNDO')
     return event.reversesType
-      ? `Reversed ${event.reversesType.replaceAll('_', ' ').toLowerCase()}`
-      : 'Reversal recorded';
+      ? tr('home:reversed', { action: localizedEnum(event.reversesType) })
+      : tr('home:reversalRecorded');
   if (event.type === 'SHOPPING_TRIP_COMPLETED')
     return event.trip?.store
-      ? `Shopping at ${event.trip.store}`
-      : 'Shopping trip completed';
+      ? tr('home:shopping3', { store: event.trip.store })
+      : tr('home:shoppingTripCompleted');
   if (event.type === 'TRIP_STOCK_CORRECTED')
-    return activityChangeText(event) || 'Stock observation updated';
+    return activityChangeText(event) || tr('home:stockObservationUpdated');
   if (event.type === 'LOCATION_STOCK_CORRECTED') {
     const change = activityChangeText(event);
     return (
       [event.location?.name, change].filter(Boolean).join(' · ') ||
-      'Stock observation updated'
+      tr('home:stockObservationUpdated')
     );
   }
   const change = activityChangeText(event);
   if (change) return change;
   if (event.quantity !== null)
-    return `${event.quantity}${event.item?.primaryUnit ? ` ${event.item.primaryUnit}` : ''}`;
+    return `${formatNumber(event.quantity)}${event.item?.primaryUnit ? ` ${event.item.primaryUnit}` : ''}`;
   return '';
 }
 
@@ -131,9 +138,7 @@ export function HomePage() {
         `${base}/items?groupBy=none`,
       );
       if (Array.isArray(result) || !result || !Array.isArray(result.items)) {
-        throw new Error(
-          'The API did not return the queried Inventory response.',
-        );
+        throw new Error(tr('home:inventoryResponseMissing'));
       }
       return result;
     },
@@ -146,7 +151,7 @@ export function HomePage() {
         `${base}/items?groupBy=location`,
       );
       if (Array.isArray(result) || !result || !Array.isArray(result.groups)) {
-        throw new Error('The API did not return Inventory location groups.');
+        throw new Error(tr('home:locationGroupsMissing'));
       }
       return result;
     },
@@ -184,17 +189,17 @@ export function HomePage() {
         }}
       >
         <label className="sr-only" htmlFor="home-search-input">
-          Search for an item
+          {tr('common:searchItem')}
         </label>
         <input
           id="home-search-input"
           type="search"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search for an item..."
+          placeholder={tr('home:searchItemPrompt')}
         />
-        <button type="submit" aria-label="Search inventory">
-          Search
+        <button type="submit" aria-label={tr('home:searchInventory')}>
+          {tr('common:search')}
         </button>
       </form>
 
@@ -206,17 +211,17 @@ export function HomePage() {
           aria-labelledby="home-attention-title"
         >
           <div className="home-section-heading">
-            <h2 id="home-attention-title">Needs attention</h2>
+            <h2 id="home-attention-title">{tr('home:needsAttention')}</h2>
             <Link to={`${base}/inventory`}>
-              See all <span aria-hidden="true">›</span>
+              {tr('home:seeAll')} <span aria-hidden="true">›</span>
             </Link>
           </div>
           {attention.isPending ? (
             <p className="muted" role="status">
-              Loading what needs attention…
+              {tr('home:loadingNeedsAttention')}
             </p>
           ) : attention.isError ? (
-            <Notice kind="error">{attention.error.message}</Notice>
+            <Notice kind="error">{localizedError(attention.error)}</Notice>
           ) : (
             <div className="home-attention-grid">
               {attention.data.items.slice(0, 2).map((entry) => {
@@ -226,12 +231,12 @@ export function HomePage() {
                 const amount = match
                   ? match.item.trackingMode === 'QUANTITY'
                     ? match.assessment.eligibleStock === null
-                      ? 'Stock unavailable'
-                      : `${match.assessment.eligibleStock} ${match.item.primaryUnit} available`
-                    : `${match.item.backupCount} ${match.item.backupCount === 1 ? 'backup' : 'backups'}`
+                      ? tr('home:stockUnavailable')
+                      : `${formatNumber(match.assessment.eligibleStock)} ${match.item.primaryUnit} ${tr('common:available')}`
+                    : `${formatNumber(match.item.backupCount)} ${tr(match.item.backupCount === 1 ? 'common:backup' : 'common:backups2')}`
                   : stock.isPending
-                    ? 'Loading stock…'
-                    : 'Stock unavailable';
+                    ? tr('common:loadingStock')
+                    : tr('home:stockUnavailable');
                 return (
                   <Link
                     className="home-attention-card"
@@ -239,7 +244,7 @@ export function HomePage() {
                     to={`${base}/inventory/${entry.itemId}`}
                   >
                     <span className={`home-attention-pill ${alertTone(entry)}`}>
-                      {alertLabel(entry)}
+                      {tr(alertLabel(entry) as Parameters<typeof tr>[0])}
                     </span>
                     <span className="home-attention-body">
                       <span className="home-attention-visual">
@@ -258,7 +263,10 @@ export function HomePage() {
         </section>
       )}
 
-      <section className="home-quick-actions" aria-label="Quick actions">
+      <section
+        className="home-quick-actions"
+        aria-label={tr('home:quickActions')}
+      >
         <Link
           className="home-quick-card home-quick-use"
           to={`${base}/inventory`}
@@ -267,8 +275,8 @@ export function HomePage() {
             <Doodle kind="jar" />
           </span>
           <span>
-            <strong>Use</strong>
-            <small>Choose an item to use</small>
+            <strong>{tr('common:use')}</strong>
+            <small>{tr('home:chooseItemUse')}</small>
           </span>
           <span className="home-quick-arrow" aria-hidden="true">
             ›
@@ -282,8 +290,8 @@ export function HomePage() {
             <Doodle kind="basket" />
           </span>
           <span>
-            <strong>Restock</strong>
-            <small>Choose an item to restock</small>
+            <strong>{tr('common:restock')}</strong>
+            <small>{tr('home:chooseItemRestock')}</small>
           </span>
           <span className="home-quick-arrow" aria-hidden="true">
             ›
@@ -293,17 +301,17 @@ export function HomePage() {
 
       <section className="home-trip" aria-labelledby="home-trip-title">
         <div className="home-section-heading">
-          <h2 id="home-trip-title">Next shopping trip</h2>
+          <h2 id="home-trip-title">{tr('home:nextShoppingTrip')}</h2>
           <Link to={`${base}/shopping`}>
-            See list <span aria-hidden="true">›</span>
+            {tr('home:seeList')} <span aria-hidden="true">›</span>
           </Link>
         </div>
         {trips.isPending ? (
           <p className="muted" role="status">
-            Loading shopping trips…
+            {tr('home:loadingShoppingTrips')}
           </p>
         ) : trips.isError ? (
-          <Notice kind="error">{trips.error.message}</Notice>
+          <Notice kind="error">{localizedError(trips.error)}</Notice>
         ) : nextTrip ? (
           <Link
             className="home-trip-link"
@@ -313,9 +321,12 @@ export function HomePage() {
               <Doodle kind="basket" />
             </span>
             <span className="home-trip-copy">
-              <strong>{nextTrip._count?.entries ?? 0} items</strong>
+              <strong>
+                {formatNumber(nextTrip._count?.entries ?? 0)}{' '}
+                {tr('common:items')}
+              </strong>
               <small>
-                {nextTrip.store} · {nextTrip.plannedDate.slice(0, 10)}
+                {nextTrip.store} · {formatDateOnly(nextTrip.plannedDate)}
               </small>
             </span>
             <span className="home-trip-arrow" aria-hidden="true">
@@ -325,9 +336,9 @@ export function HomePage() {
         ) : (
           <div className="home-trip-empty">
             <Doodle kind="basket" />
-            <span>No upcoming trip yet.</span>
+            <span>{tr('home:upcomingTripYet')}</span>
             <Link to={`${base}/shopping`}>
-              Plan shopping <span aria-hidden="true">›</span>
+              {tr('home:planShopping')} <span aria-hidden="true">›</span>
             </Link>
           </div>
         )}
@@ -335,16 +346,16 @@ export function HomePage() {
 
       <section className="home-snapshot" aria-labelledby="home-snapshot-title">
         <div className="home-section-heading">
-          <h2 id="home-snapshot-title">Inventory by location</h2>
-          <Link to={`${base}/inventory`}>See all</Link>
+          <h2 id="home-snapshot-title">{tr('home:inventoryLocation')}</h2>
+          <Link to={`${base}/inventory`}>{tr('home:seeAll')}</Link>
         </div>
         {snapshot.isPending ? (
           <p className="muted" role="status">
-            Loading locations…
+            {tr('common:loadingLocations2')}
           </p>
         ) : snapshot.isError ? (
           <Notice kind="error">
-            Locations could not be loaded: {snapshot.error.message}
+            {tr('common:locationsLoaded')} {localizedError(snapshot.error)}
           </Notice>
         ) : locationGroups.length ? (
           <div className="home-snapshot-list">
@@ -356,41 +367,43 @@ export function HomePage() {
               >
                 <strong>{group.name}</strong>
                 <span>
-                  {group.entries.length}{' '}
-                  {group.entries.length === 1 ? 'item' : 'items'}
+                  {formatNumber(group.entries.length)}{' '}
+                  {tr(
+                    group.entries.length === 1 ? 'common:item' : 'common:items',
+                  )}
                 </span>
                 <span aria-hidden="true">›</span>
               </Link>
             ))}
           </div>
         ) : (
-          <p className="muted">No items at named locations yet.</p>
+          <p className="muted">{tr('home:itemsNamedLocations')}</p>
         )}
       </section>
 
       <section className="home-activity" aria-labelledby="home-activity-title">
         <div className="home-section-heading">
-          <h2 id="home-activity-title">Recent household activity</h2>
+          <h2 id="home-activity-title">{tr('home:recentHouseholdActivity')}</h2>
         </div>
         {activity.isPending ? (
           <p className="muted" role="status">
-            Loading recent activity…
+            {tr('home:loadingRecentActivity')}
           </p>
         ) : activity.isError ? (
           <Notice kind="error">
-            Recent activity could not be loaded: {activity.error.message}
+            {tr('home:recentActivityLoaded')} {localizedError(activity.error)}
           </Notice>
         ) : !activity.data.items.length ? (
-          <p className="muted">No household activity yet.</p>
+          <p className="muted">{tr('home:householdActivityYet')}</p>
         ) : (
           <ol className="home-activity-list">
             {activity.data.items.slice(0, 5).map((event) => {
               const actor =
                 event.actorId === null
-                  ? 'Unknown member'
+                  ? tr('home:unknownMember')
                   : event.actorId === currentUserId
-                    ? 'You'
-                    : 'Household member';
+                    ? tr('common:you')
+                    : tr('home:householdMember');
               const content = (
                 <>
                   <span className="home-activity-copy">
@@ -402,7 +415,7 @@ export function HomePage() {
                     </small>
                   </span>
                   <time dateTime={event.occurredAt}>
-                    {new Date(event.occurredAt).toLocaleString()}
+                    {formatDate(event.occurredAt)}
                   </time>
                 </>
               );

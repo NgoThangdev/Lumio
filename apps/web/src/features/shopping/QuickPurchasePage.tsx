@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useHousehold } from '../../app/useHousehold';
@@ -12,6 +12,8 @@ import { keys } from '../../shared/api/keys';
 import type { CatalogOption, Item, TrackingMode } from '../../shared/api/types';
 import { ItemVisual, Notice } from '../../shared/ui/primitives';
 
+import { tr } from '../../shared/i18n';
+import { localizedError } from '../../shared/i18n';
 function validAmount(
   value: string,
   mode: TrackingMode,
@@ -152,9 +154,7 @@ export function QuickPurchasePage() {
       setAmount('');
       setExpiryDate('');
       if (!(await refreshAffectedData(item.id))) {
-        setRefreshWarning(
-          'The purchase was saved, but some inventory views could not refresh. Open Inventory or Item Detail to check the latest stock and activity.',
-        );
+        setRefreshWarning(tr('shopping:purchaseSavedRefreshWarning'));
       }
     } catch (cause) {
       setFailure(
@@ -163,12 +163,12 @@ export function QuickPurchasePage() {
           cause.itemId === item.id
           ? ''
           : cause instanceof OfflineBeforeSendError
-            ? cause.message
+            ? localizedError(cause)
             : isMutationOutcomeUnknown(cause)
-              ? "We couldn't confirm the result. Stock may already have changed. Keep this draft and check Inventory or Item Detail activity before choosing to retry."
+              ? tr('shopping:purchaseOutcomeUncertain')
               : cause instanceof Error
-                ? `Purchase rejected. Your draft is still here. ${cause.message}`
-                : 'Purchase rejected. Your draft is still here.',
+                ? `Purchase rejected. Your draft is still here. ${localizedError(cause)}`
+                : tr('shopping:purchaseRejectedDraftKept'),
       );
     }
   }
@@ -193,18 +193,16 @@ export function QuickPurchasePage() {
       setExpiryDate('');
       setLocationChoice(null);
       if (!(await refreshAffectedData(item.id)))
-        setRefreshWarning(
-          'The purchase was saved, but some inventory views could not refresh. Open Inventory or Item Detail to check the latest stock and activity.',
-        );
+        setRefreshWarning(tr('shopping:purchaseSavedRefreshWarning'));
     } catch (cause) {
       setFailure(
         cause instanceof OfflineBeforeSendError
-          ? cause.message
+          ? localizedError(cause)
           : isMutationOutcomeUnknown(cause)
-            ? "We couldn't confirm the result. Stock may already have changed. Keep this draft and check Inventory or Item Detail activity before choosing to retry."
+            ? tr('shopping:purchaseOutcomeUncertain')
             : cause instanceof Error
-              ? `Purchase rejected. Your draft is still here. ${cause.message}`
-              : 'Purchase rejected. Your draft is still here.',
+              ? `Purchase rejected. Your draft is still here. ${localizedError(cause)}`
+              : tr('shopping:purchaseRejectedDraftKept'),
       );
     }
   }
@@ -219,14 +217,14 @@ export function QuickPurchasePage() {
     <div className="quick-purchase-page">
       <div className="quick-purchase-heading">
         <div>
-          <p className="eyebrow">Shopping · Quick Purchase</p>
-          <h2>Save what you bought</h2>
-          <p className="muted">
-            Add it to home inventory now. This won’t create a Shopping Trip.
+          <p className="eyebrow">
+            {tr('shopping:backShopping')} · {tr('shopping:quickPurchase')}
           </p>
+          <h2>{tr('shopping:saveBought')}</h2>
+          <p className="muted">{tr('shopping:addHomeInventory')}</p>
         </div>
         <Link className="secondary" to={`${base}/shopping`}>
-          ← Shopping
+          {tr('shopping:backShopping')}
         </Link>
       </div>
       {failure && <Notice kind="error">{failure}</Notice>}
@@ -234,12 +232,12 @@ export function QuickPurchasePage() {
       {refreshWarning && <Notice kind="error">{refreshWarning}</Notice>}
       {items.isError && (
         <Notice kind="error">
-          Inventory items could not be loaded: {items.error.message}
+          {tr('shopping:inventoryItemsLoaded')} {localizedError(items.error)}
         </Notice>
       )}
       <section className="card quick-purchase-card">
         <label>
-          Find an item
+          {tr('shopping:findItem')}
           <input
             type="search"
             value={search}
@@ -251,13 +249,13 @@ export function QuickPurchasePage() {
               setSaved('');
               setFailure('');
             }}
-            placeholder="Search your inventory…"
+            placeholder={tr('shopping:searchYourInventory')}
             disabled={mutation.isPending}
           />
         </label>
         {items.isPending ? (
           <p className="muted" role="status">
-            Loading inventory…
+            {tr('common:loadingInventory')}
           </p>
         ) : items.isError ? (
           <button
@@ -265,7 +263,7 @@ export function QuickPurchasePage() {
             className="secondary quick-purchase-new"
             onClick={() => void items.refetch()}
           >
-            Retry inventory search
+            {tr('shopping:retryInventorySearch')}
           </button>
         ) : (
           search.trim() &&
@@ -273,7 +271,7 @@ export function QuickPurchasePage() {
           (matches.length ? (
             <div
               className="quick-purchase-results"
-              aria-label="Matching inventory items"
+              aria-label={tr('shopping:matchingInventoryItems')}
             >
               {matches.map((entry) => (
                 <button
@@ -298,8 +296,8 @@ export function QuickPurchasePage() {
                       {entry.trackingMode === 'QUANTITY'
                         ? entry.primaryUnit
                         : entry.trackingMode === 'FIVE_LEVEL'
-                          ? 'Five-level · backups'
-                          : 'Presence · backups'}
+                          ? tr('shopping:fiveLevelBackups')
+                          : tr('shopping:presenceBackups')}
                     </small>
                   </span>
                   <span aria-hidden="true">›</span>
@@ -308,12 +306,9 @@ export function QuickPurchasePage() {
             </div>
           ) : (
             <div className="quick-purchase-new-draft">
-              <p className="muted">
-                No matching item yet. Add it with the initial state you see at
-                home.
-              </p>
+              <p className="muted">{tr('shopping:matchingItemYet')}</p>
               <label>
-                Amount bought
+                {tr('common:amountBought')}
                 <input
                   type="number"
                   min="0.000001"
@@ -321,15 +316,11 @@ export function QuickPurchasePage() {
                   inputMode="decimal"
                   value={amount}
                   onChange={(event) => setAmount(event.target.value)}
-                  placeholder="Enter the purchased amount"
+                  placeholder={tr('shopping:enterPurchasedAmount')}
                   disabled={mutation.isPending}
                 />
               </label>
-              <p className="muted">
-                For a quantity item, this becomes initial stock. If you choose a
-                backup mode next, enter its current state and backup count
-                there.
-              </p>
+              <p className="muted">{tr('shopping:quantityItemBecomes')}</p>
               <button
                 type="button"
                 className="secondary quick-purchase-new"
@@ -338,7 +329,7 @@ export function QuickPurchasePage() {
                 }
                 onClick={addNewItem}
               >
-                Continue to Add Item
+                {tr('shopping:continueAddItem')}
               </button>
             </div>
           ))
@@ -346,17 +337,14 @@ export function QuickPurchasePage() {
         {selectedId &&
           (detail.isPending ? (
             <p className="muted" role="status">
-              Loading item details…
+              {tr('shopping:loadingItemDetails')}
             </p>
           ) : detail.isError ? (
             <Notice kind="error">
-              Item details could not be loaded: {detail.error.message}
+              {tr('shopping:itemDetailsLoaded')} {localizedError(detail.error)}
             </Notice>
           ) : !item || !mode ? (
-            <Notice kind="error">
-              This item’s tracking mode is unavailable. Refresh Inventory before
-              saving a purchase.
-            </Notice>
+            <Notice kind="error">{tr('shopping:itemSTracking')}</Notice>
           ) : (
             <div className="quick-purchase-selected">
               <div className="quick-purchase-picked">
@@ -367,8 +355,8 @@ export function QuickPurchasePage() {
                     {mode === 'QUANTITY'
                       ? item.primaryUnit
                       : mode === 'FIVE_LEVEL'
-                        ? 'Five-level · backup units'
-                        : 'Presence · backup units'}
+                        ? tr('shopping:fiveLevelBackup')
+                        : tr('shopping:presenceBackupUnits')}
                   </small>
                 </div>
                 <button
@@ -382,13 +370,12 @@ export function QuickPurchasePage() {
                     mutation.reset();
                   }}
                 >
-                  Change
+                  {tr('common:change')}
                 </button>
               </div>
               {mode === 'QUANTITY' && !openingKnown && (
                 <Notice kind="error">
-                  Opening policy could not be confirmed. Reload Item Detail
-                  before recording this purchase.
+                  {tr('shopping:openingPolicyConfirmed')}
                 </Notice>
               )}
               <label>
@@ -396,7 +383,7 @@ export function QuickPurchasePage() {
                   ? wholePackages
                     ? `Whole packages bought (${item.primaryUnit})`
                     : `Actual quantity bought (${item.primaryUnit})`
-                  : 'Backup units bought'}
+                  : tr('shopping:backupUnitsBought')}
                 <input
                   type="number"
                   min={mode === 'QUANTITY' && !wholePackages ? '0.000001' : '1'}
@@ -414,9 +401,9 @@ export function QuickPurchasePage() {
                   placeholder={
                     mode === 'QUANTITY'
                       ? wholePackages
-                        ? 'Enter whole package count'
-                        : 'Enter actual amount'
-                      : 'Enter whole backup count'
+                        ? tr('shopping:enterWholePackageCount')
+                        : tr('shopping:enterActualAmount')
+                      : tr('shopping:enterWholeBackupCount')
                   }
                   disabled={
                     mutation.isPending || (mode === 'QUANTITY' && !openingKnown)
@@ -425,12 +412,12 @@ export function QuickPurchasePage() {
               </label>
               {mode === 'QUANTITY' && wholePackages && (
                 <p className="muted">
-                  Opening tracking is on, so purchases must be whole packages.
+                  {tr('shopping:openingTrackingPurchases')}
                 </p>
               )}
               {mode === 'QUANTITY' && (
                 <label>
-                  Expiry <em>optional</em>
+                  {tr('common:expiry')} <em>{tr('common:optional2')}</em>
                   <input
                     type="date"
                     value={expiryDate}
@@ -443,12 +430,12 @@ export function QuickPurchasePage() {
                 <>
                   {locations.isError && !item.preferredRestockLocation?.id && (
                     <Notice kind="error">
-                      Household locations could not be loaded:{' '}
-                      {locations.error.message}
+                      {tr('common:householdLocationsLoaded')}{' '}
+                      {localizedError(locations.error)}
                     </Notice>
                   )}
                   <label>
-                    Stock location
+                    {tr('common:stockLocation')}
                     <select
                       value={locationId}
                       onChange={(event) =>
@@ -460,12 +447,12 @@ export function QuickPurchasePage() {
                         locations.isError
                       }
                     >
-                      <option value="">Choose a location</option>
+                      <option value="">{tr('common:chooseLocation')}</option>
                       {locations.data?.map((entry) => (
                         <option key={entry.id} value={entry.id}>
                           {entry.name}
                           {entry.id === item.preferredRestockLocation?.id
-                            ? ' · preferred'
+                            ? ` · ${tr('common:preferred')}`
                             : ''}
                         </option>
                       ))}
@@ -473,9 +460,9 @@ export function QuickPurchasePage() {
                   </label>
                   {item.preferredRestockLocation?.name && (
                     <p className="muted">
-                      Preferred for future stock writes:{' '}
-                      {item.preferredRestockLocation.name}. Existing batches may
-                      be in other locations.
+                      {tr('shopping:preferredFutureStock')}{' '}
+                      {item.preferredRestockLocation.name}
+                      {tr('shopping:existingBatchesOther')}
                     </p>
                   )}
                 </>
@@ -485,8 +472,8 @@ export function QuickPurchasePage() {
                 mutation.error.itemId === item.id && (
                   <>
                     <Notice kind="error">
-                      Choose a location for {mutation.error.itemId}. No stock
-                      was recorded.
+                      {tr('shopping:chooseLocation2')} {mutation.error.itemId}
+                      {tr('shopping:stockRecorded')}
                     </Notice>
                     <button
                       type="button"
@@ -496,15 +483,12 @@ export function QuickPurchasePage() {
                       }
                       onClick={() => void retryAfterChoosingLocation()}
                     >
-                      Confirm location and retry purchase
+                      {tr('shopping:confirmLocationRetry3')}
                     </button>
                   </>
                 )}
               {mode !== 'QUANTITY' && (
-                <p className="muted">
-                  The purchase adds backups. It leaves the current level or
-                  presence unchanged.
-                </p>
+                <p className="muted">{tr('shopping:purchaseAddsBackups')}</p>
               )}
               <button
                 type="button"
@@ -516,7 +500,9 @@ export function QuickPurchasePage() {
                 }
                 onClick={() => void submitPurchase()}
               >
-                {mutation.isPending ? 'Saving purchase…' : 'Save purchase'}
+                {mutation.isPending
+                  ? tr('shopping:savingPurchase')
+                  : tr('common:savePurchase')}
               </button>
             </div>
           ))}

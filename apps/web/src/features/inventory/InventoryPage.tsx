@@ -22,6 +22,13 @@ import { Doodle } from '../../shared/ui/Doodle';
 import { AddItemForm, type QuickPurchaseSeed } from './AddItemForm';
 import { ArchivedItems } from './ArchivedItems';
 
+import { tr } from '../../shared/i18n';
+import {
+  localizedError,
+  localizedEnum,
+  formatNumber,
+  formatDateOnly,
+} from '../../shared/i18n';
 function locationLabel(item: Item, locations?: CatalogOption[]) {
   if (item.trackingMode === 'QUANTITY') {
     const names = [
@@ -38,13 +45,14 @@ function locationLabel(item: Item, locations?: CatalogOption[]) {
     return names.length
       ? names.join(', ')
       : item.batches.some((batch) => batch.locationId)
-        ? 'See batch locations in detail'
-        : 'Location not set';
+        ? tr('inventory:seeBatchLocations')
+        : tr('common:locationSet');
   }
   if (item.currentLocation?.name)
-    return `Current: ${item.currentLocation.name}`;
-  if (item.backupLocation?.name) return `Backups: ${item.backupLocation.name}`;
-  return 'Location not set';
+    return `${tr('common:current')} ${item.currentLocation.name}`;
+  if (item.backupLocation?.name)
+    return `${tr('common:backups')} ${item.backupLocation.name}`;
+  return tr('common:locationSet');
 }
 
 function ItemRow({
@@ -64,10 +72,10 @@ function ItemRow({
 }) {
   const amount =
     item.trackingMode === 'QUANTITY'
-      ? `${stock ? (stock.quantity ?? '—') : (assessment.eligibleStock ?? '—')} ${item.primaryUnit}`
+      ? `${formatNumber(stock ? (stock.quantity ?? '—') : (assessment.eligibleStock ?? '—'))} ${item.primaryUnit}`
       : item.trackingMode === 'FIVE_LEVEL'
-        ? `${stock ? (stock.currentLevel?.replaceAll('_', ' ').toLowerCase() ?? 'No current item here') : (item.currentLevel?.replaceAll('_', ' ').toLowerCase() ?? '—')} · ${stock?.backupCount ?? item.backupCount} backups`
-        : `${stock ? (stock.isPresent === null ? 'No current item here' : stock.isPresent ? 'Present' : 'Absent') : item.isPresent ? 'Present' : 'Absent'} · ${stock?.backupCount ?? item.backupCount} backups`;
+        ? `${stock ? (stock.currentLevel ? localizedEnum(stock.currentLevel) : tr('inventory:currentItemHere')) : item.currentLevel ? localizedEnum(item.currentLevel) : '—'} · ${formatNumber(stock?.backupCount ?? item.backupCount)} ${tr('common:backups2')}`
+        : `${stock ? (stock.isPresent === null ? tr('inventory:currentItemHere') : tr(stock.isPresent ? 'common:present' : 'common:absent')) : tr(item.isPresent ? 'common:present' : 'common:absent')} · ${formatNumber(stock?.backupCount ?? item.backupCount)} ${tr('common:backups2')}`;
   return (
     <Link className="row inventory-row" to={`${base}/inventory/${item.id}`}>
       <ItemVisual name={item.name} />
@@ -157,9 +165,7 @@ export function InventoryPage() {
         !Array.isArray(result.items) ||
         (groupBy !== 'none' && !Array.isArray(result.groups))
       ) {
-        throw new Error(
-          'The API did not return the queried Inventory response.',
-        );
+        throw new Error(tr('inventory:inventoryResponseMissing'));
       }
       return result;
     },
@@ -218,9 +224,12 @@ export function InventoryPage() {
   return (
     <div className="inventory-page">
       <div className="grid inventory-grid">
-        <section className="inventory-list" aria-label="Household items">
+        <section
+          className="inventory-list"
+          aria-label={tr('inventory:householdItems')}
+        >
           <label className="inventory-search">
-            <span className="sr-only">Search items</span>
+            <span className="sr-only">{tr('inventory:searchItems')}</span>
             <input
               type="search"
               value={search}
@@ -228,13 +237,13 @@ export function InventoryPage() {
                 setSearch(event.target.value);
                 setInventoryParam('q', event.target.value.trim(), '');
               }}
-              placeholder="Search items, e.g. milk, rice, eggs…"
+              placeholder={tr('inventory:searchItemsPrompt')}
             />
           </label>
           <div
             className="inventory-quick-filters"
             role="group"
-            aria-label="Quick stock filters"
+            aria-label={tr('inventory:quickStockFilters')}
           >
             {quickFilters.map((filter) => (
               <button
@@ -247,17 +256,18 @@ export function InventoryPage() {
                   setInventoryParam('status', filter.value, 'ALL');
                 }}
               >
-                {filter.label}
+                {tr(filter.label as Parameters<typeof tr>[0])}
               </button>
             ))}
           </div>
           <details className="inventory-filter-details">
             <summary>
-              More filters{hasAdvancedFilters ? ' · active' : ''}
+              {tr('inventory:filters')}
+              {hasAdvancedFilters ? ` · ${tr('inventory:activeFilter')}` : ''}
             </summary>
             <div className="inventory-controls">
               <label>
-                Status
+                {tr('common:status')}
                 <select
                   value={status}
                   onChange={(event) => {
@@ -265,17 +275,17 @@ export function InventoryPage() {
                     setInventoryParam('status', event.target.value, 'ALL');
                   }}
                 >
-                  <option value="ALL">All</option>
-                  <option value="LOW">Low or needs buying</option>
-                  <option value="BUY">Buy</option>
-                  <option value="OUT">Out</option>
-                  <option value="OK">OK</option>
-                  <option value="EXPIRING">Expiring</option>
-                  <option value="OPENED">Opened</option>
+                  <option value="ALL">{tr('common:all')}</option>
+                  <option value="LOW">{tr('inventory:lowNeedsBuying')}</option>
+                  <option value="BUY">{tr('inventory:buy2')}</option>
+                  <option value="OUT">{tr('inventory:out2')}</option>
+                  <option value="OK">{tr('common:ok')}</option>
+                  <option value="EXPIRING">{tr('inventory:expiring2')}</option>
+                  <option value="OPENED">{tr('common:opened')}</option>
                 </select>
               </label>
               <label>
-                Group by
+                {tr('inventory:group')}
                 <select
                   value={groupBy}
                   onChange={(event) => {
@@ -287,13 +297,13 @@ export function InventoryPage() {
                     );
                   }}
                 >
-                  <option value="location">Location</option>
-                  <option value="category">Category</option>
-                  <option value="none">No grouping</option>
+                  <option value="location">{tr('common:location')}</option>
+                  <option value="category">{tr('common:category')}</option>
+                  <option value="none">{tr('inventory:grouping')}</option>
                 </select>
               </label>
               <label>
-                Category
+                {tr('common:category')}
                 <select
                   value={categoryId}
                   onChange={(event) => {
@@ -302,7 +312,7 @@ export function InventoryPage() {
                   }}
                   disabled={categories.isPending || categories.isError}
                 >
-                  <option value="">All categories</option>
+                  <option value="">{tr('inventory:allCategories')}</option>
                   {categories.data?.map((entry) => (
                     <option key={entry.id} value={entry.id}>
                       {entry.name}
@@ -311,13 +321,13 @@ export function InventoryPage() {
                 </select>
               </label>
               <label>
-                Location
+                {tr('common:location')}
                 <select
                   value={locationId}
                   onChange={(event) => setLocationId(event.target.value)}
                   disabled={locations.isPending || locations.isError}
                 >
-                  <option value="">All locations</option>
+                  <option value="">{tr('inventory:allLocations')}</option>
                   {locations.data?.map((entry) => (
                     <option key={entry.id} value={entry.id}>
                       {entry.name}
@@ -326,7 +336,7 @@ export function InventoryPage() {
                 </select>
               </label>
               <label>
-                Tag
+                {tr('common:tag')}
                 <select
                   value={tagId}
                   onChange={(event) => {
@@ -335,7 +345,7 @@ export function InventoryPage() {
                   }}
                   disabled={tags.isPending || tags.isError}
                 >
-                  <option value="">All tags</option>
+                  <option value="">{tr('inventory:allTags')}</option>
                   {tags.data?.map((entry) => (
                     <option key={entry.id} value={entry.id}>
                       {entry.name}
@@ -347,7 +357,7 @@ export function InventoryPage() {
           </details>
           {locations.data?.length ? (
             <details className="location-check-launch">
-              <summary>Check by location</summary>
+              <summary>{tr('inventory:checkLocation')}</summary>
               <div className="location-check-links">
                 {locations.data.map((entry) => (
                   <Link
@@ -355,62 +365,66 @@ export function InventoryPage() {
                     key={entry.id}
                     to={`${base}/locations/${entry.id}/check`}
                   >
-                    Check {entry.name}
+                    {tr('common:check')} {entry.name}
                   </Link>
                 ))}
               </div>
             </details>
           ) : locations.isPending ? (
             <p className="muted" role="status">
-              Loading locations...
+              {tr('common:loadingLocations')}
             </p>
           ) : locations.isError ? (
             <Notice kind="error">
-              Locations for stock checks could not be loaded:{' '}
-              {locations.error.message}
+              {tr('inventory:locationsStockChecks')}{' '}
+              {localizedError(locations.error)}
             </Notice>
           ) : null}
           {locationId && (
             <div className="inventory-active-location">
               <span>
-                Showing{' '}
+                {tr('inventory:showing')}{' '}
                 {locations.data?.find((entry) => entry.id === locationId)
-                  ?.name ?? 'selected location'}
+                  ?.name ?? tr('inventory:selectedLocation')}
               </span>
               <button type="button" onClick={() => setLocationId('')}>
-                Clear location
+                {tr('inventory:clearLocation')}
               </button>
             </div>
           )}
           {(categories.isPending || locations.isPending || tags.isPending) && (
             <p className="muted" role="status">
-              Loading filter options…
+              {tr('inventory:loadingFilterOptions')}
             </p>
           )}
           {[categories, locations, tags]
             .filter((result) => result.isError)
             .map((result, index) => (
               <Notice kind="error" key={index}>
-                A catalog filter could not load: {result.error?.message}
+                {tr('inventory:catalogFilterLoad')} {result.error?.message}
               </Notice>
             ))}
           {inventory.isPending ? (
             <p className="muted" role="status">
-              Loading inventory…
+              {tr('common:loadingInventory')}
             </p>
           ) : inventory.isError ? (
-            <Notice kind="error">{inventory.error.message}</Notice>
+            <Notice kind="error">{localizedError(inventory.error)}</Notice>
           ) : inventory.data.items.length === 0 ? (
             <div className="empty">
               <ItemVisual name="Inventory" large />
-              <h3>{hasFilters ? 'No matching items' : 'No items yet'}</h3>
+              <h3>
+                {hasFilters
+                  ? tr('inventory:matchingItems')
+                  : tr('common:itemsYet')}
+              </h3>
               <p>
                 {hasFilters
-                  ? 'Try a different search or filter.'
-                  : 'Add an item with its starting stock or state.'}
+                  ? tr('inventory:tryDifferentSearch')
+                  : tr('inventory:addItemStarting')}
               </p>
               <a className="link" href="#add-item">
-                Add an item
+                {tr('inventory:addItem')}
               </a>
             </div>
           ) : groupBy === 'none' ? (
@@ -437,7 +451,11 @@ export function InventoryPage() {
                   <span className="inventory-group-title">{group.name}</span>
                   <span className="inventory-group-count">
                     {group.entries.length}{' '}
-                    {group.entries.length === 1 ? 'item' : 'items'}
+                    {tr(
+                      group.entries.length === 1
+                        ? 'common:item'
+                        : 'common:items',
+                    )}
                   </span>
                   <span className="inventory-group-chevron" aria-hidden="true">
                     ⌃
@@ -468,7 +486,7 @@ export function InventoryPage() {
             ))
           )}
           <a className="primary inventory-add-button" href="#add-item">
-            <span aria-hidden="true">＋</span> Add item
+            <span aria-hidden="true">＋</span> {tr('inventory:addItem2')}
           </a>
         </section>
         <AddItemForm
@@ -482,11 +500,15 @@ export function InventoryPage() {
       <div className="insight-strip">
         {intelligence.data && intelligence.data.useSoon.length > 0 && (
           <Card className="use-soon">
-            <p className="eyebrow">Use Soon</p>
+            <p className="eyebrow">{tr('common:useSoon2')}</p>
             <h2>
               {intelligence.data.useSoon.length}{' '}
-              {intelligence.data.useSoon.length === 1 ? 'item' : 'items'} to
-              check
+              {tr(
+                intelligence.data.useSoon.length === 1
+                  ? 'common:item'
+                  : 'common:items',
+              )}{' '}
+              {tr('common:check2')}
             </h2>
             {intelligence.data.useSoon.slice(0, 4).map((entry) => (
               <Link
@@ -503,15 +525,15 @@ export function InventoryPage() {
         <Card className="suggestions">
           <div className="suggestion-heading">
             <div>
-              <p className="eyebrow">Shopping suggestions</p>
+              <p className="eyebrow">{tr('common:shoppingSuggestions')}</p>
               <h2>
                 {intelligence.data
-                  ? `${intelligence.data.suggestions.length} ${intelligence.data.suggestions.length === 1 ? 'item' : 'items'} suggested`
+                  ? `${intelligence.data.suggestions.length} ${tr(intelligence.data.suggestions.length === 1 ? 'common:item' : 'common:items')} suggested`
                   : '—'}
               </h2>
             </div>
             <label>
-              Shopping date
+              {tr('common:shoppingDate')}
               <input
                 type="date"
                 value={shoppingDate || intelligence.data?.shoppingDate || ''}
@@ -521,18 +543,17 @@ export function InventoryPage() {
           </div>
           {intelligence.data && (
             <p className="muted">
-              Assessment date: {intelligence.data.shoppingDate} (from Lumio's
-              stock assessment)
+              {tr('inventory:assessmentDate')}{' '}
+              {formatDateOnly(intelligence.data.shoppingDate)}{' '}
+              {tr('inventory:lumioSStock')}
             </p>
           )}
           {intelligence.isPending ? (
-            <p className="muted">Loading stock assessment…</p>
+            <p className="muted">{tr('common:loadingStockAssessment')}</p>
           ) : intelligence.isError ? (
-            <Notice kind="error">{intelligence.error.message}</Notice>
+            <Notice kind="error">{localizedError(intelligence.error)}</Notice>
           ) : intelligence.data.suggestions.length === 0 ? (
-            <p className="muted">
-              Nothing to buy based on current stock and item rules.
-            </p>
+            <p className="muted">{tr('common:nothingBuyBased')}</p>
           ) : (
             intelligence.data.suggestions.map((entry) => (
               <div className="suggestion-row" key={entry.itemId}>
@@ -541,22 +562,20 @@ export function InventoryPage() {
                     {entry.name}{' '}
                     <span className="priority">
                       {entry.suggestion?.priority === 'MUST_BUY'
-                        ? 'Must buy'
-                        : 'Should buy'}
+                        ? tr('common:buy3')
+                        : tr('common:buy4')}
                     </span>
                   </strong>
-                  <small>{entry.suggestion?.reason}</small>
+                  <small>{localizedEnum(entry.suggestion?.reason)}</small>
                 </div>
                 <span>
-                  {entry.suggestion?.quantity} {entry.primaryUnit}
+                  {formatNumber(entry.suggestion?.quantity ?? 0)}{' '}
+                  {entry.primaryUnit}
                 </span>
               </div>
             ))
           )}
-          <p className="muted">
-            Suggestions are a starting quantity. Enter actual purchases in a
-            Shopping Trip.
-          </p>
+          <p className="muted">{tr('inventory:suggestionsStartingQuantity')}</p>
         </Card>
       </div>
     </div>

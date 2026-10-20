@@ -14,6 +14,8 @@ import {
 } from '../../shared/shoppingSections';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
 
+import { tr } from '../../shared/i18n';
+import { localizedError, localizedEnum } from '../../shared/i18n';
 type Category = {
   id: string;
   name: string;
@@ -53,7 +55,10 @@ export function CategorySectionSettings({
         current?.map((entry) => (entry.id === saved.id ? saved : entry)),
       );
       setNotice(
-        `${saved.name} now appears under ${shoppingSections.find((section) => section.code === (saved.shoppingSection ?? 'OTHER'))?.label ?? 'Other'}.`,
+        tr('settings:nowAppearsUnder', {
+          name: saved.name,
+          section: localizedEnum(saved.shoppingSection ?? 'OTHER'),
+        }),
       );
       const refreshes = await Promise.allSettled([
         queryClient.invalidateQueries(
@@ -66,21 +71,19 @@ export function CategorySectionSettings({
         ),
       ]);
       if (refreshes.some((result) => result.status === 'rejected')) {
-        setError(
-          'The mapping was saved, but category or trip details could not refresh. Reload to check the current sections.',
-        );
+        setError(tr('settings:sectionSavedRefreshWarning'));
       }
     } catch (cause) {
       setError(
         cause instanceof OfflineBeforeSendError
-          ? cause.message
+          ? localizedError(cause)
           : isMutationOutcomeUnknown(cause)
-            ? 'The mapping result is uncertain. Reload the category list before choosing to retry.'
+            ? tr('settings:sectionSaveUncertain')
             : cause instanceof ApiError
-              ? `Mapping was not saved: ${cause.message}`
+              ? `Mapping was not saved: ${localizedError(cause)}`
               : cause instanceof Error
-                ? cause.message
-                : 'Mapping could not be saved.',
+                ? localizedError(cause)
+                : tr('settings:mappingSaveFailed'),
       );
     } finally {
       setBusyId('');
@@ -89,24 +92,25 @@ export function CategorySectionSettings({
 
   return (
     <Card>
-      <h2>Shopping sections for {household.name}</h2>
-      <p className="muted">
-        Sections organize trip checklists. Existing purchase amounts and saved
-        suggestions stay the same.
-      </p>
-      {categories.isPending && <p role="status">Loading categories…</p>}
+      <h2>
+        {tr('settings:shoppingSections')} {household.name}
+      </h2>
+      <p className="muted">{tr('settings:sectionsOrganizeTrip')}</p>
+      {categories.isPending && (
+        <p role="status">{tr('common:loadingCategories')}</p>
+      )}
       {categories.isError && (
         <>
           <Notice kind="error">
-            Categories could not be loaded: {categories.error.message}
+            {tr('common:categoriesLoaded')} {localizedError(categories.error)}
           </Notice>
           <Button variant="secondary" onClick={() => void categories.refetch()}>
-            Retry categories
+            {tr('settings:retryCategories')}
           </Button>
         </>
       )}
       {categories.data?.length === 0 && (
-        <p className="muted">No categories yet.</p>
+        <p className="muted">{tr('settings:categoriesYet')}</p>
       )}
       {notice && <Notice kind="success">{notice}</Notice>}
       {error && <Notice kind="error">{error}</Notice>}
@@ -126,12 +130,12 @@ export function CategorySectionSettings({
                   )
                 }
               >
-                <option value="">Other (no mapping)</option>
+                <option value="">{tr('settings:otherMapping')}</option>
                 {shoppingSections
                   .filter((section) => section.code !== 'OTHER')
                   .map((section) => (
                     <option key={section.code} value={section.code}>
-                      {section.label}
+                      {localizedEnum(section.code)}
                     </option>
                   ))}
               </select>
@@ -139,18 +143,13 @@ export function CategorySectionSettings({
           ) : (
             <p>
               <strong>{category.name}</strong> ·{' '}
-              {shoppingSections.find(
-                (section) =>
-                  section.code === (category.shoppingSection ?? 'OTHER'),
-              )?.label ?? 'Other'}
+              {localizedEnum(category.shoppingSection ?? 'OTHER')}
             </p>
           )}
         </div>
       ))}
       {household.role !== 'ADMIN' && categories.data?.length ? (
-        <p className="muted">
-          Only a household Admin can change category sections.
-        </p>
+        <p className="muted">{tr('common:onlyHouseholdAdmin')}</p>
       ) : null}
     </Card>
   );

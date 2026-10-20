@@ -20,6 +20,61 @@ function approvedAppUrl(value) {
   }
 }
 
+function openSettingsDb() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('lumio-app-settings', 1);
+    request.onupgradeneeded = () =>
+      request.result.createObjectStore('settings');
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function saveLanguageSetting(setting) {
+  const db = await openSettingsDb();
+  await new Promise((resolve, reject) => {
+    const transaction = db.transaction('settings', 'readwrite');
+    transaction.objectStore('settings').put(setting, 'language');
+    transaction.oncomplete = resolve;
+    transaction.onerror = () => reject(transaction.error);
+    transaction.onabort = () => reject(transaction.error);
+  });
+  db.close();
+}
+
+async function getLanguageSetting() {
+  try {
+    const db = await openSettingsDb();
+    const value = await new Promise((resolve, reject) => {
+      const request = db
+        .transaction('settings')
+        .objectStore('settings')
+        .get('language');
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    db.close();
+    if (value?.explicit && (value.language === 'en' || value.language === 'vi'))
+      return value.language;
+  } catch {
+    // Use the browser's language when the preference database is unavailable.
+  }
+  return self.navigator.language?.toLowerCase().startsWith('vi') ? 'vi' : 'en';
+}
+
+self.addEventListener('message', (event) => {
+  const data = event.data;
+  if (
+    data?.type !== 'LUMIO_LANGUAGE' ||
+    (data.language !== 'en' && data.language !== 'vi') ||
+    typeof data.explicit !== 'boolean'
+  )
+    return;
+  event.waitUntil(
+    saveLanguageSetting({ language: data.language, explicit: data.explicit }),
+  );
+});
+
 self.addEventListener('push', (event) => {
   let payload;
   try {
@@ -31,12 +86,19 @@ self.addEventListener('push', (event) => {
   if (!url) return;
   const isTrip = new URL(url).pathname.includes('/shopping/');
   event.waitUntil(
-    self.registration.showNotification('Lumio', {
-      body: isTrip
-        ? 'There’s a shopping trip to review.'
-        : 'There’s a household item to review.',
-      data: { url },
-    }),
+    getLanguageSetting().then((language) =>
+      self.registration.showNotification('Lumio', {
+        body:
+          language === 'vi'
+            ? isTrip
+              ? 'C\u00f3 chuy\u1ebfn mua s\u1eafm c\u1ea7n xem l\u1ea1i.'
+              : 'C\u00f3 m\u1eb7t h\u00e0ng trong gia \u0111\u00ecnh c\u1ea7n xem l\u1ea1i.'
+            : isTrip
+              ? 'There is a shopping trip to review.'
+              : 'There is a household item to review.',
+        data: { url },
+      }),
+    ),
   );
 });
 

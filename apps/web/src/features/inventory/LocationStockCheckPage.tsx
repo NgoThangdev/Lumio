@@ -11,6 +11,14 @@ import type {
 } from '../../shared/api/types';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
 
+import { tr } from '../../shared/i18n';
+import {
+  formatDate,
+  formatDateOnly,
+  formatNumber,
+  localizedError,
+  localizedEnum,
+} from '../../shared/i18n';
 const levels: StockLevel[] = [
   'FULL',
   'THREE_QUARTERS',
@@ -21,11 +29,11 @@ const levels: StockLevel[] = [
 
 function showReason(reason: LocationCheckItem['reason']) {
   const labels: Record<LocationCheckItem['reason'], string> = {
-    STOCK_CHANGED: 'Stock changed since the last check',
-    MISSING_STATE: 'Current state is missing',
-    NO_STOCK_RECORD: 'No stock record at this location',
-    STALE_RECORD: 'This stock record is over 30 days old',
-    RECENT_RECORD: 'Recent stock record',
+    STOCK_CHANGED: tr('location-check:stockChangedSinceCheck'),
+    MISSING_STATE: tr('location-check:missingCurrentState'),
+    NO_STOCK_RECORD: tr('location-check:noLocationStockRecord'),
+    STALE_RECORD: tr('location-check:stockRecordOld'),
+    RECENT_RECORD: tr('location-check:recentStockRecord'),
   };
   return labels[reason];
 }
@@ -48,7 +56,7 @@ export function LocationStockCheckPage() {
     return (
       <Card>
         <p className="muted" role="status">
-          Loading location checklist…
+          {tr('location-check:loadingLocationChecklist')}
         </p>
       </Card>
     );
@@ -56,19 +64,24 @@ export function LocationStockCheckPage() {
     return (
       <>
         <Notice kind="error">
-          Location checklist could not be loaded: {check.error.message}
+          {tr('location-check:locationChecklistLoaded')}{' '}
+          {localizedError(check.error)}
         </Notice>
         <Button
           type="button"
           variant="secondary"
           onClick={() => void check.refetch()}
         >
-          Retry checklist
+          {tr('location-check:retryChecklist')}
         </Button>
       </>
     );
   if (!check.data)
-    return <Notice kind="error">Location checklist is unavailable.</Notice>;
+    return (
+      <Notice kind="error">
+        {tr('location-check:locationChecklistUnavailable')}
+      </Notice>
+    );
 
   return (
     <section className="location-stock-check-page">
@@ -82,22 +95,22 @@ export function LocationStockCheckPage() {
                   item.status === 'CONFIRM' || item.status === 'CORRECT',
               ).length
             }{' '}
-            of {check.data.items.length} checked
+            {tr('common:of')} {formatNumber(check.data.items.length)}{' '}
+            {tr('location-check:checked')}
           </p>
         </div>
         <Link
           className="secondary"
           to={`/households/${household.id}/inventory`}
         >
-          ← Inventory
+          {tr('location-check:inventory2')}
         </Link>
       </div>
       {check.data.items.length === 0 ? (
         <Card className="empty">
-          <h3>No items are assigned to this location</h3>
+          <h3>{tr('location-check:itemsAssignedLocation')}</h3>
           <p className="muted">
-            Items appear here when their stock or preferred placement belongs to{' '}
-            {check.data.location.name}.
+            {tr('location-check:itemsAppearHere')} {check.data.location.name}.
           </p>
         </Card>
       ) : (
@@ -212,28 +225,22 @@ function LocationCheckCard({
         } else {
           setBatchDataUnavailable(true);
         }
-        setError(
-          'The API needs a count for each positive batch at this location. Review the returned batch details below.',
-        );
+        setError(tr('location-check:batchCountsRequired'));
       } else if (code === 'STOCK_CHANGED') {
         setFreshDecisionRequired(true);
-        setError(
-          'Stock changed before this check was saved. The checklist was refreshed; review the latest values and make a new decision.',
-        );
+        setError(tr('location-check:stockChangedReviewAgain'));
         await refetch();
       } else {
         setError(
           cause instanceof Error
-            ? cause.message
-            : 'The location check could not be saved.',
+            ? localizedError(cause)
+            : tr('location-check:locationCheckSaveFailed'),
         );
       }
     }
   };
 
-  const checkedAt = item.checkedAt
-    ? new Date(item.checkedAt).toLocaleString()
-    : null;
+  const checkedAt = item.checkedAt ? formatDate(item.checkedAt) : null;
   const orderedPositiveBatches = (item.stock.batches ?? []).filter(
     (batch) => Number(batch.quantity) > 0,
   );
@@ -242,36 +249,42 @@ function LocationCheckCard({
     <Card className={`location-check-item status-${item.status.toLowerCase()}`}>
       <div className="location-check-item-heading">
         <div>
-          <p className="eyebrow">{item.trackingMode.replaceAll('_', ' ')}</p>
+          <p className="eyebrow">{localizedEnum(item.trackingMode)}</p>
           <h3>{item.name}</h3>
         </div>
         <span
           className={`location-check-status location-check-status-${item.status.toLowerCase()}`}
         >
-          {item.status.replaceAll('_', ' ')}
+          {localizedEnum(item.status)}
         </span>
       </div>
       <p className="location-check-reason">{showReason(item.reason)}</p>
       {item.trackingMode === 'QUANTITY' ? (
         <div className="location-check-stock">
-          <strong>{item.stock.quantity ?? '—'}</strong>{' '}
-          <span>at this location</span>
+          <strong>{formatNumber(item.stock.quantity ?? '—')}</strong>{' '}
+          <span>{tr('location-check:location2')}</span>
           {!!item.stock.batches?.length && (
             <div className="location-check-batches">
               {item.stock.batches.map((batch) => (
                 <div className="location-check-batch" key={batch.id}>
                   <span>
-                    {batch.quantity} ·{' '}
+                    {formatNumber(batch.quantity)} ·{' '}
                     {batch.openedAt
-                      ? `opened ${batch.openedAt.slice(0, 10)}`
+                      ? tr('location-check:opened5', {
+                          date: formatDateOnly(batch.openedAt),
+                        })
                       : 'unopened'}
                   </span>
                   <small>
                     {batch.expiryDate
-                      ? `Expires ${batch.expiryDate}`
-                      : 'No expiry'}
+                      ? tr('common:expires2', {
+                          date: formatDateOnly(batch.expiryDate),
+                        })
+                      : tr('common:expiry2')}
                     {batch.openedUseByDate
-                      ? ` · use by ${batch.openedUseByDate}`
+                      ? tr('common:use2', {
+                          date: formatDateOnly(batch.openedUseByDate),
+                        })
                       : ''}
                   </small>
                 </div>
@@ -279,67 +292,61 @@ function LocationCheckCard({
             </div>
           )}
           {item.openedTrackingEnabled && (
-            <p className="muted">
-              Opening tracking is on. The API validates whole package counts and
-              opened batch limits.
-            </p>
+            <p className="muted">{tr('location-check:openingTrackingApi')}</p>
           )}
         </div>
       ) : (
         <div className="location-check-stock state-check-stock">
           {Object.hasOwn(item.stock, 'currentLevel') && (
             <p>
-              Current level:{' '}
+              {tr('location-check:currentLevel2')}{' '}
               <strong>
-                {item.stock.currentLevel?.replaceAll('_', ' ').toLowerCase() ??
-                  'Not recorded'}
+                {(item.stock.currentLevel
+                  ? localizedEnum(item.stock.currentLevel)
+                  : undefined) ?? tr('location-check:recorded')}
               </strong>
             </p>
           )}
           {Object.hasOwn(item.stock, 'isPresent') && (
             <p>
-              Current item:{' '}
+              {tr('location-check:currentItem2')}{' '}
               <strong>
                 {item.stock.isPresent === null
-                  ? 'Not recorded'
+                  ? tr('location-check:recorded')
                   : item.stock.isPresent
-                    ? 'Present'
-                    : 'Absent'}
+                    ? tr('common:present')
+                    : tr('common:absent')}
               </strong>
             </p>
           )}
           {Object.hasOwn(item.stock, 'backupCount') && (
             <p>
-              Backups at this location:{' '}
-              <strong>{item.stock.backupCount}</strong>
+              {tr('location-check:backupsLocation2')}{' '}
+              <strong>{formatNumber(item.stock.backupCount ?? '—')}</strong>
             </p>
           )}
           {!Object.keys(item.stock).length && (
-            <p className="muted">
-              No current or backup stock fields are assigned to this location.
-            </p>
+            <p className="muted">{tr('location-check:currentBackupStock')}</p>
           )}
         </div>
       )}
       {checkedAt && (
         <p className="muted location-check-saved">
-          Last checked {checkedAt}
-          {item.checkedByUserId ? ' · saved by a household member' : ''}
+          {tr('location-check:lastChecked')} {checkedAt}
+          {item.checkedByUserId
+            ? ` · ${tr('location-check:savedByHouseholdMember')}`
+            : ''}
         </p>
       )}
       {message && <Notice kind="success">{message}</Notice>}
       {error && <Notice kind="error">{error}</Notice>}
       {(freshDecisionRequired || item.status === 'STALE') && (
         <p className="muted" role="status">
-          Review the latest stock and revision before choosing Confirm or
-          Correct. No request was retried.
+          {tr('common:reviewLatestStock')}
         </p>
       )}
       {batchDataUnavailable && (
-        <p className="muted">
-          The checklist did not return current batch details, so batch
-          correction is unavailable until the API provides them.
-        </p>
+        <p className="muted">{tr('location-check:checklistReturnCurrent')}</p>
       )}
       <div className="location-check-actions">
         <Button
@@ -348,11 +355,13 @@ function LocationCheckCard({
           onClick={() =>
             void run(
               { decision: 'CONFIRM' },
-              'Stock confirmed for this location.',
+              tr('location-check:locationStockConfirmed'),
             )
           }
         >
-          {mutation.isPending ? 'Saving…' : 'Confirm stock here'}
+          {mutation.isPending
+            ? tr('common:saving')
+            : tr('location-check:confirmStockHere')}
         </Button>
         <Button
           type="button"
@@ -365,7 +374,9 @@ function LocationCheckCard({
             setCorrecting((current) => !current);
           }}
         >
-          {correcting ? 'Close correction' : 'Correct stock'}
+          {correcting
+            ? tr('common:closeCorrection')
+            : tr('location-check:correctStock')}
         </Button>
       </div>
       {correcting && (
@@ -388,12 +399,12 @@ function LocationCheckCard({
                       ? { extraExpiryDate: extraExpiry }
                       : {}),
                   },
-                  'Location stock correction saved.',
+                  tr('location-check:locationStockCorrectionSaved'),
                 );
               } else {
                 void run(
                   { decision: 'CORRECT', quantity },
-                  'Location stock correction saved.',
+                  tr('location-check:locationStockCorrectionSaved'),
                 );
               }
             } else {
@@ -406,14 +417,18 @@ function LocationCheckCard({
                 observation.isPresent = presence === 'true';
               if (Object.hasOwn(item.stock, 'backupCount'))
                 observation.backupCount = Number(backups);
-              void run(observation, 'Location state correction saved.');
+              void run(
+                observation,
+                tr('location-check:locationStateCorrectionSaved'),
+              );
             }
           }}
         >
           {item.trackingMode === 'QUANTITY' ? (
             <>
               <label>
-                Total quantity at {'this location'}
+                {tr('location-check:totalQuantity')}{' '}
+                {tr('location-check:thisLocation')}
                 <input
                   type="number"
                   min="0"
@@ -425,19 +440,19 @@ function LocationCheckCard({
                 />
               </label>
               {!batchEditing ? (
-                <p className="muted">
-                  This changes only stock assigned to this location. It does not
-                  change batches elsewhere.
-                </p>
+                <p className="muted">{tr('location-check:changesOnlyStock')}</p>
               ) : (
                 <>
                   {orderedPositiveBatches.map((batch) => (
                     <label className="batch-observation" key={batch.id}>
-                      Batch {batch.id.slice(0, 8)} ·{' '}
-                      {batch.openedAt ? 'opened' : 'unopened'} ·{' '}
+                      {tr('common:batch')} {batch.id.slice(0, 8)} ·{' '}
+                      {batch.openedAt
+                        ? tr('common:opened')
+                        : tr('common:unopened')}{' '}
+                      ·{' '}
                       {batch.expiryDate
                         ? `expires ${batch.expiryDate}`
-                        : 'no expiry'}
+                        : tr('common:expiry2')}
                       <input
                         type="number"
                         min="0"
@@ -459,7 +474,7 @@ function LocationCheckCard({
                     </label>
                   ))}
                   <label>
-                    Additional unopened quantity
+                    {tr('location-check:additionalUnopenedQuantity')}
                     <input
                       type="number"
                       min="0"
@@ -473,7 +488,8 @@ function LocationCheckCard({
                   </label>
                   {Number(extraQuantity) > 0 && (
                     <label>
-                      Expiry for additional quantity <em>optional</em>
+                      {tr('location-check:expiryAdditionalQuantity')}{' '}
+                      <em>{tr('common:optional2')}</em>
                       <input
                         type="date"
                         value={extraExpiry}
@@ -481,10 +497,7 @@ function LocationCheckCard({
                       />
                     </label>
                   )}
-                  <p className="muted">
-                    Batch IDs and expiry/opened details come from the API. The
-                    API validates the entered observations and total.
-                  </p>
+                  <p className="muted">{tr('location-check:batchIdsExpiry')}</p>
                 </>
               )}
             </>
@@ -492,7 +505,7 @@ function LocationCheckCard({
             <>
               {Object.hasOwn(item.stock, 'currentLevel') && (
                 <label>
-                  Current level
+                  {tr('common:currentLevel')}
                   <select
                     value={level}
                     onChange={(event) =>
@@ -500,10 +513,12 @@ function LocationCheckCard({
                     }
                     required
                   >
-                    <option value="">Choose observed level</option>
+                    <option value="">
+                      {tr('location-check:chooseObservedLevel')}
+                    </option>
                     {levels.map((entry) => (
                       <option key={entry} value={entry}>
-                        {entry.replaceAll('_', ' ').toLowerCase()}
+                        {localizedEnum(entry)}
                       </option>
                     ))}
                   </select>
@@ -511,21 +526,23 @@ function LocationCheckCard({
               )}
               {Object.hasOwn(item.stock, 'isPresent') && (
                 <label>
-                  Current item
+                  {tr('common:currentItem')}
                   <select
                     value={presence}
                     onChange={(event) => setPresence(event.target.value)}
                     required
                   >
-                    <option value="">Choose observed state</option>
-                    <option value="true">Present</option>
-                    <option value="false">Absent</option>
+                    <option value="">
+                      {tr('location-check:chooseObservedState')}
+                    </option>
+                    <option value="true">{tr('common:present')}</option>
+                    <option value="false">{tr('common:absent')}</option>
                   </select>
                 </label>
               )}
               {Object.hasOwn(item.stock, 'backupCount') && (
                 <label>
-                  Backups at this location
+                  {tr('location-check:backupsLocation')}
                   <input
                     type="number"
                     min="0"
@@ -545,10 +562,10 @@ function LocationCheckCard({
             disabled={mutation.isPending}
           >
             {mutation.isPending
-              ? 'Saving…'
+              ? tr('common:saving')
               : batchEditing
-                ? 'Save batch observations'
-                : 'Save correction'}
+                ? tr('location-check:saveBatchObservations')
+                : tr('common:saveCorrection')}
           </Button>
         </form>
       )}

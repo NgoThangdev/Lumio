@@ -11,6 +11,8 @@ import type { Item } from '../../shared/api/types';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
 import { refreshItemLifecycle } from './itemLifecycle';
 
+import { tr } from '../../shared/i18n';
+import { localizedError } from '../../shared/i18n';
 type ArchivedItem = Pick<Item, 'id' | 'name' | 'primaryUnit' | 'archivedAt'>;
 
 export function ArchivedItems({ householdId }: { householdId: string }) {
@@ -35,21 +37,19 @@ export function ArchivedItems({ householdId }: { householdId: string }) {
         'POST',
       );
       queryClient.setQueryData(keys.item(householdId, itemId), saved);
-      setNotice(`${saved.name} restored to active Inventory.`);
+      setNotice(tr('inventory:restoredActiveInventory', { name: saved.name }));
       if (!(await refreshItemLifecycle(queryClient, householdId, itemId))) {
-        setError(
-          'Restored, but some views could not refresh. Reload to check current Inventory and Shopping data.',
-        );
+        setError(tr('inventory:restoreRefreshWarning'));
       }
     } catch (cause) {
       setError(
         cause instanceof OfflineBeforeSendError
-          ? cause.message
+          ? localizedError(cause)
           : isMutationOutcomeUnknown(cause)
-            ? 'The result is uncertain. Reload archived items and check Item Detail before choosing to retry.'
+            ? tr('inventory:restoreOutcomeUncertain')
             : cause instanceof Error
-              ? `Restore was not saved: ${cause.message}`
-              : 'Restore was not saved.',
+              ? `Restore was not saved: ${localizedError(cause)}`
+              : tr('inventory:restoreRejected'),
       );
     } finally {
       setBusyId('');
@@ -58,25 +58,25 @@ export function ArchivedItems({ householdId }: { householdId: string }) {
 
   return (
     <Card>
-      <h2>Archived items</h2>
-      <p className="muted">
-        Stock and history remain available in Item Detail.
-      </p>
+      <h2>{tr('inventory:archivedItems')}</h2>
+      <p className="muted">{tr('inventory:stockHistoryRemain')}</p>
       {notice && <Notice kind="success">{notice}</Notice>}
       {error && <Notice kind="error">{error}</Notice>}
-      {archived.isPending && <p role="status">Loading archived items…</p>}
+      {archived.isPending && (
+        <p role="status">{tr('inventory:loadingArchivedItems')}</p>
+      )}
       {archived.isError && (
         <>
           <Notice kind="error">
-            Archived items could not load: {archived.error.message}
+            {tr('inventory:archivedItemsLoad')} {localizedError(archived.error)}
           </Notice>
           <Button variant="secondary" onClick={() => void archived.refetch()}>
-            Retry
+            {tr('common:retry')}
           </Button>
         </>
       )}
       {archived.data?.length === 0 && (
-        <p className="muted">No archived items.</p>
+        <p className="muted">{tr('inventory:archivedItems2')}</p>
       )}
       {archived.data?.map((item) => (
         <div className="row" key={item.id}>
@@ -88,7 +88,7 @@ export function ArchivedItems({ householdId }: { householdId: string }) {
             disabled={!!busyId}
             onClick={() => void restore(item.id)}
           >
-            {busyId === item.id ? 'Restoring…' : 'Restore'}
+            {busyId === item.id ? tr('common:restoring') : tr('common:restore')}
           </Button>
         </div>
       ))}

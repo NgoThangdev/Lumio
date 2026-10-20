@@ -16,6 +16,8 @@ import type {
 import { Brand } from '../../shared/ui/Doodle';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
 
+import { tr } from '../../shared/i18n';
+import { formatDate, localizedError, localizedEnum } from '../../shared/i18n';
 type PreviewState =
   | { kind: 'loading' }
   | { kind: 'ready'; data: InvitationPreview }
@@ -36,15 +38,15 @@ function TechnicalDetails({
   const referenceCode = code && code !== serverMessage ? code : undefined;
   return (
     <details className="invitation-technical-details">
-      <summary>Technical details</summary>
+      <summary>{tr('households:technicalDetails')}</summary>
       {serverMessage && (
         <small>
-          <strong>Server response:</strong> {serverMessage}
+          <strong>{tr('households:serverResponse')}</strong> {serverMessage}
         </small>
       )}
       {referenceCode && (
         <small>
-          <strong>Reference code:</strong> {referenceCode}
+          <strong>{tr('households:referenceCode')}</strong> {referenceCode}
         </small>
       )}
     </details>
@@ -52,11 +54,10 @@ function TechnicalDetails({
 }
 
 const statusMessages: Record<InvitationStatus, string> = {
-  ACTIVE:
-    'This invitation is available. Joining requires your explicit confirmation.',
-  EXPIRED: 'This invitation has expired. Ask a household Admin for a new link.',
-  REVOKED: 'This invitation was revoked. Ask a household Admin for a new link.',
-  USED: 'This one-time invitation has already been used. Ask a household Admin for a new link.',
+  ACTIVE: tr('households:invitationAvailable'),
+  EXPIRED: tr('households:invitationExpiredHelp'),
+  REVOKED: tr('households:invitationRevokedHelp'),
+  USED: tr('households:invitationUsedHelp'),
 };
 
 export function InvitationPage({ user }: { user: User | null }) {
@@ -86,9 +87,9 @@ export function InvitationPage({ user }: { user: User | null }) {
         else
           setPreview({
             kind: 'error',
-            message:
-              'We could not load this invitation. Check the link or ask a household Admin for help.',
-            serverMessage: cause instanceof Error ? cause.message : undefined,
+            message: tr('households:invitationLoadFailed'),
+            serverMessage:
+              cause instanceof Error ? localizedError(cause) : undefined,
             code:
               cause instanceof ApiError ? (cause.code ?? undefined) : undefined,
           });
@@ -135,32 +136,27 @@ export function InvitationPage({ user }: { user: User | null }) {
     } catch (cause) {
       if (cause instanceof ApiError) {
         const guidance: Record<string, string> = {
-          ALREADY_MEMBER:
-            'This account already belongs to the household. Open your household list to continue.',
-          INVITATION_EXPIRED:
-            'This invitation has expired. Ask a household Admin for a new link.',
-          INVITATION_REVOKED:
-            'This invitation was revoked. Ask a household Admin for a new link.',
-          INVITATION_USED:
-            'This invitation has already been used. Ask a household Admin for a new link.',
-          INVITATION_NOT_FOUND:
-            'Invitation not found. Check the link or ask a household Admin for a new one.',
+          ALREADY_MEMBER: tr('households:alreadyMemberContinue'),
+          INVITATION_EXPIRED: tr('households:invitationExpiredHelp'),
+          INVITATION_REVOKED: tr('households:invitationRevokedHelp'),
+          INVITATION_USED: tr('households:invitationUsedHelp'),
+          INVITATION_NOT_FOUND: tr('households:invitationNotFoundHelp'),
         };
         setAcceptError({
           guidance:
-            guidance[cause.code ?? ''] ??
-            'We could not accept this invitation. Check its status or ask a household Admin for help.',
-          serverMessage: cause.message,
+            guidance[cause.code ?? 'UNKNOWN'] ??
+            tr('households:invitationAcceptFailed'),
+          serverMessage: localizedError(cause),
           code: cause.code ?? undefined,
         });
         if (cause.status === 410) retry();
       } else {
         setAcceptError({
           guidance: isMutationOutcomeUnknown(cause)
-            ? 'The acceptance result is uncertain. Check your household list before choosing to try again.'
+            ? tr('households:invitationAcceptUncertain')
             : cause instanceof Error
-              ? cause.message
-              : 'The invitation could not be accepted.',
+              ? localizedError(cause)
+              : tr('households:invitationCouldNotAccept'),
         });
       }
     } finally {
@@ -172,25 +168,26 @@ export function InvitationPage({ user }: { user: User | null }) {
   return (
     <div className="shell">
       <header className="topbar">
-        <Link className="brand" to="/households" aria-label="Lumio households">
+        <Link
+          className="brand"
+          to="/households"
+          aria-label={tr('common:lumioHouseholdsTitle')}
+        >
           <Brand />
         </Link>
       </header>
       <main className="content narrow invitation-preview-page">
         <Card>
-          <p className="eyebrow">Household invitation</p>
-          <h1>Join a household</h1>
+          <p className="eyebrow">{tr('households:householdInvitation')}</p>
+          <h1>{tr('households:joinHousehold')}</h1>
           {preview.kind === 'loading' && (
             <p className="muted" role="status">
-              Loading invitation…
+              {tr('households:loadingInvitation')}
             </p>
           )}
           {preview.kind === 'not-found' && (
             <Notice kind="error">
-              <p>
-                Invitation not found. Check the link or ask a household Admin
-                for a new one.
-              </p>
+              <p>{tr('households:invitationFoundCheck')}</p>
               <TechnicalDetails serverMessage="INVITATION_NOT_FOUND" />
             </Notice>
           )}
@@ -204,7 +201,7 @@ export function InvitationPage({ user }: { user: User | null }) {
                 />
               </Notice>
               <Button variant="secondary" onClick={retry}>
-                Retry preview
+                {tr('households:retryPreview')}
               </Button>
             </>
           )}
@@ -213,21 +210,20 @@ export function InvitationPage({ user }: { user: User | null }) {
               <h2>{preview.data.household.name}</h2>
               <p>{statusMessages[preview.data.status]}</p>
               <p className="muted">
-                Status: {preview.data.status} · Expires{' '}
-                {new Date(preview.data.expiresAt).toLocaleString()}
+                {tr('households:statusExpires', {
+                  status: localizedEnum(preview.data.status),
+                  date: formatDate(preview.data.expiresAt),
+                })}{' '}
               </p>
               {preview.data.status === 'ACTIVE' && !user && (
                 <>
-                  <p>
-                    Sign in or sign up to decide whether to join. This preview
-                    does not accept the invitation.
-                  </p>
+                  <p>{tr('households:signSignUp2')}</p>
                   <Link
                     className="secondary"
                     to="/sign-in"
                     state={{ from: returnPath }}
                   >
-                    Sign in or sign up
+                    {tr('households:signSignUp')}
                   </Link>
                 </>
               )}
@@ -236,11 +232,13 @@ export function InvitationPage({ user }: { user: User | null }) {
                 !acceptedMembership && (
                   <>
                     <p>
-                      Signed in as {user.email}. Choose Accept to join as a
-                      Member.
+                      {tr('households:signed')} {user.email}
+                      {tr('households:chooseAcceptJoin')}
                     </p>
                     <Button disabled={accepting} onClick={() => void accept()}>
-                      {accepting ? 'Accepting…' : 'Accept invitation'}
+                      {accepting
+                        ? tr('households:accepting')
+                        : tr('households:acceptInvitation')}
                     </Button>
                   </>
                 )}
@@ -257,7 +255,7 @@ export function InvitationPage({ user }: { user: User | null }) {
           )}
           {acceptedMembership && (
             <Notice kind="success">
-              Invitation accepted. Opening your household…
+              {tr('households:invitationAcceptedOpening')}
             </Notice>
           )}
         </Card>

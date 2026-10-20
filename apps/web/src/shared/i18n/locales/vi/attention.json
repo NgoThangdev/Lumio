@@ -1,0 +1,12 @@
+{
+  "liveViewItems": "Danh sách trực tiếp các mặt hàng được máy chủ đánh dấu cần xem lại.",
+  "acrossHouseholds": "Trong tất cả hộ gia đình của bạn",
+  "assessmentDetails": "Chi tiết đánh giá",
+  "currentAttention": "Việc cần chú ý",
+  "currentAttentionLoaded": "Không thể tải danh sách việc cần chú ý:",
+  "expiryAssessment": "Đánh giá hạn dùng: {{value}}",
+  "loadingCurrentAttention": "Đang tải việc cần chú ý…",
+  "nothingNeedsAttention": "Hiện không có việc gì cần chú ý",
+  "stockAssessment": "Đánh giá tồn kho: {{value}}",
+  "serverFindsItem": "Khi máy chủ phát hiện mặt hàng cần xem lại trong một hộ gia đình của bạn, mặt hàng đó sẽ xuất hiện tại đây."
+}

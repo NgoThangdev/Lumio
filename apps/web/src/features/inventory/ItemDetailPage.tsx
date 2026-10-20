@@ -24,8 +24,16 @@ import {
 } from '../../shared/ui/primitives';
 import { ItemLifecyclePanel } from './ItemLifecyclePanel';
 
+import { tr } from '../../shared/i18n';
+import {
+  formatDate,
+  formatDateOnly,
+  formatNumber,
+  localizedError,
+  localizedEnum,
+} from '../../shared/i18n';
 const asDate = (value: string | null) =>
-  value ? value.slice(0, 10) : 'No expiry';
+  value ? formatDateOnly(value) : tr('common:expiry2');
 
 export function ItemDetailPage() {
   const household = useHousehold();
@@ -118,8 +126,8 @@ export function ItemDetailPage() {
       await refresh();
       setNotice(
         result.alreadyUndone
-          ? 'This action was already undone. Stock and activity refreshed.'
-          : 'Action undone. Stock and activity refreshed.',
+          ? tr('item-detail:actionAlreadyUndone')
+          : tr('item-detail:actionUndone'),
       );
     },
     onError: async (error) => {
@@ -155,7 +163,7 @@ export function ItemDetailPage() {
   if (itemQuery.isPending)
     return (
       <Card>
-        <p className="muted">Loading item detail…</p>
+        <p className="muted">{tr('common:loadingItemDetail')}</p>
       </Card>
     );
   if (itemQuery.isError)
@@ -164,20 +172,23 @@ export function ItemDetailPage() {
         {notice && <Notice kind="success">{notice}</Notice>}
         <Notice kind="error">
           {notice
-            ? `The item was saved, but its latest detail could not be refreshed. Check Inventory or retry opening this item. ${itemQuery.error.message}`
-            : itemQuery.error.message}
+            ? `The item was saved, but its latest detail could not be refreshed. Check Inventory or retry opening this item. ${localizedError(itemQuery.error)}`
+            : localizedError(itemQuery.error)}
         </Notice>
       </>
     );
-  if (!item) return <Notice kind="error">Item detail is unavailable.</Notice>;
+  if (!item)
+    return (
+      <Notice kind="error">{tr('item-detail:itemDetailUnavailable')}</Notice>
+    );
   return (
     <>
       <div className="detail-intro">
         <div>
-          <p className="eyebrow">A little part of your home</p>
+          <p className="eyebrow">{tr('item-detail:littlePartHome')}</p>
           <h2 className="detail-title">{item.name}</h2>
           {item.archivedAt && (
-            <p className="muted">Archived · stock and history retained</p>
+            <p className="muted">{tr('item-detail:archivedStockHistory')}</p>
           )}
           <div className="detail-badges">
             {!item.archivedAt && (
@@ -192,11 +203,12 @@ export function ItemDetailPage() {
       </div>
       {notice && <Notice kind="success">{notice}</Notice>}
       {!item.archivedAt && !undoCandidate && undoAction.isError && (
-        <Notice kind="error">{undoAction.error.message}</Notice>
+        <Notice kind="error">{localizedError(undoAction.error)}</Notice>
       )}
       {intelligence.isError && (
         <Notice kind="error">
-          Assessment could not be loaded: {intelligence.error.message}
+          {tr('item-detail:assessmentLoaded')}{' '}
+          {localizedError(intelligence.error)}
         </Notice>
       )}
       <div
@@ -209,33 +221,38 @@ export function ItemDetailPage() {
         <div className="stack detail-overview">
           {item.archivedAt ? (
             <section className="stock-summary">
-              <p className="eyebrow">Archived stock</p>
-              <p>
-                Stock and history are retained. See the saved batches and
-                activity below.
-              </p>
+              <p className="eyebrow">{tr('item-detail:archivedStock')}</p>
+              <p>{tr('item-detail:stockHistoryRetained')}</p>
             </section>
           ) : item.trackingMode === 'QUANTITY' ? (
             <section className="stock-summary">
-              <p className="eyebrow">Ready to use</p>
-              <strong>{assessment?.eligibleStock ?? '—'}</strong>{' '}
+              <p className="eyebrow">{tr('item-detail:readyUse')}</p>
+              <strong>
+                {formatNumber(assessment?.eligibleStock ?? '—')}
+              </strong>{' '}
               <span>{item.primaryUnit}</span>
               <p>
-                Physical: {assessment?.physicalStock ?? '—'} {item.primaryUnit}{' '}
-                · Expired: {assessment?.expiredStock ?? '—'} {item.primaryUnit}
+                {tr('common:physical')}{' '}
+                {formatNumber(assessment?.physicalStock ?? '—')}{' '}
+                {item.primaryUnit} {tr('common:expired2')}{' '}
+                {formatNumber(assessment?.expiredStock ?? '—')}{' '}
+                {item.primaryUnit}
               </p>
               {item.openedTrackingEnabled && (
                 <p>
-                  Opened: {item.openedQuantity ?? '—'} {item.primaryUnit} ·
-                  Unopened: {item.unopenedQuantity ?? '—'} {item.primaryUnit}
+                  {tr('item-detail:opened4')}{' '}
+                  {formatNumber(item.openedQuantity ?? '—')} {item.primaryUnit}{' '}
+                  {tr('item-detail:unopened2')}{' '}
+                  {formatNumber(item.unopenedQuantity ?? '—')}{' '}
+                  {item.primaryUnit}
                 </p>
               )}
               {item.openedTrackingEnabled && (
                 <p className="muted">
-                  Opening tracking is on
+                  {tr('common:openingTracking')}
                   {item.recommendedDaysAfterOpening
-                    ? ` · use within ${item.recommendedDaysAfterOpening} days after opening`
-                    : ' · no use-by interval set'}
+                    ? ` · ${tr('item-detail:useWithinDaysAfterOpening', { days: item.recommendedDaysAfterOpening })}`
+                    : ` · ${tr('item-detail:noUseByInterval')}`}
                   .
                 </p>
               )}
@@ -244,38 +261,47 @@ export function ItemDetailPage() {
             <section className="stock-summary">
               <p className="eyebrow">
                 {item.trackingMode === 'FIVE_LEVEL'
-                  ? 'Current level'
-                  : 'Current item'}
+                  ? tr('common:currentLevel')
+                  : tr('common:currentItem')}
               </p>
               <strong className="state-value">
                 {item.trackingMode === 'FIVE_LEVEL'
-                  ? (item.currentLevel?.replaceAll('_', ' ').toLowerCase() ??
-                    '—')
+                  ? ((item.currentLevel
+                      ? localizedEnum(item.currentLevel)
+                      : undefined) ?? '—')
                   : item.isPresent
-                    ? 'Present'
-                    : 'Absent'}
+                    ? tr('common:present')
+                    : tr('common:absent')}
               </strong>
               <p>
-                {item.backupCount}{' '}
-                {item.backupCount === 1 ? 'backup' : 'backups'} available
+                {formatNumber(item.backupCount)}{' '}
+                {tr(
+                  item.backupCount === 1 ? 'common:backup' : 'common:backups2',
+                )}{' '}
+                {tr('common:available')}
               </p>
               {item.currentLocation?.name && (
-                <p>Current location: {item.currentLocation.name}</p>
+                <p>
+                  {tr('item-detail:currentLocation')}{' '}
+                  {item.currentLocation.name}
+                </p>
               )}
               {item.backupLocation?.name && (
-                <p>Backup location: {item.backupLocation.name}</p>
+                <p>
+                  {tr('item-detail:backupLocation')} {item.backupLocation.name}
+                </p>
               )}
             </section>
           )}
           {!item.archivedAt && intelligence.isPending && (
             <Card className="assessment-loading">
-              <p className="muted">Loading stock assessment…</p>
+              <p className="muted">{tr('common:loadingStockAssessment')}</p>
             </Card>
           )}
           {!item.archivedAt && assessment && (
             <Card className="assessment-card">
-              <p className="eyebrow">Stock health</p>
-              <h2>How things are looking</h2>
+              <p className="eyebrow">{tr('common:stockHealth')}</p>
+              <h2>{tr('item-detail:howThingsLooking')}</h2>
               {assessment.reasons.map((reason) => (
                 <p className="muted" key={reason}>
                   {reason}
@@ -295,10 +321,10 @@ export function ItemDetailPage() {
                 assessment.recommendedAction &&
                 assessment.recommendedAction !== 'NONE' && (
                   <p className="muted">
-                    Recommended:{' '}
+                    {tr('common:recommended')}{' '}
                     {assessment.recommendedAction === 'OPEN_REFILL'
-                      ? 'Open a backup'
-                      : 'Buy a backup'}
+                      ? tr('common:openBackup')
+                      : tr('common:buyBackup')}
                   </p>
                 )}
             </Card>
@@ -308,16 +334,16 @@ export function ItemDetailPage() {
           <div className="stack detail-actions">
             {undoCandidate && (
               <Card className="action-card plain-action-card undo-action">
-                <p className="eyebrow">Recent action</p>
-                <p className="muted">
-                  The server says this action can be undone.
-                </p>
+                <p className="eyebrow">{tr('item-detail:recentAction')}</p>
+                <p className="muted">{tr('item-detail:serverSaysAction')}</p>
                 {undoAction.isError && (
-                  <Notice kind="error">{undoAction.error.message}</Notice>
+                  <Notice kind="error">
+                    {localizedError(undoAction.error)}
+                  </Notice>
                 )}
                 {undoAction.isPending && (
                   <p className="muted" role="status">
-                    Undoing action...
+                    {tr('item-detail:undoingAction')}
                   </p>
                 )}
                 <Button
@@ -326,27 +352,29 @@ export function ItemDetailPage() {
                   disabled={undoAction.isPending}
                   onClick={() => undoAction.mutate(undoCandidate)}
                 >
-                  Undo
+                  {tr('common:undo')}
                 </Button>
               </Card>
             )}
             <Card className="action-card use-action">
               <details>
                 <summary className="action-summary">
-                  <span aria-hidden="true">−</span> Use{' '}
+                  <span aria-hidden="true">−</span> {tr('common:use')}{' '}
                   <span className="disclosure-arrow" aria-hidden="true">
                     ⌄
                   </span>
                 </summary>
                 <div className="action-body">
-                  <h2>Use stock</h2>
+                  <h2>{tr('common:useStock')}</h2>
                   <p className="muted">
                     {item.openedTrackingEnabled
-                      ? 'Eligible opened stock is used first. Lumio opens eligible packages only when needed.'
-                      : 'The earliest eligible expiry is used first.'}
+                      ? tr('item-detail:eligibleOpenedStock')
+                      : tr('common:earliestEligibleExpiry')}
                   </p>
                   {useAction.isError && (
-                    <Notice kind="error">{useAction.error.message}</Notice>
+                    <Notice kind="error">
+                      {localizedError(useAction.error)}
+                    </Notice>
                   )}
                   <form
                     onSubmit={(event) => {
@@ -362,7 +390,7 @@ export function ItemDetailPage() {
                     }}
                   >
                     <label>
-                      Quantity used
+                      {tr('common:quantityUsed')}
                       <input
                         type="number"
                         inputMode="decimal"
@@ -374,7 +402,7 @@ export function ItemDetailPage() {
                       />
                     </label>
                     <Button className="wide" disabled={busy}>
-                      Record use
+                      {tr('common:recordUse')}
                     </Button>
                   </form>
                 </div>
@@ -383,15 +411,17 @@ export function ItemDetailPage() {
             <Card className="action-card restock-action">
               <details>
                 <summary className="action-summary">
-                  <span aria-hidden="true">＋</span> Restock{' '}
+                  <span aria-hidden="true">＋</span> {tr('common:restock')}{' '}
                   <span className="disclosure-arrow" aria-hidden="true">
                     ⌄
                   </span>
                 </summary>
                 <div className="action-body">
-                  <h2>Add a little more</h2>
+                  <h2>{tr('item-detail:addLittle')}</h2>
                   {restockAction.isError && (
-                    <Notice kind="error">{restockAction.error.message}</Notice>
+                    <Notice kind="error">
+                      {localizedError(restockAction.error)}
+                    </Notice>
                   )}
                   <form
                     onSubmit={(event) => {
@@ -413,7 +443,7 @@ export function ItemDetailPage() {
                     }}
                   >
                     <label>
-                      Actual quantity
+                      {tr('common:actualQuantity')}
                       <input
                         type="number"
                         inputMode={
@@ -428,11 +458,12 @@ export function ItemDetailPage() {
                     </label>
                     {item.openedTrackingEnabled && (
                       <p className="muted">
-                        Enter whole unopened package counts.
+                        {tr('item-detail:enterWholeUnopened')}
                       </p>
                     )}
                     <label>
-                      Expiry date <em>optional</em>
+                      {tr('common:expiryDate')}{' '}
+                      <em>{tr('common:optional2')}</em>
                       <input
                         type="date"
                         value={expiry}
@@ -441,12 +472,12 @@ export function ItemDetailPage() {
                     </label>
                     {locations.isError && (
                       <Notice kind="error">
-                        Household locations could not be loaded:{' '}
-                        {locations.error.message}
+                        {tr('common:householdLocationsLoaded')}{' '}
+                        {localizedError(locations.error)}
                       </Notice>
                     )}
                     <label>
-                      Stock location
+                      {tr('common:stockLocation')}
                       <select
                         value={restockLocationId}
                         onChange={(event) =>
@@ -456,12 +487,12 @@ export function ItemDetailPage() {
                           locations.isPending || locations.isError || busy
                         }
                       >
-                        <option value="">Choose a location</option>
+                        <option value="">{tr('common:chooseLocation')}</option>
                         {locations.data?.map((entry) => (
                           <option key={entry.id} value={entry.id}>
                             {entry.name}
                             {entry.id === item.preferredRestockLocation?.id
-                              ? ' · preferred'
+                              ? ` · ${tr('common:preferred')}`
                               : ''}
                           </option>
                         ))}
@@ -470,8 +501,7 @@ export function ItemDetailPage() {
                     {needsRestockLocation ? (
                       <>
                         <Notice kind="error">
-                          Choose a location for this item before this stock
-                          write can be retried.
+                          {tr('item-detail:chooseLocationItem')}
                         </Notice>
                         <Button
                           type="button"
@@ -496,7 +526,7 @@ export function ItemDetailPage() {
                               .catch(() => undefined);
                           }}
                         >
-                          Confirm location and retry Restock
+                          {tr('item-detail:confirmLocationRetry2')}
                         </Button>
                       </>
                     ) : (
@@ -507,7 +537,7 @@ export function ItemDetailPage() {
                           busy || locations.isPending || locations.isError
                         }
                       >
-                        Add stock
+                        {tr('common:addStock')}
                       </Button>
                     )}
                   </form>
@@ -532,34 +562,52 @@ export function ItemDetailPage() {
           />
         )}
         <details className="history-disclosure">
-          <summary>Stock breakdown &amp; activity</summary>
+          <summary>{tr('item-detail:stockBreakdownActivity')}</summary>
           <div className="detail-history">
             {item.trackingMode === 'QUANTITY' ? (
               <>
                 <Card>
                   <h2>
-                    Batches <span className="count">{item.batches.length}</span>
+                    {tr('common:batches')}{' '}
+                    <span className="count">
+                      {formatNumber(item.batches.length)}
+                    </span>
                   </h2>
                   {item.batches.length === 0 ? (
-                    <p className="muted">No stock batches yet.</p>
+                    <p className="muted">{tr('common:stockBatchesYet')}</p>
                   ) : (
                     item.batches.map((batch) => (
                       <div className="row static" key={batch.id}>
                         <span>
                           <strong>
-                            {batch.quantity} {item.primaryUnit}
-                            {batch.openedAt ? ' · Opened' : ' · Unopened'}
+                            {formatNumber(batch.quantity)} {item.primaryUnit}
+                            {tr(
+                              batch.openedAt
+                                ? 'common:opened'
+                                : 'common:unopened',
+                            )}
                           </strong>
                           <small>
                             {batch.expiryDate
-                              ? `Original expiry ${asDate(batch.expiryDate)}`
-                              : 'No original expiry'}{' '}
-                            · {batch.location?.name ?? 'Location not set'}
+                              ? tr('item-detail:originalExpiry2', {
+                                  date: asDate(batch.expiryDate),
+                                })
+                              : tr('item-detail:originalExpiry')}{' '}
+                            · {batch.location?.name ?? tr('common:locationSet')}
                             {batch.openedAt
-                              ? ` · Opened ${asDate(batch.openedAt)}${batch.openedUseByDate ? ` · Use by ${asDate(batch.openedUseByDate)}` : ''}`
+                              ? tr('item-detail:opened3', {
+                                  date: asDate(batch.openedAt),
+                                  useBy: batch.openedUseByDate
+                                    ? tr('common:use2', {
+                                        date: asDate(batch.openedUseByDate),
+                                      })
+                                    : '',
+                                })
                               : ''}
                             {batch.effectiveExpiryDate
-                              ? ` · Effective expiry ${asDate(batch.effectiveExpiryDate)}`
+                              ? tr('item-detail:effectiveExpiry', {
+                                  date: asDate(batch.effectiveExpiryDate),
+                                })
                               : ''}
                           </small>
                         </span>
@@ -569,11 +617,13 @@ export function ItemDetailPage() {
                 </Card>
                 <Card>
                   <h2>
-                    Activity{' '}
-                    <span className="count">{item.actions?.length ?? 0}</span>
+                    {tr('common:activity')}{' '}
+                    <span className="count">
+                      {formatNumber(item.actions?.length ?? 0)}
+                    </span>
                   </h2>
                   {!item.actions?.length ? (
-                    <p className="muted">No activity yet.</p>
+                    <p className="muted">{tr('common:activityYet')}</p>
                   ) : (
                     [...item.actions].reverse().map((action) => (
                       <div className="row static" key={action.id}>
@@ -595,23 +645,23 @@ export function ItemDetailPage() {
                                   : '+'}
                             </span>{' '}
                             {action.type === 'USE'
-                              ? 'Used'
+                              ? tr('common:used2')
                               : action.type === 'RESTOCK'
-                                ? 'Restocked'
+                                ? tr('common:restocked2')
                                 : action.type === 'OPEN'
-                                  ? 'Opened'
+                                  ? tr('common:opened')
                                   : action.type === 'FINISH_OPENED'
-                                    ? 'Finished opened stock'
-                                    : 'Initial stock'}{' '}
-                            {action.quantity} {item.primaryUnit}
+                                    ? tr('common:finishedOpenedStock')
+                                    : tr('common:initialStock')}{' '}
+                            {formatNumber(action.quantity)} {item.primaryUnit}
                           </strong>
                           <small>
-                            {new Date(action.createdAt).toLocaleString()} ·{' '}
+                            {formatDate(action.createdAt)} ·{' '}
                             {action.openTransfer
-                              ? 'Package moved into opened stock'
-                              : `${action.allocations.length} ${action.allocations.length === 1 ? 'batch' : 'batches'}`}
+                              ? tr('item-detail:packageMovedOpened')
+                              : `${formatNumber(action.allocations.length)} ${action.allocations.length === 1 ? 'batch' : 'batches'}`}
                             {action.undo
-                              ? ` · Undone ${new Date(action.undo.createdAt).toLocaleString()}`
+                              ? ` · Undone ${formatDate(action.undo.createdAt)}`
                               : ''}
                           </small>
                         </span>
@@ -623,25 +673,24 @@ export function ItemDetailPage() {
             ) : (
               <Card>
                 <h2>
-                  State activity{' '}
+                  {tr('common:stateActivity')}{' '}
                   <span className="count">
                     {item.stateActions?.length ?? 0}
                   </span>
                 </h2>
                 {!item.stateActions?.length ? (
-                  <p className="muted">No state activity yet.</p>
+                  <p className="muted">{tr('common:stateActivityYet')}</p>
                 ) : (
                   [...item.stateActions].reverse().map((action) => (
                     <div className="row static" key={action.id}>
                       <span>
-                        <strong>
-                          {action.type.replaceAll('_', ' ').toLowerCase()}
-                        </strong>
+                        <strong>{localizedEnum(action.type)}</strong>
                         <small>
-                          {new Date(action.createdAt).toLocaleString()} ·{' '}
-                          {action.afterBackupCount} backups
+                          {formatDate(action.createdAt)} ·{' '}
+                          {formatNumber(action.afterBackupCount)}{' '}
+                          {tr('common:backups2')}
                           {action.undo
-                            ? ` · Undone ${new Date(action.undo.createdAt).toLocaleString()}`
+                            ? ` · Undone ${formatDate(action.undo.createdAt)}`
                             : ''}
                         </small>
                       </span>
@@ -652,21 +701,21 @@ export function ItemDetailPage() {
             )}
             <Card>
               <h2>
-                Undo history{' '}
+                {tr('item-detail:undoHistory')}{' '}
                 <span className="count">{item.undos?.length ?? 0}</span>
               </h2>
               {!item.undos?.length ? (
-                <p className="muted">No actions undone yet.</p>
+                <p className="muted">{tr('item-detail:actionsUndoneYet')}</p>
               ) : (
                 [...item.undos].reverse().map((undo) => (
                   <div className="row static" key={undo.id}>
                     <span>
                       <strong>
                         {undo.inventoryActionId
-                          ? 'Inventory action undone'
-                          : 'State action undone'}
+                          ? tr('item-detail:inventoryActionUndone')
+                          : tr('item-detail:stateActionUndone')}
                       </strong>
-                      <small>{new Date(undo.createdAt).toLocaleString()}</small>
+                      <small>{formatDate(undo.createdAt)}</small>
                     </span>
                   </div>
                 ))
@@ -674,11 +723,11 @@ export function ItemDetailPage() {
             </Card>
             <Card>
               <h2>
-                Stock-check history{' '}
+                {tr('item-detail:stockCheckHistory')}{' '}
                 <span className="count">{stockCheckEvents.length}</span>
               </h2>
               {!stockCheckEvents.length ? (
-                <p className="muted">No stock checks recorded yet.</p>
+                <p className="muted">{tr('item-detail:stockChecksRecorded')}</p>
               ) : (
                 stockCheckEvents.map((event) => (
                   <div
@@ -688,12 +737,10 @@ export function ItemDetailPage() {
                     <span>
                       <strong>
                         {event.decision === 'CONFIRM'
-                          ? 'Stock confirmed'
-                          : 'Stock corrected'}
+                          ? tr('item-detail:stockConfirmed')
+                          : tr('item-detail:stockCorrected')}
                       </strong>
-                      <small>
-                        {new Date(event.checkedAt).toLocaleString()}
-                      </small>
+                      <small>{formatDate(event.checkedAt)}</small>
                     </span>
                   </div>
                 ))
@@ -701,25 +748,23 @@ export function ItemDetailPage() {
             </Card>
             <Card>
               <h2>
-                Item changes{' '}
+                {tr('item-detail:itemChanges')}{' '}
                 <span className="count">{item.changes?.length ?? 0}</span>
               </h2>
               {!item.changes?.length ? (
-                <p className="muted">No item changes yet.</p>
+                <p className="muted">{tr('item-detail:itemChangesYet')}</p>
               ) : (
                 item.changes.map((change) => (
                   <div className="row static" key={change.id}>
                     <span>
                       <strong>
                         {change.kind === 'EDIT'
-                          ? 'Details edited'
+                          ? tr('item-detail:detailsEdited')
                           : change.kind === 'ARCHIVE'
-                            ? 'Archived'
-                            : 'Restored'}
+                            ? tr('common:archived')
+                            : tr('common:restored')}
                       </strong>
-                      <small>
-                        {new Date(change.createdAt).toLocaleString()}
-                      </small>
+                      <small>{formatDate(change.createdAt)}</small>
                     </span>
                   </div>
                 ))
@@ -731,7 +776,7 @@ export function ItemDetailPage() {
       {household.role === 'ADMIN' && (
         <section
           className="stack detail-management"
-          aria-label="Item management"
+          aria-label={tr('item-detail:itemManagement')}
         >
           <ItemLifecyclePanel householdId={household.id} item={item} />
           {!item.archivedAt && item.trackingMode === 'QUANTITY' && (
@@ -788,8 +833,8 @@ function OpeningActions({
       await onRefresh();
       setUndoMessage(
         result.alreadyUndone
-          ? 'This action was already undone. Stock and activity refreshed.'
-          : 'Action undone. Stock and activity refreshed.',
+          ? tr('item-detail:actionAlreadyUndone')
+          : tr('item-detail:actionUndone'),
       );
     },
     onError: async (error) => {
@@ -820,29 +865,35 @@ function OpeningActions({
       setUndoMessage('');
       setMessage(
         operation === 'open'
-          ? `Opened ${result.batch?.quantity ?? 'one'} ${item.primaryUnit}. Stock refreshed.`
-          : `Finished ${result.quantity ?? 'opened'} ${item.primaryUnit}. Stock and activity refreshed.`,
+          ? tr('item-detail:openedStockRefreshed', {
+              quantity: formatNumber(result.batch?.quantity ?? '\u2014'),
+              unit: item.primaryUnit,
+            })
+          : tr('item-detail:finishedStockActivity', {
+              quantity: formatNumber(result.quantity ?? '\u2014'),
+              unit: item.primaryUnit,
+            }),
       );
     },
   });
   return (
     <Card className="action-card plain-action-card">
-      <p className="eyebrow">Opened stock</p>
-      <p className="muted">Lumio chooses the eligible package and batch.</p>
+      <p className="eyebrow">{tr('item-detail:openedStock')}</p>
+      <p className="muted">{tr('item-detail:lumioChoosesEligible')}</p>
       {message && <Notice kind="success">{message}</Notice>}
       {undoMessage && <Notice kind="success">{undoMessage}</Notice>}
-      {action.isError && <Notice kind="error">{action.error.message}</Notice>}
+      {action.isError && (
+        <Notice kind="error">{localizedError(action.error)}</Notice>
+      )}
       {undoCandidate && (
         <>
-          <p className="muted">
-            The server says this Finish opened action can be undone.
-          </p>
+          <p className="muted">{tr('item-detail:serverSaysFinish')}</p>
           {undoAction.isError && (
-            <Notice kind="error">{undoAction.error.message}</Notice>
+            <Notice kind="error">{localizedError(undoAction.error)}</Notice>
           )}
           {undoAction.isPending && (
             <p className="muted" role="status">
-              Undoing action...
+              {tr('item-detail:undoingAction')}
             </p>
           )}
           <Button
@@ -851,16 +902,16 @@ function OpeningActions({
             disabled={undoAction.isPending || action.isPending}
             onClick={() => undoAction.mutate(undoCandidate)}
           >
-            Undo finished action
+            {tr('item-detail:undoFinishedAction')}
           </Button>
         </>
       )}
       {!undoCandidate && undoAction.isError && (
-        <Notice kind="error">{undoAction.error.message}</Notice>
+        <Notice kind="error">{localizedError(undoAction.error)}</Notice>
       )}
       {action.isPending && (
         <p className="muted" role="status">
-          Updating opened stock…
+          {tr('item-detail:updatingOpenedStock')}
         </p>
       )}
       <div className="state-level-actions">
@@ -872,7 +923,7 @@ function OpeningActions({
             action.mutate('open');
           }}
         >
-          Open one package
+          {tr('item-detail:openOnePackage')}
         </Button>
         <Button
           type="button"
@@ -883,7 +934,7 @@ function OpeningActions({
             action.mutate('finish-opened');
           }}
         >
-          Finish opened stock
+          {tr('item-detail:finishOpenedStock')}
         </Button>
       </div>
     </Card>
@@ -916,20 +967,23 @@ function OpeningConfigForm({
       await onSaved();
       setConfirmed(false);
       setNotice(
-        enabled ? 'Opening tracking enabled.' : 'Opening tracking disabled.',
+        enabled
+          ? tr('item-detail:openingTrackingEnabled')
+          : tr('item-detail:openingTrackingDisabled'),
       );
     },
   });
   return (
     <Card>
       <details>
-        <summary className="settings-summary">Opening policy</summary>
-        <p className="muted">
-          Use this only when one primary unit equals one complete package.
-          Existing positive unopened stock must be whole packages.
-        </p>
+        <summary className="settings-summary">
+          {tr('common:openingPolicy')}
+        </summary>
+        <p className="muted">{tr('item-detail:useOnlyOne')}</p>
         {notice && <Notice kind="success">{notice}</Notice>}
-        {save.isError && <Notice kind="error">{save.error.message}</Notice>}
+        {save.isError && (
+          <Notice kind="error">{localizedError(save.error)}</Notice>
+        )}
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -947,12 +1001,13 @@ function OpeningConfigForm({
                 setConfirmed(false);
               }}
             />{' '}
-            Track opened packages
+            {tr('item-detail:trackOpenedPackages')}
           </label>
           {enabled && (
             <>
               <label>
-                Recommended days after opening <em>optional</em>
+                {tr('item-detail:recommendedDaysOpening')}{' '}
+                <em>{tr('common:optional2')}</em>
                 <input
                   type="number"
                   min="1"
@@ -969,7 +1024,8 @@ function OpeningConfigForm({
                   onChange={(event) => setConfirmed(event.target.checked)}
                   required
                 />{' '}
-                I confirm one {item.primaryUnit} equals one complete package.
+                {tr('item-detail:iConfirmOne')} {item.primaryUnit}{' '}
+                {tr('item-detail:equalsOneComplete')}
               </label>
             </>
           )}
@@ -978,7 +1034,9 @@ function OpeningConfigForm({
             className="wide"
             disabled={save.isPending || (enabled && !confirmed)}
           >
-            {save.isPending ? 'Saving…' : 'Save opening policy'}
+            {save.isPending
+              ? tr('common:saving')
+              : tr('item-detail:saveOpeningPolicy')}
           </Button>
         </form>
       </details>
@@ -1014,8 +1072,8 @@ function StateActions({
       await onRefresh();
       setSuccess(
         result.alreadyUndone
-          ? 'This action was already undone. Stock and activity refreshed.'
-          : 'Action undone. Stock and activity refreshed.',
+          ? tr('item-detail:actionAlreadyUndone')
+          : tr('item-detail:actionUndone'),
       );
     },
     onError: async (error) => {
@@ -1065,28 +1123,26 @@ function StateActions({
   return (
     <div className="stack detail-actions state-actions">
       <Card className="action-card plain-action-card">
-        <p className="eyebrow">Quick action</p>
+        <p className="eyebrow">{tr('common:quickAction')}</p>
         <h2>
           {item.trackingMode === 'FIVE_LEVEL'
-            ? 'Update current level'
-            : 'Update current item'}
+            ? tr('item-detail:updateCurrentLevel')
+            : tr('item-detail:updateCurrentItem')}
         </h2>
-        <p className="muted">
-          Choose what is true at home. Lumio will update the household state.
-        </p>
+        <p className="muted">{tr('item-detail:chooseTrueHome')}</p>
         {success && <Notice kind="success">{success}</Notice>}
-        {action.isError && <Notice kind="error">{action.error.message}</Notice>}
+        {action.isError && (
+          <Notice kind="error">{localizedError(action.error)}</Notice>
+        )}
         {undoCandidate && (
           <>
-            <p className="muted">
-              The server says this state change can be undone.
-            </p>
+            <p className="muted">{tr('item-detail:serverSaysState')}</p>
             {undoAction.isError && (
-              <Notice kind="error">{undoAction.error.message}</Notice>
+              <Notice kind="error">{localizedError(undoAction.error)}</Notice>
             )}
             {undoAction.isPending && (
               <p className="muted" role="status">
-                Undoing action...
+                {tr('item-detail:undoingAction')}
               </p>
             )}
             <Button
@@ -1095,20 +1151,23 @@ function StateActions({
               disabled={undoAction.isPending || action.isPending}
               onClick={() => undoAction.mutate(undoCandidate)}
             >
-              Undo state change
+              {tr('item-detail:undoStateChange')}
             </Button>
           </>
         )}
         {!undoCandidate && undoAction.isError && (
-          <Notice kind="error">{undoAction.error.message}</Notice>
+          <Notice kind="error">{localizedError(undoAction.error)}</Notice>
         )}
         {action.isPending && (
           <p className="muted" role="status">
-            Saving stock state…
+            {tr('item-detail:savingStockState')}
           </p>
         )}
         {item.trackingMode === 'FIVE_LEVEL' ? (
-          <div className="state-level-actions" aria-label="Set current level">
+          <div
+            className="state-level-actions"
+            aria-label={tr('item-detail:setCurrentLevel')}
+          >
             {stateLevels.map((level) => (
               <Button
                 key={level}
@@ -1120,11 +1179,13 @@ function StateActions({
                   submit(
                     'level',
                     { level },
-                    `Level updated to ${level.replaceAll('_', ' ').toLowerCase()}.`,
+                    tr('item-detail:levelUpdatedTo', {
+                      level: localizedEnum(level),
+                    }),
                   )
                 }
               >
-                {level.replaceAll('_', ' ').toLowerCase()}
+                {localizedEnum(level)}
               </Button>
             ))}
           </div>
@@ -1139,11 +1200,11 @@ function StateActions({
                 submit(
                   'presence',
                   { present: true },
-                  'Current item marked present.',
+                  tr('item-detail:itemMarkedPresent'),
                 )
               }
             >
-              Present
+              {tr('common:present')}
             </Button>
             <Button
               type="button"
@@ -1154,11 +1215,11 @@ function StateActions({
                 submit(
                   'presence',
                   { present: false },
-                  'Current item marked absent.',
+                  tr('item-detail:itemMarkedAbsent'),
                 )
               }
             >
-              Absent
+              {tr('common:absent')}
             </Button>
           </div>
         )}
@@ -1170,7 +1231,7 @@ function StateActions({
           }}
         >
           <label>
-            Add backups
+            {tr('item-detail:addBackups')}
             <input
               type="number"
               inputMode="numeric"
@@ -1190,7 +1251,9 @@ function StateActions({
               Number(backupCount) < 1
             }
           >
-            {action.isPending ? 'Saving…' : 'Add backups'}
+            {action.isPending
+              ? tr('common:saving')
+              : tr('item-detail:addBackups')}
           </Button>
         </form>
         {recommendedAction === 'OPEN_REFILL' && (
@@ -1201,11 +1264,13 @@ function StateActions({
               submit(
                 'open-refill',
                 undefined,
-                'Backup opened and current stock updated.',
+                tr('item-detail:backupOpenedStockUpdated'),
               )
             }
           >
-            {action.isPending ? 'Saving…' : 'Open refill'}
+            {action.isPending
+              ? tr('common:saving')
+              : tr('item-detail:openRefill')}
           </Button>
         )}
       </Card>
@@ -1239,13 +1304,17 @@ function ConfigForm({
   return (
     <Card>
       <details>
-        <summary className="settings-summary">Stock rules</summary>
+        <summary className="settings-summary">
+          {tr('item-detail:stockRules')}
+        </summary>
         <p className="muted">
-          Optional values use {item.primaryUnit}. Set a target to enable
-          purchase quantities.
+          {tr('common:optionalValuesUse')} {item.primaryUnit}
+          {tr('item-detail:setTargetEnable')}
         </p>
         {notice && <Notice kind="success">{notice}</Notice>}
-        {save.isError && <Notice kind="error">{save.error.message}</Notice>}
+        {save.isError && (
+          <Notice kind="error">{localizedError(save.error)}</Notice>
+        )}
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -1258,10 +1327,10 @@ function ConfigForm({
         >
           {(
             [
-              ['minimumStock', 'Minimum stock'],
-              ['buyThreshold', 'Buy threshold'],
-              ['lowStockThreshold', 'Low threshold'],
-              ['targetStock', 'Target stock'],
+              ['minimumStock', tr('common:minimumStock')],
+              ['buyThreshold', tr('common:buyThreshold')],
+              ['lowStockThreshold', tr('common:lowThreshold')],
+              ['targetStock', tr('common:targetStock')],
             ] as const
           ).map(([field, label]) => (
             <label key={field}>
@@ -1291,7 +1360,7 @@ function ConfigForm({
                 }))
               }
             />{' '}
-            Never run out
+            {tr('common:neverRunOut')}
           </label>
           <label className="check-label">
             <input
@@ -1304,14 +1373,14 @@ function ConfigForm({
                 }))
               }
             />{' '}
-            Predict from USE history
+            {tr('common:predictUseHistory')}
           </label>
           <Button
             variant="secondary"
             className="wide"
             disabled={save.isPending}
           >
-            Save stock rules
+            {tr('common:saveStockRules')}
           </Button>
         </form>
       </details>
