@@ -949,6 +949,13 @@ em {
   color: var(--muted);
   overflow-wrap: anywhere;
 }
+.home-attention-explanation {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
 .home-attention-footer {
   align-self: flex-end;
   display: inline-flex;
@@ -1596,6 +1603,13 @@ em {
   line-height: 1.5;
   color: var(--muted);
   margin-top: 5px;
+}
+.suggestion-row .suggestion-explanation {
+  display: block;
+  margin: 5px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
 }
 .suggestion-row > span {
   color: var(--green-deep);

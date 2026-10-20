@@ -18,6 +18,8 @@ import type {
 import {
   Button,
   Card,
+  ExplanationText,
+  hasExplanationTranslation,
   ItemVisual,
   Notice,
   StockBadge,
@@ -142,6 +144,9 @@ export function ItemDetailPage() {
   const assessment = intelligence.data?.assessments.find(
     (entry) => entry.itemId === itemId,
   );
+  const showReasonExplanations =
+    !assessment?.suggestion ||
+    hasExplanationTranslation(assessment.suggestion.explanation);
   const stockCheckEvents = (item?.stockChecks ?? [])
     .flatMap((check) =>
       check.history.map((event, index) => ({
@@ -302,20 +307,59 @@ export function ItemDetailPage() {
             <Card className="assessment-card">
               <p className="eyebrow">{tr('common:stockHealth')}</p>
               <h2>{tr('item-detail:howThingsLooking')}</h2>
-              {assessment.reasons.map((reason) => (
-                <p className="muted" key={reason}>
-                  {reason}
-                </p>
-              ))}
-              {assessment.expiryReason && (
-                <p className="use-soon-note">{assessment.expiryReason}</p>
-              )}
+              {showReasonExplanations &&
+                (assessment.reasonExplanations?.length
+                  ? assessment.reasonExplanations.map((explanation, index) => (
+                      <ExplanationText
+                        key={`${explanation.code}-${index}`}
+                        explanation={explanation}
+                        fallback={assessment.reasons[index]}
+                      />
+                    ))
+                  : assessment.reasons.map((reason, index) => (
+                      <ExplanationText
+                        key={`${reason}-${index}`}
+                        explanation={undefined}
+                        fallback={reason}
+                      />
+                    )))}
+              <ExplanationText
+                className="use-soon-note"
+                explanation={assessment.expiryExplanation}
+                fallback={assessment.expiryReason}
+              />
               {item.trackingMode === 'QUANTITY' && (
-                <p className="muted">
-                  {assessment.prediction.reason}
+                <>
+                  <ExplanationText
+                    explanation={assessment.prediction.explanation}
+                    fallback={assessment.prediction.reason}
+                  />
                   {assessment.prediction.basis === 'USE_14_DAY' &&
-                    ` Daily rate: ${assessment.prediction.dailyRate} ${item.primaryUnit}; projected need through ${intelligence.data?.shoppingDate}: ${assessment.prediction.projectedNeed} ${item.primaryUnit}.`}
-                </p>
+                    assessment.prediction.dailyRate !== null &&
+                    assessment.prediction.projectedNeed !== null &&
+                    intelligence.data?.shoppingDate && (
+                      <p className="muted">
+                        {tr('inventory:predictionDetails', {
+                          dailyRate: formatNumber(
+                            assessment.prediction.dailyRate,
+                          ),
+                          unit: item.primaryUnit,
+                          shoppingDate: formatDateOnly(
+                            intelligence.data.shoppingDate,
+                          ),
+                          projectedNeed: formatNumber(
+                            assessment.prediction.projectedNeed,
+                          ),
+                        })}
+                      </p>
+                    )}
+                </>
+              )}
+              {assessment.suggestion && (
+                <ExplanationText
+                  explanation={assessment.suggestion.explanation}
+                  fallback={assessment.suggestion.reason}
+                />
               )}
               {item.trackingMode !== 'QUANTITY' &&
                 assessment.recommendedAction &&

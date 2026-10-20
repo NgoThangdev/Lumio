@@ -2,6 +2,9 @@ import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react';
 import { Doodle, type IllustrationKey } from './Doodle';
 import { tr, type TranslationKey } from '../i18n';
 
+export { ExplanationText } from './ExplanationText';
+export { hasExplanationTranslation } from './ExplanationText';
+
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary' | 'link';
 };

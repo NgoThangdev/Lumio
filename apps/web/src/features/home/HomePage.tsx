@@ -12,9 +12,13 @@ import type {
   User,
 } from '../../shared/api/types';
 import { Doodle } from '../../shared/ui/Doodle';
-import { Notice } from '../../shared/ui/primitives';
+import {
+  ExplanationText,
+  hasExplanationTranslation,
+  Notice,
+} from '../../shared/ui/primitives';
 
-import { tr } from '../../shared/i18n';
+import { tr, type TranslationKey } from '../../shared/i18n';
 import {
   formatDate,
   formatDateOnly,
@@ -32,12 +36,12 @@ type TripSummary = {
 
 type AttentionItem = NeedsAttention['items'][number];
 
-function alertLabel(entry: AttentionItem) {
-  if (entry.action === 'USE_SOON') return 'Use soon';
-  if (entry.lowStockRisk === 'OUT') return 'Out of stock';
-  if (entry.lowStockRisk === 'BUY') return 'Time to buy';
-  if (entry.lowStockRisk === 'LOW') return 'Low stock';
-  return 'Needs attention';
+function alertLabel(entry: AttentionItem): TranslationKey {
+  if (entry.action === 'USE_SOON') return 'common:useSoon3';
+  if (entry.lowStockRisk === 'OUT') return 'common:outStock';
+  if (entry.lowStockRisk === 'BUY') return 'common:timeBuy';
+  if (entry.lowStockRisk === 'LOW') return 'common:lowStock';
+  return 'home:needsAttention';
 }
 
 function alertTone(entry: AttentionItem) {
@@ -237,6 +241,20 @@ export function HomePage() {
                   : stock.isPending
                     ? tr('common:loadingStock')
                     : tr('home:stockUnavailable');
+                // Pair legacy fallback text in the API's full explanation
+                // order. The displayed primary descriptor remains API-owned.
+                const primaryReasonIndex =
+                  entry.action === 'USE_SOON'
+                    ? 0
+                    : entry.action === 'OPEN_REFILL' ||
+                        entry.trackingMode !== 'QUANTITY'
+                      ? entry.reasons.length - 1
+                      : entry.expiryRisk === 'USE_SOON'
+                        ? 1
+                        : 0;
+                const supportingFallbacks = entry.reasons.filter(
+                  (_, index) => index !== primaryReasonIndex,
+                );
                 return (
                   <Link
                     className="home-attention-card"
@@ -244,16 +262,56 @@ export function HomePage() {
                     to={`${base}/inventory/${entry.itemId}`}
                   >
                     <span className={`home-attention-pill ${alertTone(entry)}`}>
-                      {tr(alertLabel(entry) as Parameters<typeof tr>[0])}
+                      {tr(alertLabel(entry))}
                     </span>
                     <span className="home-attention-body">
                       <span className="home-attention-visual">
                         <Doodle itemName={entry.name} />
                       </span>
-                      <span className="home-attention-copy">
+                      <div className="home-attention-copy">
                         <strong>{entry.name}</strong>
                         <small>{amount}</small>
-                      </span>
+                        {entry.primaryExplanation ? (
+                          <>
+                            <ExplanationText
+                              className="home-attention-explanation"
+                              explanation={entry.primaryExplanation}
+                              fallback={entry.reason}
+                            />
+                            {hasExplanationTranslation(
+                              entry.primaryExplanation,
+                            ) &&
+                              (entry.supportingExplanations?.length
+                                ? entry.supportingExplanations.map(
+                                    (explanation, index) => (
+                                      <ExplanationText
+                                        className="home-attention-explanation"
+                                        key={`${explanation.code}-${index}`}
+                                        explanation={explanation}
+                                        fallback={supportingFallbacks[index]}
+                                      />
+                                    ),
+                                  )
+                                : supportingFallbacks.map((reason, index) => (
+                                    <ExplanationText
+                                      className="home-attention-explanation"
+                                      key={`${reason}-${index}`}
+                                      explanation={undefined}
+                                      fallback={reason}
+                                    />
+                                  )))}
+                          </>
+                        ) : (
+                          entry.reasons.map((reason, index) => (
+                            <ExplanationText
+                              className="home-attention-explanation"
+                              key={`fallback-${reason}-${index}`}
+                              explanation={undefined}
+                              fallback={reason}
+                            />
+                          ))
+                        )}
+                      </div>
                     </span>
                   </Link>
                 );

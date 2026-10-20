@@ -14,6 +14,7 @@ import type {
 } from '../../shared/api/types';
 import {
   Card,
+  ExplanationText,
   ItemVisual,
   Notice,
   StockBadge,
@@ -209,11 +210,11 @@ export function InventoryPage() {
   const base = `/households/${household.id}`;
   // These values are accepted by the queried Inventory endpoint, including OPENED.
   const quickFilters = [
-    { value: 'ALL', label: 'All' },
-    { value: 'LOW', label: 'Low' },
-    { value: 'EXPIRING', label: 'Expiring' },
-    { value: 'OPENED', label: 'Opened' },
-  ];
+    { value: 'ALL', label: 'common:all' },
+    { value: 'LOW', label: 'inventory:filterLow' },
+    { value: 'EXPIRING', label: 'inventory:expiring2' },
+    { value: 'OPENED', label: 'common:opened' },
+  ] as const;
   const hasAdvancedFilters =
     !quickFilters.some((filter) => filter.value === status) ||
     !!categoryId ||
@@ -256,7 +257,7 @@ export function InventoryPage() {
                   setInventoryParam('status', filter.value, 'ALL');
                 }}
               >
-                {tr(filter.label as Parameters<typeof tr>[0])}
+                {tr(filter.label)}
               </button>
             ))}
           </div>
@@ -517,7 +518,11 @@ export function InventoryPage() {
                 to={`${base}/inventory/${entry.itemId}`}
               >
                 <strong>{entry.name}</strong>
-                <span>{entry.expiryReason}</span>
+                <ExplanationText
+                  as="span"
+                  explanation={entry.expiryExplanation}
+                  fallback={entry.expiryReason}
+                />
               </Link>
             ))}
           </Card>
@@ -566,7 +571,13 @@ export function InventoryPage() {
                         : tr('common:buy4')}
                     </span>
                   </strong>
-                  <small>{localizedEnum(entry.suggestion?.reason)}</small>
+                  {entry.suggestion && (
+                    <ExplanationText
+                      className="suggestion-explanation"
+                      explanation={entry.suggestion.explanation}
+                      fallback={entry.suggestion.reason}
+                    />
+                  )}
                 </div>
                 <span>
                   {formatNumber(entry.suggestion?.quantity ?? 0)}{' '}

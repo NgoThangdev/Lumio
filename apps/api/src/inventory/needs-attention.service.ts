@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { StockIntelligenceService } from './stock-intelligence.service.js';
+import type { AssessmentExplanation } from './assessment-explanation.js';
 
 type Assessment = Awaited<
   ReturnType<StockIntelligenceService['assessHousehold']>
@@ -43,6 +44,17 @@ export function rankNeedsAttention(assessments: Assessment[]) {
         : action === 'OPEN_REFILL'
           ? assessment.reasons.at(-1)!
           : assessment.reasons.join(' ');
+    const explanations: AssessmentExplanation[] = [
+      ...(assessment.expiryExplanation ? [assessment.expiryExplanation] : []),
+      ...assessment.reasonExplanations,
+    ];
+    const primaryExplanation: AssessmentExplanation =
+      action === 'USE_SOON'
+        ? assessment.expiryExplanation!
+        : assessment.trackingMode === 'QUANTITY'
+          ? assessment.reasonExplanations[0]
+          : assessment.reasonExplanations.at(-1)!;
+    const primaryIndex = explanations.indexOf(primaryExplanation);
     return [
       {
         itemId: assessment.itemId,
@@ -54,6 +66,10 @@ export function rankNeedsAttention(assessments: Assessment[]) {
         action,
         reason,
         reasons,
+        primaryExplanation,
+        supportingExplanations: explanations.filter(
+          (_, index) => index !== primaryIndex,
+        ),
         rank,
       },
     ];

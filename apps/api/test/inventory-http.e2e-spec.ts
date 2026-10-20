@@ -405,8 +405,27 @@ describe('Authenticated inventory HTTP flow (database)', () => {
       physicalStock: '4',
       eligibleStock: '4',
       lowStockRisk: 'BUY',
-      prediction: { basis: 'THRESHOLD_FALLBACK', usedIn14Days: '1' },
-      suggestion: { quantity: '20', priority: 'MUST_BUY' },
+      reasonExplanations: [
+        {
+          code: 'QUANTITY_AT_OR_BELOW_BUY_THRESHOLD',
+          params: { buyThreshold: '5', unit: 'egg' },
+        },
+      ],
+      prediction: {
+        basis: 'THRESHOLD_FALLBACK',
+        usedIn14Days: '1',
+        explanation: {
+          code: 'PREDICTION_INSUFFICIENT_HISTORY',
+        },
+      },
+      suggestion: {
+        quantity: '20',
+        priority: 'MUST_BUY',
+        explanation: {
+          code: 'QUANTITY_BUY_TO_TARGET',
+          params: { quantity: '20', unit: 'egg', targetStock: '24' },
+        },
+      },
     });
     expect(insight.body.suggestions).toHaveLength(1);
     await prisma.membership.create({
@@ -461,6 +480,10 @@ describe('Authenticated inventory HTTP flow (database)', () => {
       itemId: item.body.id,
       lowStockRisk: 'OUT',
       physicalStock: '0',
+      reasonExplanations: [
+        { code: 'QUANTITY_NO_ELIGIBLE_STOCK' },
+        { code: 'QUANTITY_TARGET_REQUIRED' },
+      ],
     });
     expect(filtered.body.groups[0].entries[0]).toMatchObject({
       itemId: item.body.id,
@@ -474,6 +497,7 @@ describe('Authenticated inventory HTTP flow (database)', () => {
       itemId: item.body.id,
       action: 'BUY',
       priority: 'CRITICAL',
+      primaryExplanation: { code: 'QUANTITY_NO_ELIGIBLE_STOCK' },
     });
     const opened = await request(app.getHttpServer())
       .get(base)

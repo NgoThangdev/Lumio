@@ -1,5 +1,6 @@
 import { Prisma } from '../generated/prisma/browser.js';
 import { effectiveExpiryDate, localCalendarDate } from './plan-use.js';
+import type { AssessmentExplanation } from './assessment-explanation.js';
 
 type Decimal = InstanceType<typeof Prisma.Decimal>;
 const ZERO = new Prisma.Decimal(0);
@@ -130,30 +131,82 @@ export function assessItem(
         ? 'LOW'
         : 'OK';
   const reasons: string[] = [];
-  if (out) reasons.push('No eligible stock remains.');
+  const reasonExplanations: AssessmentExplanation[] = [];
+  const addReason = (reason: string, explanation: AssessmentExplanation) => {
+    reasons.push(reason);
+    reasonExplanations.push(explanation);
+  };
+  if (out)
+    addReason('No eligible stock remains.', {
+      code: 'QUANTITY_NO_ELIGIBLE_STOCK',
+    });
   if (minimumReached)
-    reasons.push(
+    addReason(
       `Eligible stock is at or below the minimum of ${item.minimumStock?.toString()}.`,
+      {
+        code: 'QUANTITY_AT_OR_BELOW_MINIMUM',
+        params: {
+          minimumStock: item.minimumStock!.toString(),
+          unit: item.primaryUnit,
+        },
+      },
     );
   if (buyThresholdReached)
-    reasons.push(
+    addReason(
       `Eligible stock is at or below the buy threshold of ${item.buyThreshold?.toString()}.`,
+      {
+        code: 'QUANTITY_AT_OR_BELOW_BUY_THRESHOLD',
+        params: {
+          buyThreshold: item.buyThreshold!.toString(),
+          unit: item.primaryUnit,
+        },
+      },
     );
   if (forecastShortage)
-    reasons.push(
+    addReason(
       `Projected need through ${shoppingDate} is ${projectedNeed?.toString()} with a 20% buffer.`,
+      {
+        code: 'QUANTITY_PROJECTED_NEED',
+        params: {
+          shoppingDate,
+          projectedNeed: projectedNeed!.toString(),
+          unit: item.primaryUnit,
+          bufferPercent: 20,
+        },
+      },
     );
   if (!buyRisk && lowThresholdReached)
-    reasons.push(
+    addReason(
       `Eligible stock is at or below the low threshold of ${item.lowStockThreshold?.toString()}.`,
+      {
+        code: 'QUANTITY_AT_OR_BELOW_LOW_THRESHOLD',
+        params: {
+          lowStockThreshold: item.lowStockThreshold!.toString(),
+          unit: item.primaryUnit,
+        },
+      },
     );
   if (reasons.length === 0)
-    reasons.push('Eligible stock is above the configured risk levels.');
+    addReason('Eligible stock is above the configured risk levels.', {
+      code: 'QUANTITY_ABOVE_RISK_LEVELS',
+    });
   if (buyRisk && item.targetStock === null) {
-    reasons.push('Set a target stock to calculate a purchase quantity.');
+    addReason('Set a target stock to calculate a purchase quantity.', {
+      code: 'QUANTITY_TARGET_REQUIRED',
+    });
   }
-  const expiryReason = expiring.gt(0)
-    ? `${expiring.toString()} ${item.primaryUnit} expires by ${useSoonThrough}; use eligible batches soon.`
+  const expiry = expiring.gt(0)
+    ? {
+        reason: `${expiring.toString()} ${item.primaryUnit} expires by ${useSoonThrough}; use eligible batches soon.`,
+        explanation: {
+          code: 'QUANTITY_USE_SOON',
+          params: {
+            quantity: expiring.toString(),
+            unit: item.primaryUnit,
+            throughDate: useSoonThrough,
+          },
+        } satisfies AssessmentExplanation,
+      }
     : null;
   const suggestedGap =
     buyRisk && item.targetStock && item.targetStock.gt(eligible)
@@ -162,6 +215,32 @@ export function assessItem(
   const suggestedQuantity = suggestedGap
     ? purchasableSuggestionQuantity(suggestedGap, item.openedTrackingEnabled)
     : null;
+  const predictionMessage = !item.predictionEnabled
+    ? {
+        reason: 'Prediction is off; configured thresholds are used.',
+        explanation: { code: 'PREDICTION_DISABLED' },
+      }
+    : hasHistory
+      ? {
+          reason:
+            'USE and FINISH_OPENED quantities from the last 14 local calendar days are divided by 14; the projected need includes a 20% buffer.',
+          explanation: {
+            code: 'PREDICTION_USE_14_DAY',
+            params: { windowDays: 14, bufferPercent: 20 },
+          },
+        }
+      : {
+          reason:
+            'At least two consumption dates in the last 14 are required, including one at least seven local calendar days ago; configured thresholds are used.',
+          explanation: {
+            code: 'PREDICTION_INSUFFICIENT_HISTORY',
+            params: {
+              windowDays: 14,
+              minimumDistinctDays: 2,
+              requiredSpanDays: 7,
+            },
+          },
+        };
 
   return {
     itemId: item.id,
@@ -176,17 +255,15 @@ export function assessItem(
     useSoonQuantity: expiring.toString(),
     useTodayQuantity: useToday.toString(),
     expiryRisk: expiring.gt(0) ? 'USE_SOON' : 'NONE',
-    expiryReason,
+    expiryReason: expiry?.reason ?? null,
+    expiryExplanation: expiry?.explanation ?? null,
     lowStockRisk: health,
     reasons,
+    reasonExplanations,
     prediction: {
       enabled: item.predictionEnabled,
       basis: hasHistory ? 'USE_14_DAY' : 'THRESHOLD_FALLBACK',
-      reason: !item.predictionEnabled
-        ? 'Prediction is off; configured thresholds are used.'
-        : hasHistory
-          ? 'USE and FINISH_OPENED quantities from the last 14 local calendar days are divided by 14; the projected need includes a 20% buffer.'
-          : 'At least two consumption dates in the last 14 are required, including one at least seven local calendar days ago; configured thresholds are used.',
+      ...predictionMessage,
       usedIn14Days: usedIn14Days.toString(),
       dailyRate: dailyRate?.toString() ?? null,
       projectedNeed: projectedNeed?.toString() ?? null,
@@ -197,6 +274,16 @@ export function assessItem(
           quantity: suggestedQuantity.toString(),
           priority: out || item.neverRunOut ? 'MUST_BUY' : 'SHOULD_BUY',
           reason: `Buy ${suggestedQuantity.toString()} ${item.primaryUnit} to ${item.openedTrackingEnabled ? 'meet or exceed' : 'reach'} the target of ${item.targetStock?.toString()}. ${reasons.join(' ')}`,
+          explanation: {
+            code: item.openedTrackingEnabled
+              ? 'QUANTITY_BUY_TO_MEET_OR_EXCEED_TARGET'
+              : 'QUANTITY_BUY_TO_TARGET',
+            params: {
+              quantity: suggestedQuantity.toString(),
+              unit: item.primaryUnit,
+              targetStock: item.targetStock!.toString(),
+            },
+          },
         }
       : null,
   };

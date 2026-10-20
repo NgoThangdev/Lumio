@@ -193,12 +193,15 @@ export type Assessment = {
   expiredStock: string | null;
   expiryRisk: 'USE_SOON' | 'NONE';
   expiryReason: string | null;
+  reasonExplanations?: Explanation[];
+  expiryExplanation?: Explanation | null;
   lowStockRisk: 'OUT' | 'BUY' | 'LOW' | 'OK';
   reasons: string[];
   recommendedAction?: 'NONE' | 'OPEN_REFILL' | 'BUY_BACKUP';
   prediction: {
     basis: 'USE_14_DAY' | 'THRESHOLD_FALLBACK' | 'NOT_APPLICABLE';
     reason: string;
+    explanation?: Explanation;
     dailyRate: string | null;
     projectedNeed: string | null;
   };
@@ -206,7 +209,12 @@ export type Assessment = {
     quantity: string;
     priority: 'MUST_BUY' | 'SHOULD_BUY';
     reason: string;
+    explanation?: Explanation;
   } | null;
+};
+export type Explanation = {
+  code: string;
+  params?: Record<string, string | number | boolean | null>;
 };
 export type Intelligence = {
   shoppingDate: string;
@@ -245,6 +253,8 @@ export type NeedsAttention = {
     action: 'BUY' | 'USE_SOON' | 'OPEN_REFILL' | 'VIEW_ITEM';
     reason: string;
     reasons: string[];
+    primaryExplanation?: Explanation;
+    supportingExplanations?: Explanation[];
   }[];
 };
 export type CurrentAttentionSignal = 'LOW_STOCK' | 'USE_SOON';

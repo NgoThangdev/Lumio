@@ -1,5 +1,6 @@
 import type { StockLevel, TrackingMode } from '../generated/prisma/client.js';
 import { LEVELS } from './inventory-state.service.js';
+import type { AssessmentExplanation } from './assessment-explanation.js';
 
 export interface StateAssessmentItem {
   id: string;
@@ -48,17 +49,48 @@ export function assessStateItem(item: StateAssessmentItem) {
     lowStockRisk = 'OK';
     recommendedAction = 'NONE';
   }
-  const state = fiveLevel
-    ? `Current container is ${item.currentLevel}; ${item.backupCount} refill(s) remain.`
-    : `Current item is ${item.isPresent ? 'present' : 'absent'}; ${item.backupCount} backup(s) remain.`;
-  const reason =
+  const state: { reason: string; explanation: AssessmentExplanation } =
+    fiveLevel
+      ? {
+          reason: `Current container is ${item.currentLevel}; ${item.backupCount} refill(s) remain.`,
+          explanation: {
+            code: 'FIVE_LEVEL_CURRENT_AND_BACKUPS',
+            params: { level: item.currentLevel, backupCount: item.backupCount },
+          } satisfies AssessmentExplanation,
+        }
+      : {
+          reason: `Current item is ${item.isPresent ? 'present' : 'absent'}; ${item.backupCount} backup(s) remain.`,
+          explanation: {
+            code: 'PRESENCE_CURRENT_AND_BACKUPS',
+            params: { present: item.isPresent, backupCount: item.backupCount },
+          } satisfies AssessmentExplanation,
+        };
+  const reason: { reason: string; explanation: AssessmentExplanation } =
     recommendedAction === 'OPEN_REFILL'
-      ? 'Open one available backup before buying.'
+      ? {
+          reason: 'Open one available backup before buying.',
+          explanation: { code: 'STATE_OPEN_BACKUP_BEFORE_BUY' },
+        }
       : recommendedAction === 'BUY_BACKUP'
-        ? `No backup remains${item.neverRunOut ? ' for this never-run-out item' : ''}; buy a refill.`
+        ? {
+            reason: `No backup remains${item.neverRunOut ? ' for this never-run-out item' : ''}; buy a refill.`,
+            explanation: {
+              code: 'STATE_BUY_REFILL_NO_BACKUP',
+              params: { neverRunOut: item.neverRunOut },
+            },
+          }
         : fiveLevel && !hasBackup && lowStockRisk === 'LOW'
-          ? `Current level reached the low threshold (${item.lowAtLevel}).`
-          : 'Current stock and backups do not require a purchase.';
+          ? {
+              reason: `Current level reached the low threshold (${item.lowAtLevel}).`,
+              explanation: {
+                code: 'FIVE_LEVEL_AT_LOW_THRESHOLD',
+                params: { lowAtLevel: item.lowAtLevel },
+              },
+            }
+          : {
+              reason: 'Current stock and backups do not require a purchase.',
+              explanation: { code: 'STATE_NO_PURCHASE_NEEDED' },
+            };
   return {
     itemId: item.id,
     neverRunOut: item.neverRunOut,
@@ -75,6 +107,7 @@ export function assessStateItem(item: StateAssessmentItem) {
     useTodayQuantity: null,
     expiryRisk: 'NONE' as const,
     expiryReason: null,
+    expiryExplanation: null,
     lowStockRisk,
     recommendedAction,
     purchasePriority:
@@ -83,12 +116,14 @@ export function assessStateItem(item: StateAssessmentItem) {
           ? 'MUST_BUY'
           : 'SHOULD_BUY'
         : null,
-    reasons: [state, reason],
+    reasons: [state.reason, reason.reason],
+    reasonExplanations: [state.explanation, reason.explanation],
     prediction: {
       enabled: false,
       basis: 'NOT_APPLICABLE',
       reason:
         'Quantity-based USE prediction does not apply to this tracking mode.',
+      explanation: { code: 'PREDICTION_NOT_APPLICABLE' },
       usedIn14Days: null,
       dailyRate: null,
       projectedNeed: null,

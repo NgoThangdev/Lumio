@@ -45,6 +45,13 @@ describe('quantity stock intelligence', () => {
     expect(result.useTodayQuantity).toBe('3');
     expect(result.useSoonQuantity).toBe('6');
     expect(result.expiredStock).toBe('4');
+    expect(result.expiryReason).toBe(
+      '6 egg expires by 2026-10-12; use eligible batches soon.',
+    );
+    expect(result.expiryExplanation).toEqual({
+      code: 'QUANTITY_USE_SOON',
+      params: { quantity: '6', unit: 'egg', throughDate: '2026-10-12' },
+    });
   });
   it('counts Finish opened as consumption and uses opening expiry for Use Soon', () => {
     const result = assessItem(
@@ -114,6 +121,26 @@ describe('quantity stock intelligence', () => {
     });
     expect(result.lowStockRisk).toBe('BUY');
     expect(result.suggestion?.quantity).toBe('17');
+    expect(result.reasons).toContain(
+      'Projected need through 2026-10-15 is 7.2 with a 20% buffer.',
+    );
+    expect(result.reasonExplanations).toContainEqual({
+      code: 'QUANTITY_PROJECTED_NEED',
+      params: {
+        shoppingDate: '2026-10-15',
+        projectedNeed: '7.2',
+        unit: 'egg',
+        bufferPercent: 20,
+      },
+    });
+    expect(result.prediction.explanation).toEqual({
+      code: 'PREDICTION_USE_14_DAY',
+      params: { windowDays: 14, bufferPercent: 20 },
+    });
+    expect(result.suggestion?.explanation).toEqual({
+      code: 'QUANTITY_BUY_TO_TARGET',
+      params: { quantity: '17', unit: 'egg', targetStock: '24' },
+    });
   });
 
   it('falls back to thresholds when USE history does not span seven days', () => {
@@ -138,6 +165,20 @@ describe('quantity stock intelligence', () => {
     expect(result.lowStockRisk).toBe('BUY');
     expect(result.suggestion?.quantity).toBe('19');
     expect(result.suggestion?.reason).toContain('target of 24');
+    expect(result.prediction.explanation).toEqual({
+      code: 'PREDICTION_INSUFFICIENT_HISTORY',
+      params: {
+        windowDays: 14,
+        minimumDistinctDays: 2,
+        requiredSpanDays: 7,
+      },
+    });
+    expect(result.reasonExplanations).toEqual([
+      {
+        code: 'QUANTITY_AT_OR_BELOW_BUY_THRESHOLD',
+        params: { buyThreshold: '6', unit: 'egg' },
+      },
+    ]);
   });
 
   it('keeps expiry risk separate from buy risk and distinguishes physical from eligible stock', () => {
@@ -209,6 +250,12 @@ describe('quantity stock intelligence', () => {
     );
     expect(result.lowStockRisk).toBe('LOW');
     expect(result.suggestion).toBeNull();
+    expect(result.reasonExplanations).toEqual([
+      {
+        code: 'QUANTITY_AT_OR_BELOW_LOW_THRESHOLD',
+        params: { lowStockThreshold: '5', unit: 'egg' },
+      },
+    ]);
   });
 
   it('suggests whole containers for opened tracking and retains ordinary fractional quantities', () => {
@@ -226,6 +273,10 @@ describe('quantity stock intelligence', () => {
       '2026-10-15',
     );
     expect(opened.suggestion?.quantity).toBe('1');
+    expect(opened.suggestion?.explanation).toEqual({
+      code: 'QUANTITY_BUY_TO_MEET_OR_EXCEED_TARGET',
+      params: { quantity: '1', unit: 'box', targetStock: '2' },
+    });
     expect(opened.suggestion?.reason).toContain(
       'Buy 1 box to meet or exceed the target of 2.',
     );
