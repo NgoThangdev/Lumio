@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: lumio-api-trial
+    runtime: node
+    plan: free
+    branch: main
+    region: singapore
+    autoDeployTrigger: off
+    buildCommand: npm ci && npm exec --workspace=apps/api -- prisma generate && npm run build -w @lumio/api
+    startCommand: npm run start:prod -w @lumio/api
+    healthCheckPath: /api/ready
+    envVars:
+      - key: NODE_VERSION
+        value: 24.18.0
+      - key: NOTIFICATION_AUTOMATION_ENABLED
+        value: "false"
+      - key: DATABASE_URL
+        sync: false
