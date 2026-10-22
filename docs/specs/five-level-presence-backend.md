@@ -1,5 +1,7 @@
 # Five-level and presence/backup backend slice
 
+This records the original backend state-model slice. Its deferred Shopping/UI notes are historical; use the current Inventory and Shopping API contracts and source for the complete implementation.
+
 ## State model
 
 `InventoryItem.trackingMode` is `QUANTITY`, `FIVE_LEVEL`, or `PRESENCE_BACKUP`. Existing rows default to `QUANTITY`; their batches, FEFO Use, quantity intelligence, and Shopping Trip restock remain the quantity path. Five-level and presence items use `currentLevel` or `isPresent`, plus an integer `backupCount`. They do not create fractional quantity batches. Database checks require nonnegative backups and a valid state shape for each mode.

@@ -1,0 +1,7 @@
+# Deployment context
+
+As reported by the project owner on 2026-10-22, Lumio is publicly deployed with **Cloudflare Pages** (web), **Render** (API), and **Neon** (PostgreSQL). This note is a platform handoff, not an independent live-health or migration verification. Confirm actual service URLs, build settings, environment variables, migration state, and notification automation with the deployment owner or platform before changing them.
+
+The obsolete `apps/web/vercel.json` was removed. `functions/api.js` and `functions/api/[[path]].js` provide the Cloudflare Pages `/api` proxy in source. `render.yaml` and that proxy still use the `lumio-api-trial` name/hostname; the name alone does not mean the Render service is unused. Verify the active service before renaming or deleting either file. `compose.yaml` and `.env.example` support **local development**, not Neon deployment. Keep credentials and connection strings out of Git and logs; inspect the target before any production migration. Local Docker/PostgreSQL behavior does not establish Neon schema status.
+
+The web calls same-origin `/api` and uses an HTTP-only session cookie. Any Cloudflare-to-Render proxy or routing rule must preserve the `/api` path, cookie behavior, and authenticated response privacy. Verify this in the deployed browser rather than assuming the local Vite proxy applies. The service worker must not cache authenticated API responses.
