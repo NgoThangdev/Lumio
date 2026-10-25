@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useLocation, useSearchParams } from 'react-router';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 import { useHousehold } from '../../app/useHousehold';
 import { api } from '../../shared/api/client';
 import { keys } from '../../shared/api/keys';
@@ -20,6 +20,7 @@ import {
   StockBadge,
 } from '../../shared/ui/primitives';
 import { Doodle } from '../../shared/ui/Doodle';
+import { ControlIcon } from '../../shared/ui/ControlIcon';
 import { AddItemForm, type QuickPurchaseSeed } from './AddItemForm';
 import { ArchivedItems } from './ArchivedItems';
 
@@ -105,7 +106,18 @@ function ItemRow({
 export function InventoryPage() {
   const household = useHousehold();
   const location = useLocation();
+  const navigate = useNavigate();
   const initialAddItemScrollHandled = useRef(false);
+  const addItemButton = useRef<HTMLAnchorElement>(null);
+  const closeAddItemButton = useRef<HTMLButtonElement>(null);
+  const addItemDialog = useRef<HTMLDivElement>(null);
+  const returnFocusTo = useRef<HTMLElement | null>(null);
+  const [mobileLayout, setMobileLayout] = useState(
+    () => window.matchMedia('(max-width: 700px)').matches,
+  );
+  const [addItemOpen, setAddItemOpen] = useState(false);
+  const modalVisible =
+    mobileLayout && (addItemOpen || location.hash === '#add-item');
   const routeState = location.state as {
     quickPurchaseDraft?: Partial<QuickPurchaseSeed>;
   } | null;
@@ -198,15 +210,69 @@ export function InventoryPage() {
     !locations.isPending &&
     !tags.isPending;
   useEffect(() => {
+    const media = window.matchMedia('(max-width: 700px)');
+    const update = () => setMobileLayout(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+  useEffect(() => {
     if (initialAddItemScrollHandled.current || !inventoryPageReady) return;
     initialAddItemScrollHandled.current = true;
     if (window.location.hash !== '#add-item') return;
+    if (mobileLayout) return;
     const target = document.getElementById('add-item');
     if (!target) return;
     window.requestAnimationFrame(() =>
       target.scrollIntoView({ behavior: 'smooth', block: 'start' }),
     );
-  }, [inventoryPageReady, location.hash]);
+  }, [inventoryPageReady, location.hash, mobileLayout]);
+  useEffect(() => {
+    if (!modalVisible) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const frame = window.requestAnimationFrame(() =>
+      closeAddItemButton.current?.focus(),
+    );
+    return () => {
+      window.cancelAnimationFrame(frame);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [modalVisible]);
+  const closeAddItem = () => {
+    setAddItemOpen(false);
+    if (location.hash === '#add-item') {
+      void navigate(
+        { pathname: location.pathname, search: location.search, hash: '' },
+        { replace: true, state: location.state },
+      );
+    }
+    window.requestAnimationFrame(() =>
+      (returnFocusTo.current ?? addItemButton.current)?.focus(),
+    );
+  };
+  const handleDialogKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeAddItem();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const focusable = Array.from(
+      addItemDialog.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), summary, [tabindex]:not([tabindex="-1"])',
+      ) ?? [],
+    ).filter((element) => element.getClientRects().length > 0);
+    const first = focusable[0];
+    const last = focusable.at(-1);
+    if (!first || !last) return;
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
   const base = `/households/${household.id}`;
   // These values are accepted by the queried Inventory endpoint, including OPENED.
   const quickFilters = [
@@ -240,6 +306,7 @@ export function InventoryPage() {
               }}
               placeholder={tr('inventory:searchItemsPrompt')}
             />
+            <ControlIcon name="search" className="inventory-search-icon" />
           </label>
           <div
             className="inventory-quick-filters"
@@ -355,32 +422,53 @@ export function InventoryPage() {
                 </select>
               </label>
             </div>
+            <section
+              className="inventory-filter-stock-check"
+              aria-labelledby="inventory-check-location-heading"
+            >
+              <h3 id="inventory-check-location-heading">
+                {tr('inventory:checkLocation')}
+              </h3>
+              <p className="muted">{tr('inventory:checkLocationHint')}</p>
+              {locations.data?.length ? (
+                <div className="location-check-links">
+                  {locations.data.map((entry) => (
+                    <Link
+                      className="secondary"
+                      key={entry.id}
+                      to={`${base}/locations/${entry.id}/check`}
+                    >
+                      {tr('common:check')} {entry.name}
+                    </Link>
+                  ))}
+                </div>
+              ) : locations.isPending ? (
+                <p className="muted" role="status">
+                  {tr('common:loadingLocations')}
+                </p>
+              ) : locations.isError ? (
+                <Notice kind="error">
+                  {tr('inventory:locationsStockChecks')}{' '}
+                  {localizedError(locations.error)}
+                </Notice>
+              ) : (
+                <p className="muted">{tr('inventory:noCheckLocations')}</p>
+              )}
+            </section>
           </details>
-          {locations.data?.length ? (
-            <details className="location-check-launch">
-              <summary>{tr('inventory:checkLocation')}</summary>
-              <div className="location-check-links">
-                {locations.data.map((entry) => (
-                  <Link
-                    className="secondary"
-                    key={entry.id}
-                    to={`${base}/locations/${entry.id}/check`}
-                  >
-                    {tr('common:check')} {entry.name}
-                  </Link>
-                ))}
-              </div>
-            </details>
-          ) : locations.isPending ? (
-            <p className="muted" role="status">
-              {tr('common:loadingLocations')}
-            </p>
-          ) : locations.isError ? (
-            <Notice kind="error">
-              {tr('inventory:locationsStockChecks')}{' '}
-              {localizedError(locations.error)}
-            </Notice>
-          ) : null}
+          <a
+            className="primary inventory-add-button"
+            href="#add-item"
+            ref={addItemButton}
+            onClick={(event) => {
+              if (!mobileLayout) return;
+              event.preventDefault();
+              returnFocusTo.current = event.currentTarget;
+              setAddItemOpen(true);
+            }}
+          >
+            <span aria-hidden="true">＋</span> {tr('inventory:addItem2')}
+          </a>
           {locationId && (
             <div className="inventory-active-location">
               <span>
@@ -424,9 +512,6 @@ export function InventoryPage() {
                   ? tr('inventory:tryDifferentSearch')
                   : tr('inventory:addItemStarting')}
               </p>
-              <a className="link" href="#add-item">
-                {tr('inventory:addItem')}
-              </a>
             </div>
           ) : groupBy === 'none' ? (
             <div className="inventory-ungrouped">
@@ -459,7 +544,14 @@ export function InventoryPage() {
                     )}
                   </span>
                   <span className="inventory-group-chevron" aria-hidden="true">
-                    ⌃
+                    <ControlIcon
+                      name="arrowdown"
+                      className="inventory-chevron-closed"
+                    />
+                    <ControlIcon
+                      name="arrowup"
+                      className="inventory-chevron-open"
+                    />
                   </span>
                 </summary>
                 {group.entries.map((entry) => {
@@ -486,14 +578,33 @@ export function InventoryPage() {
               </details>
             ))
           )}
-          <a className="primary inventory-add-button" href="#add-item">
-            <span aria-hidden="true">＋</span> {tr('inventory:addItem2')}
-          </a>
         </section>
-        <AddItemForm
-          household={household}
-          quickPurchaseSeed={quickPurchaseSeed}
-        />
+        <div
+          className={`inventory-add-panel${modalVisible ? ' is-open' : ''}`}
+          role={mobileLayout ? 'dialog' : undefined}
+          aria-modal={modalVisible ? true : undefined}
+          aria-labelledby={mobileLayout ? 'add-item-heading' : undefined}
+          inert={mobileLayout && !modalVisible}
+          ref={addItemDialog}
+          onKeyDown={modalVisible ? handleDialogKeyDown : undefined}
+        >
+          <div className="inventory-add-dialog-content">
+            <div className="inventory-add-dialog-bar">
+              <button
+                className="secondary"
+                type="button"
+                ref={closeAddItemButton}
+                onClick={closeAddItem}
+              >
+                {tr('inventory:closeAddItem')}
+              </button>
+            </div>
+            <AddItemForm
+              household={household}
+              quickPurchaseSeed={quickPurchaseSeed}
+            />
+          </div>
+        </div>
       </div>
       {household.role === 'ADMIN' && (
         <ArchivedItems householdId={household.id} />

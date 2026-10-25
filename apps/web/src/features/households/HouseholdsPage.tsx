@@ -23,7 +23,7 @@ export function HouseholdsPage() {
     onSuccess: async (entry) => {
       await queryClient.invalidateQueries({ queryKey: keys.households });
       setName('');
-      void navigate(`/households/${entry.id}/inventory`);
+      void navigate(`/households/${entry.id}/home`);
     },
   });
   return (
@@ -47,7 +47,7 @@ export function HouseholdsPage() {
             <button
               className="row"
               key={entry.id}
-              onClick={() => navigate(`/households/${entry.id}/inventory`)}
+              onClick={() => navigate(`/households/${entry.id}/home`)}
             >
               <Doodle kind="household" className="household-row-doodle" />
               <span className="item-identity">

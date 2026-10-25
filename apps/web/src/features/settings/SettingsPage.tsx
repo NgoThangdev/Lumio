@@ -10,6 +10,7 @@ import {
 import { keys } from '../../shared/api/keys';
 import type { NotificationPreferences, User } from '../../shared/api/types';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
+import { ControlIcon } from '../../shared/ui/ControlIcon';
 import {
   applyAppearance,
   readAppearanceChoice,
@@ -73,9 +74,17 @@ function permissionState() {
   return supportedPush() ? Notification.permission : 'unsupported';
 }
 
-export function SettingsPage({ user }: { user: User }) {
+export function SettingsPage({
+  user,
+  onSignOut,
+}: {
+  user: User;
+  onSignOut: () => Promise<void>;
+}) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [signOutBusy, setSignOutBusy] = useState(false);
+  const [signOutError, setSignOutError] = useState('');
   const [appearance, setAppearance] = useState(readAppearanceChoice);
   const [systemDark, setSystemDark] = useState(
     () => window.matchMedia('(prefers-color-scheme: dark)').matches,
@@ -524,6 +533,18 @@ export function SettingsPage({ user }: { user: User }) {
     }
   }
 
+  async function signOut() {
+    setSignOutError('');
+    setSignOutBusy(true);
+    try {
+      await onSignOut();
+    } catch (error) {
+      setSignOutError(localizedError(error));
+    } finally {
+      setSignOutBusy(false);
+    }
+  }
+
   return (
     <section className="settings-page narrow">
       <div className="settings-heading">
@@ -845,6 +866,19 @@ export function SettingsPage({ user }: { user: User }) {
           <Notice kind={pushMessage.kind}>{pushMessage.text}</Notice>
         )}
         <p className="muted">{tr('notifications:permissionRequestedOnly')}</p>
+      </Card>
+      <Card className="settings-signout">
+        <h2>{tr('common:account')}</h2>
+        {signOutError && <Notice kind="error">{signOutError}</Notice>}
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={signOutBusy}
+          onClick={() => void signOut()}
+        >
+          <ControlIcon name="logout" />
+          {signOutBusy ? tr('common:updating') : tr('common:signOut')}
+        </Button>
       </Card>
     </section>
   );

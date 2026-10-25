@@ -216,7 +216,7 @@ export function AddItemForm({
   return (
     <Card className="create-card" id="add-item">
       <p className="eyebrow">{tr('inventory:makeLittleRoom')}</p>
-      <h2>{tr('inventory:addSomethingHome')}</h2>
+      <h2 id="add-item-heading">{tr('inventory:addSomethingHome')}</h2>
       <p className="muted">{tr('inventory:choosePlaceStarting')}</p>
       {create.isError && (
         <Notice kind="error">

@@ -12,6 +12,7 @@ import type {
   User,
 } from '../../shared/api/types';
 import { Doodle } from '../../shared/ui/Doodle';
+import { ControlIcon } from '../../shared/ui/ControlIcon';
 import {
   ExplanationText,
   hasExplanationTranslation,
@@ -202,8 +203,13 @@ export function HomePage() {
           onChange={(event) => setSearch(event.target.value)}
           placeholder={tr('home:searchItemPrompt')}
         />
-        <button type="submit" aria-label={tr('home:searchInventory')}>
-          {tr('common:search')}
+        <button
+          className="home-search-submit"
+          type="submit"
+          aria-label={tr('home:searchInventory')}
+          title={tr('home:searchInventory')}
+        >
+          <ControlIcon name="search" />
         </button>
       </form>
 

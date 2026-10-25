@@ -32,6 +32,7 @@ import { api, ApiError } from '../shared/api/client';
 import { keys } from '../shared/api/keys';
 import type { Household, User } from '../shared/api/types';
 import { Brand, Doodle } from '../shared/ui/Doodle';
+import { ControlIcon } from '../shared/ui/ControlIcon';
 import { Button, Notice } from '../shared/ui/primitives';
 import { localizedError, tr } from '../shared/i18n';
 import { useTranslation } from 'react-i18next';
@@ -46,6 +47,7 @@ function setSession(queryClient: QueryClient, user: User | null) {
 
 function SessionRoutes() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const location = useLocation();
   const session = useQuery({
     queryKey: keys.session,
@@ -106,7 +108,19 @@ function SessionRoutes() {
       <Route path="/invite/:secret" element={<InvitationPage user={user} />} />
       <Route element={user ? <SignedInShell user={user} /> : <RequireSignIn />}>
         <Route path="/attention" element={<AttentionPage user={user!} />} />
-        <Route path="/settings" element={<SettingsPage user={user!} />} />
+        <Route
+          path="/settings"
+          element={
+            <SettingsPage
+              user={user!}
+              onSignOut={async () => {
+                await api('/auth/sign-out', 'POST');
+                setSession(queryClient, null);
+                void navigate('/sign-in', { replace: true });
+              }}
+            />
+          }
+        />
         <Route path="/households" element={<HouseholdsPage />} />
         <Route path="/households/:householdId" element={<HouseholdBoundary />}>
           <Route index element={<Navigate to="home" replace />} />
@@ -149,34 +163,24 @@ function RequireSignIn() {
 }
 
 function SignedInShell({ user }: { user: User }) {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const { pathname, search } = useLocation();
+  const { pathname, search, hash } = useLocation();
+  const [compactHeader, setCompactHeader] = useState(() => window.scrollY > 24);
+  useEffect(() => {
+    if (!hash) window.scrollTo(0, 0);
+  }, [pathname, hash]);
+  useEffect(() => {
+    const onScroll = () => setCompactHeader(window.scrollY > 24);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
   const householdId =
     pathname.match(/^\/households\/([^/]+)(?:\/|$)/)?.[1] ??
     (pathname === '/settings'
       ? new URLSearchParams(search).get('householdId')
       : null);
-  const [signOutError, setSignOutError] = useState('');
-  const [signingOut, setSigningOut] = useState(false);
-  const signOut = async () => {
-    setSignOutError('');
-    setSigningOut(true);
-    try {
-      await api('/auth/sign-out', 'POST');
-      setSession(queryClient, null);
-      void navigate('/sign-in', { replace: true });
-    } catch (cause) {
-      setSignOutError(
-        cause instanceof Error ? cause.message : 'Sign out failed.',
-      );
-    } finally {
-      setSigningOut(false);
-    }
-  };
   return (
     <div className="shell">
-      <header className="topbar">
+      <header className={`topbar${compactHeader ? ' is-compact' : ''}`}>
         <Link
           className="brand"
           to="/households"
@@ -188,26 +192,20 @@ function SignedInShell({ user }: { user: User }) {
         <div className="top-actions">
           <small>{user.email}</small>
           <Link
-            className="link"
+            className="settings-icon-link"
             to={
               householdId
                 ? `/settings?householdId=${encodeURIComponent(householdId)}`
                 : '/settings'
             }
+            aria-label={tr('common:settings')}
+            title={tr('common:settings')}
           >
-            {tr('common:settings')}
+            <ControlIcon name="setting" />
           </Link>
-          <Button
-            variant="link"
-            disabled={signingOut}
-            onClick={() => void signOut()}
-          >
-            {tr('common:signOut')}
-          </Button>
         </div>
       </header>
       <main className="content">
-        {signOutError && <Notice kind="error">{signOutError}</Notice>}
         <Outlet />
       </main>
     </div>
@@ -282,8 +280,13 @@ function HouseholdWorkspace({ household }: { household: Household }) {
               {tr('common:allItems')}
             </Link>
           ) : household.role === 'ADMIN' && !members ? (
-            <Link className="secondary" to={`${base}/members`}>
-              {tr('common:membersInvites')}
+            <Link
+              className="secondary members-link"
+              to={`${base}/members`}
+              aria-label={tr('common:membersInvites')}
+              title={tr('common:membersInvites')}
+            >
+              <ControlIcon name="adduser" />
             </Link>
           ) : (
             <Doodle
@@ -302,7 +305,7 @@ function HouseholdWorkspace({ household }: { household: Household }) {
           aria-current={home ? 'page' : undefined}
           to={`${base}/home`}
         >
-          <Doodle kind="home" />
+          <ControlIcon name="homeicon" />
           <span>{tr('common:home')}</span>
         </Link>
         <Link
@@ -310,7 +313,7 @@ function HouseholdWorkspace({ household }: { household: Household }) {
           aria-current={!home && !shopping && !members ? 'page' : undefined}
           to={`${base}/inventory`}
         >
-          <Doodle kind="inventory" />
+          <ControlIcon name="clipboard" />
           <span>{tr('common:inventory')}</span>
         </Link>
         <Link
@@ -318,11 +321,11 @@ function HouseholdWorkspace({ household }: { household: Household }) {
           aria-current={shopping ? 'page' : undefined}
           to={`${base}/shopping`}
         >
-          <Doodle kind="basket" />
+          <ControlIcon name="shoppingcart" />
           <span>{tr('common:shopping2')}</span>
         </Link>
         <Link to="/households">
-          <Doodle kind="household" />
+          <ControlIcon name="warehouse" />
           <span>{tr('common:households')}</span>
         </Link>
       </nav>

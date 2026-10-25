@@ -132,6 +132,22 @@ export type ItemStockCheck = {
   checkedAt: string | null;
   history: StockCheckEvent[];
 };
+export type LocationStockSnapshot = {
+  quantity?: string;
+  currentLevel?: StockLevel | null;
+  isPresent?: boolean | null;
+  backupCount?: number;
+};
+export type ItemLocationStockCheck = {
+  locationId: string;
+  history: {
+    decision: 'CONFIRM' | 'CORRECT';
+    userId: string;
+    checkedAt: string;
+    before: LocationStockSnapshot;
+    after: LocationStockSnapshot;
+  }[];
+};
 export type Item = {
   id: string;
   name: string;
@@ -151,8 +167,10 @@ export type Item = {
   trackingMode: TrackingMode;
   preferredRestockLocationId?: string | null;
   preferredRestockLocation?: { id: string; name: string } | null;
-  currentLocation?: { name: string } | null;
-  backupLocation?: { name: string } | null;
+  currentLocationId?: string | null;
+  backupLocationId?: string | null;
+  currentLocation?: { id: string; name: string } | null;
+  backupLocation?: { id: string; name: string } | null;
   currentLevel: StockLevel | null;
   isPresent: boolean | null;
   backupCount: number;
@@ -163,6 +181,7 @@ export type Item = {
   batches: Batch[];
   actions?: Action[];
   stockChecks?: ItemStockCheck[];
+  locationStockChecks?: ItemLocationStockCheck[];
   stateActions?: {
     id: string;
     type:

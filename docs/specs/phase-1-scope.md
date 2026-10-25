@@ -20,6 +20,7 @@
 - Allow inventory grouping by location or category, preferably defaulting to location.
 - Provide an item detail view with stock health, total stock, contextual actions, opened stock and batch breakdown, locations and tags, recent history, and stock rules disclosed as needed.
 - Provide fast, tracking-mode-appropriate actions such as Use, Open, Finish, Update level, and Restock. Support immediate Undo for recent quick actions where feasible. When an opened container is empty and backup exists, allow opening the next refill and updating backup stock.
+- Let a household member correct wrongly entered current stock from Item Detail, including after Add Item, for quantity, five-level, and presence/backup items. Keep the original action and record an attributable before/after correction instead of representing it as Use or Restock. Request location or batch detail only when needed for an unambiguous correction.
 - Support a quick physical stock check by location, prioritizing items with uncertain stock data.
 - Record meaningful inventory and shopping activity with household, user, item where applicable, time, action, and relevant quantity changes. Use the history for recent activity and consumption calculations.
 

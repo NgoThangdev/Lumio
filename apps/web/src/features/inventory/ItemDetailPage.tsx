@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useLocation, useParams } from 'react-router';
+import { Link, useLocation, useParams } from 'react-router';
 import { useHousehold } from '../../app/useHousehold';
 import { ApiError, api } from '../../shared/api/client';
 import { keys } from '../../shared/api/keys';
@@ -10,10 +10,12 @@ import type {
   Config,
   Intelligence,
   Item,
+  LocationStockSnapshot,
   StockLevel,
   UndoCandidate,
   UndoEligibility,
   UndoResult,
+  User,
 } from '../../shared/api/types';
 import {
   Button,
@@ -36,6 +38,25 @@ import {
 } from '../../shared/i18n';
 const asDate = (value: string | null) =>
   value ? formatDateOnly(value) : tr('common:expiry2');
+
+function observedStock(snapshot: LocationStockSnapshot, unit: string) {
+  const parts: string[] = [];
+  if (snapshot.quantity !== undefined)
+    parts.push(`${formatNumber(snapshot.quantity)} ${unit}`);
+  if (Object.hasOwn(snapshot, 'currentLevel'))
+    parts.push(
+      `${tr('common:currentLevel')}: ${snapshot.currentLevel ? localizedEnum(snapshot.currentLevel) : tr('location-check:recorded')}`,
+    );
+  if (Object.hasOwn(snapshot, 'isPresent'))
+    parts.push(
+      `${tr('common:currentItem')}: ${snapshot.isPresent === null ? tr('location-check:recorded') : tr(snapshot.isPresent ? 'common:present' : 'common:absent')}`,
+    );
+  if (snapshot.backupCount !== undefined)
+    parts.push(
+      `${tr('common:backups2')}: ${formatNumber(snapshot.backupCount)}`,
+    );
+  return parts.join(' · ');
+}
 
 export function ItemDetailPage() {
   const household = useHousehold();
@@ -139,6 +160,62 @@ export function ItemDetailPage() {
     },
   });
   const item = itemQuery.data;
+  const locationName = (
+    locationId: string,
+    relation?: { name: string } | null,
+  ) =>
+    relation?.name ??
+    locations.data?.find((place) => place.id === locationId)?.name ??
+    locationId;
+  const correctionLocations = new Map<string, { name: string; part: string }>();
+  if (item?.trackingMode === 'QUANTITY') {
+    for (const batch of item.batches) {
+      if (batch.locationId)
+        correctionLocations.set(batch.locationId, {
+          name: locationName(batch.locationId, batch.location),
+          part: tr('item-detail:quantityAtLocation'),
+        });
+    }
+    if (
+      item.preferredRestockLocationId &&
+      !correctionLocations.has(item.preferredRestockLocationId)
+    )
+      correctionLocations.set(item.preferredRestockLocationId, {
+        name: locationName(
+          item.preferredRestockLocationId,
+          item.preferredRestockLocation,
+        ),
+        part: tr('item-detail:quantityAtLocation'),
+      });
+  } else if (item) {
+    if (item.currentLocationId)
+      correctionLocations.set(item.currentLocationId, {
+        name: locationName(item.currentLocationId, item.currentLocation),
+        part: tr('item-detail:currentPart'),
+      });
+    if (item.backupLocationId) {
+      const current = correctionLocations.get(item.backupLocationId);
+      correctionLocations.set(item.backupLocationId, {
+        name: locationName(item.backupLocationId, item.backupLocation),
+        part: current
+          ? tr('item-detail:currentAndBackups')
+          : tr('item-detail:backupsPart'),
+      });
+    }
+  }
+  const correctionChoices = [...correctionLocations].map(
+    ([locationId, value]) => ({
+      locationId,
+      ...value,
+      to: `/households/${household.id}/locations/${locationId}/check?itemId=${encodeURIComponent(itemId)}&correct=1`,
+    }),
+  );
+  const hasUnlocatedQuantity =
+    item?.trackingMode === 'QUANTITY' &&
+    item.batches.some((batch) => !batch.locationId);
+  const hasMissingStateLocation =
+    item?.trackingMode !== 'QUANTITY' &&
+    (!item?.currentLocationId || !item?.backupLocationId);
   const restockLocationId =
     restockLocation ?? item?.preferredRestockLocation?.id ?? '';
   const assessment = intelligence.data?.assessments.find(
@@ -158,6 +235,18 @@ export function ItemDetailPage() {
     .sort(
       (left, right) => Date.parse(right.checkedAt) - Date.parse(left.checkedAt),
     );
+  const locationCheckEvents = (item?.locationStockChecks ?? [])
+    .flatMap((check) =>
+      check.history.map((event, index) => ({
+        ...event,
+        locationId: check.locationId,
+        index,
+      })),
+    )
+    .sort(
+      (left, right) => Date.parse(right.checkedAt) - Date.parse(left.checkedAt),
+    );
+  const signedInUser = queryClient.getQueryData<User>(keys.session);
   const busy =
     restockAction.isPending || useAction.isPending || undoAction.isPending;
   const needsRestockLocation =
@@ -297,6 +386,48 @@ export function ItemDetailPage() {
                 </p>
               )}
             </section>
+          )}
+          {!item.archivedAt && (
+            <Card className="stock-correction-entry">
+              <h2>{tr('item-detail:correctStock')}</h2>
+              <p className="muted">{tr('item-detail:correctObservedNow')}</p>
+              {correctionChoices.length === 1 &&
+              !hasUnlocatedQuantity &&
+              !hasMissingStateLocation ? (
+                <Link className="secondary" to={correctionChoices[0].to}>
+                  {tr('item-detail:correctStock')}
+                </Link>
+              ) : correctionChoices.length > 0 ? (
+                <>
+                  <p>{tr('item-detail:chooseObservedLocation')}</p>
+                  <div className="stock-correction-choices">
+                    {correctionChoices.map((choice) => (
+                      <Link
+                        className="secondary"
+                        key={choice.locationId}
+                        to={choice.to}
+                      >
+                        {choice.part}: {choice.name}
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <Notice kind="error">
+                  {tr('item-detail:correctionLocationUnavailable')}
+                </Notice>
+              )}
+              {hasUnlocatedQuantity && (
+                <Notice kind="error">
+                  {tr('item-detail:unlocatedStockWarning')}
+                </Notice>
+              )}
+              {hasMissingStateLocation && (
+                <Notice kind="error">
+                  {tr('item-detail:missingStatePlacement')}
+                </Notice>
+              )}
+            </Card>
           )}
           {!item.archivedAt && intelligence.isPending && (
             <Card className="assessment-loading">
@@ -785,6 +916,49 @@ export function ItemDetailPage() {
                           : tr('item-detail:stockCorrected')}
                       </strong>
                       <small>{formatDate(event.checkedAt)}</small>
+                    </span>
+                  </div>
+                ))
+              )}
+            </Card>
+            <Card>
+              <h2>
+                {tr('item-detail:locationCorrectionHistory')}{' '}
+                <span className="count">{locationCheckEvents.length}</span>
+              </h2>
+              {!locationCheckEvents.length ? (
+                <p className="muted">
+                  {tr('item-detail:noLocationCorrections')}
+                </p>
+              ) : (
+                locationCheckEvents.map((event) => (
+                  <div
+                    className="row static"
+                    key={`${event.locationId}-${event.index}`}
+                  >
+                    <span>
+                      <strong>
+                        {event.decision === 'CORRECT'
+                          ? tr('item-detail:stockCorrected')
+                          : tr('item-detail:stockConfirmed')}
+                      </strong>
+                      <small>
+                        {locations.data?.find(
+                          (place) => place.id === event.locationId,
+                        )?.name ?? event.locationId}
+                        {' · '}
+                        {formatDate(event.checkedAt)}
+                        {' · '}
+                        {event.userId === signedInUser?.id
+                          ? tr('common:you')
+                          : tr('item-detail:householdMember')}
+                      </small>
+                      {event.decision === 'CORRECT' && (
+                        <small>
+                          {observedStock(event.before, item.primaryUnit)} →{' '}
+                          {observedStock(event.after, item.primaryUnit)}
+                        </small>
+                      )}
                     </span>
                   </div>
                 ))

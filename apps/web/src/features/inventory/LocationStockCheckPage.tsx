@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link, useParams } from 'react-router';
+import { Link, useParams, useSearchParams } from 'react-router';
 import { useHousehold } from '../../app/useHousehold';
 import { ApiError, api } from '../../shared/api/client';
 import { keys } from '../../shared/api/keys';
@@ -19,6 +19,7 @@ import {
   localizedError,
   localizedEnum,
 } from '../../shared/i18n';
+import type { TranslationKey } from '../../shared/i18n';
 const levels: StockLevel[] = [
   'FULL',
   'THREE_QUARTERS',
@@ -38,9 +39,49 @@ function showReason(reason: LocationCheckItem['reason']) {
   return labels[reason];
 }
 
+const correctionErrors: Record<string, TranslationKey> = {
+  INVALID_EXPECTED_REVISION: 'location-check:invalidRevision',
+  INVALID_CHECK_DECISION: 'location-check:invalidDecision',
+  INVALID_QUANTITY: 'location-check:invalidQuantity',
+  INVALID_BATCH_COUNTS: 'location-check:invalidBatchCounts',
+  INVALID_BATCH_COUNT: 'location-check:invalidBatchCount',
+  BATCH_TOTAL_MISMATCH: 'location-check:batchTotalMismatch',
+  INVALID_EXTRA_QUANTITY: 'location-check:invalidExtraQuantity',
+  INVALID_EXPIRY_DATE: 'location-check:invalidExtraExpiry',
+  INVALID_PACKAGE_COUNT: 'location-check:invalidPackageCount',
+  INVALID_LEVEL: 'location-check:invalidLevel',
+  INVALID_PRESENCE: 'location-check:invalidPresence',
+  INVALID_BACKUP_COUNT: 'location-check:invalidBackupCount',
+  FIELD_NOT_AT_LOCATION: 'location-check:fieldNotAtLocation',
+  OBSERVATION_REQUIRED: 'location-check:invalidObservation',
+  CHECK_ITEM_NOT_FOUND: 'location-check:itemNotAtLocation',
+  ITEM_ARCHIVED: 'location-check:itemArchived',
+};
+
+function correctionError(cause: unknown) {
+  const code = cause instanceof ApiError ? cause.code : null;
+  return code && correctionErrors[code]
+    ? tr(correctionErrors[code])
+    : localizedError(cause);
+}
+
 export function LocationStockCheckPage() {
   const household = useHousehold();
   const { locationId = '' } = useParams();
+  const [searchParams] = useSearchParams();
+  const targetItemId =
+    searchParams.get('correct') === '1' ? searchParams.get('itemId') : null;
+  const focusedItem = useRef<string | null>(null);
+  const [autoOpenItem, setAutoOpenItem] = useState(targetItemId);
+  const [conflictItemId, setConflictItemId] = useState<string | null>(null);
+  const [savedNotice, setSavedNotice] = useState<{
+    itemId: string;
+    revision: number;
+    text: string;
+  } | null>(null);
+  const [refreshWarningItemId, setRefreshWarningItemId] = useState<
+    string | null
+  >(null);
   const queryClient = useQueryClient();
   const queryKey = keys.locationStockCheck(household.id, locationId);
   const check = useQuery({
@@ -51,6 +92,17 @@ export function LocationStockCheckPage() {
       ),
     enabled: Boolean(locationId),
   });
+  useEffect(() => {
+    if (!check.data || !targetItemId || focusedItem.current === targetItemId)
+      return;
+    const target = document.getElementById(
+      `location-correction-${targetItemId}`,
+    );
+    if (!target) return;
+    target.scrollIntoView({ block: 'center' });
+    target.focus({ preventScroll: true });
+    focusedItem.current = targetItemId;
+  }, [check.data, targetItemId]);
 
   if (check.isPending)
     return (
@@ -82,22 +134,27 @@ export function LocationStockCheckPage() {
         {tr('location-check:locationChecklistUnavailable')}
       </Notice>
     );
+  const visibleItems = targetItemId
+    ? check.data.items.filter((item) => item.itemId === targetItemId)
+    : check.data.items;
 
   return (
     <section className="location-stock-check-page">
       <div className="location-check-heading">
         <div>
           <h1>{check.data.location.name}</h1>
-          <p className="location-check-progress" role="status">
-            {
-              check.data.items.filter(
-                (item) =>
-                  item.status === 'CONFIRM' || item.status === 'CORRECT',
-              ).length
-            }{' '}
-            {tr('common:of')} {formatNumber(check.data.items.length)}{' '}
-            {tr('location-check:checked')}
-          </p>
+          {!targetItemId && (
+            <p className="location-check-progress" role="status">
+              {
+                check.data.items.filter(
+                  (item) =>
+                    item.status === 'CONFIRM' || item.status === 'CORRECT',
+                ).length
+              }{' '}
+              {tr('common:of')} {formatNumber(check.data.items.length)}{' '}
+              {tr('location-check:checked')}
+            </p>
+          )}
         </div>
         <Link
           className="secondary"
@@ -105,8 +162,16 @@ export function LocationStockCheckPage() {
         >
           {tr('location-check:inventory2')}
         </Link>
+        {targetItemId && (
+          <Link
+            className="secondary"
+            to={`/households/${household.id}/inventory/${targetItemId}`}
+          >
+            {tr('location-check:backToItem')}
+          </Link>
+        )}
       </div>
-      {check.data.items.length === 0 ? (
+      {!targetItemId && check.data.items.length === 0 ? (
         <Card className="empty">
           <h3>{tr('location-check:itemsAssignedLocation')}</h3>
           <p className="muted">
@@ -115,30 +180,67 @@ export function LocationStockCheckPage() {
         </Card>
       ) : (
         <div className="location-check-list">
-          {check.data.items.map((item) => (
-            <LocationCheckCard
-              key={`${item.itemId}-${item.stockRevision}`}
-              item={item}
-              householdId={household.id}
-              locationId={locationId}
-              refresh={async (savedItem) => {
-                queryClient.setQueryData<LocationStockCheck>(
-                  queryKey,
-                  (current) =>
-                    current && {
-                      ...current,
-                      items: current.items.map((entry) =>
-                        entry.itemId === savedItem.itemId ? savedItem : entry,
-                      ),
+          {targetItemId && visibleItems.length === 0 && (
+            <Notice kind="error">
+              {tr('location-check:itemNotAtLocation')}
+            </Notice>
+          )}
+          {visibleItems.map((item) => (
+            <div key={item.itemId}>
+              {conflictItemId === item.itemId && (
+                <Notice kind="error">
+                  {tr('location-check:stockChangedReviewAgain')}
+                </Notice>
+              )}
+              {savedNotice?.itemId === item.itemId &&
+                savedNotice.revision === item.stockRevision &&
+                item.status !== 'STALE' && (
+                  <Notice kind="success">{savedNotice.text}</Notice>
+                )}
+              {refreshWarningItemId === item.itemId && (
+                <Notice kind="error">
+                  {tr('location-check:savedRefreshFailed')}
+                </Notice>
+              )}
+              <LocationCheckCard
+                key={`${item.stockRevision}-${item.status}`}
+                item={item}
+                householdId={household.id}
+                locationId={locationId}
+                initiallyCorrecting={autoOpenItem === item.itemId}
+                onDecisionStart={() => {
+                  setSavedNotice(null);
+                  setRefreshWarningItemId(null);
+                }}
+                onSaved={(text, revision) => {
+                  setAutoOpenItem(null);
+                  setConflictItemId(null);
+                  setSavedNotice({ itemId: item.itemId, revision, text });
+                }}
+                onConflict={() => setConflictItemId(item.itemId)}
+                onRefreshWarning={() => setRefreshWarningItemId(item.itemId)}
+                refresh={async (savedItem) => {
+                  queryClient.setQueryData<LocationStockCheck>(
+                    queryKey,
+                    (current) =>
+                      current && {
+                        ...current,
+                        items: current.items.map((entry) =>
+                          entry.itemId === savedItem.itemId ? savedItem : entry,
+                        ),
+                      },
+                  );
+                  await queryClient.invalidateQueries(
+                    {
+                      queryKey: keys.household(household.id),
+                      refetchType: 'all',
                     },
-                );
-                await queryClient.invalidateQueries({
-                  queryKey: keys.household(household.id),
-                  refetchType: 'all',
-                });
-              }}
-              refetch={check.refetch}
-            />
+                    { throwOnError: true },
+                  );
+                }}
+                refetch={check.refetch}
+              />
+            </div>
           ))}
         </div>
       )}
@@ -150,16 +252,26 @@ function LocationCheckCard({
   item,
   householdId,
   locationId,
+  initiallyCorrecting,
+  onDecisionStart,
+  onSaved,
+  onConflict,
+  onRefreshWarning,
   refresh,
   refetch,
 }: {
   item: LocationCheckItem;
   householdId: string;
   locationId: string;
+  initiallyCorrecting: boolean;
+  onDecisionStart: () => void;
+  onSaved: (text: string, revision: number) => void;
+  onConflict: () => void;
+  onRefreshWarning: () => void;
   refresh: (item: LocationCheckItem) => Promise<void>;
   refetch: () => Promise<{ data: LocationStockCheck | undefined }>;
 }) {
-  const [correcting, setCorrecting] = useState(false);
+  const [correcting, setCorrecting] = useState(initiallyCorrecting);
   const [batchEditing, setBatchEditing] = useState(false);
   const [quantity, setQuantity] = useState(item.stock.quantity ?? '');
   const [batchCounts, setBatchCounts] = useState<Record<string, string>>({});
@@ -176,7 +288,6 @@ function LocationCheckCard({
         : '',
   );
   const [backups, setBackups] = useState(String(item.stock.backupCount ?? 0));
-  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [freshDecisionRequired, setFreshDecisionRequired] = useState(false);
   const [batchDataUnavailable, setBatchDataUnavailable] = useState(false);
@@ -191,7 +302,7 @@ function LocationCheckCard({
 
   const run = async (body: Record<string, unknown>, successText: string) => {
     setError('');
-    setMessage('');
+    onDecisionStart();
     setFreshDecisionRequired(false);
     setBatchDataUnavailable(false);
     try {
@@ -199,10 +310,14 @@ function LocationCheckCard({
         expectedRevision: item.stockRevision,
         ...body,
       });
-      await refresh(result.item);
+      onSaved(successText, result.item.stockRevision);
       setCorrecting(false);
       setBatchEditing(false);
-      setMessage(successText);
+      try {
+        await refresh(result.item);
+      } catch {
+        onRefreshWarning();
+      }
     } catch (cause) {
       const code = cause instanceof ApiError ? cause.code : null;
       if (code === 'BATCH_DETAIL_REQUIRED') {
@@ -229,11 +344,12 @@ function LocationCheckCard({
       } else if (code === 'STOCK_CHANGED') {
         setFreshDecisionRequired(true);
         setError(tr('location-check:stockChangedReviewAgain'));
+        onConflict();
         await refetch();
       } else {
         setError(
           cause instanceof Error
-            ? localizedError(cause)
+            ? correctionError(cause)
             : tr('location-check:locationCheckSaveFailed'),
         );
       }
@@ -246,7 +362,11 @@ function LocationCheckCard({
   );
 
   return (
-    <Card className={`location-check-item status-${item.status.toLowerCase()}`}>
+    <Card
+      id={`location-correction-${item.itemId}`}
+      tabIndex={-1}
+      className={`location-check-item status-${item.status.toLowerCase()}`}
+    >
       <div className="location-check-item-heading">
         <div>
           <p className="eyebrow">{localizedEnum(item.trackingMode)}</p>
@@ -259,6 +379,9 @@ function LocationCheckCard({
         </span>
       </div>
       <p className="location-check-reason">{showReason(item.reason)}</p>
+      {initiallyCorrecting && (
+        <p className="muted">{tr('location-check:correctObservedNow')}</p>
+      )}
       {item.trackingMode === 'QUANTITY' ? (
         <div className="location-check-stock">
           <strong>{formatNumber(item.stock.quantity ?? '—')}</strong>{' '}
@@ -273,7 +396,7 @@ function LocationCheckCard({
                       ? tr('location-check:opened5', {
                           date: formatDateOnly(batch.openedAt),
                         })
-                      : 'unopened'}
+                      : tr('common:unopened')}
                   </span>
                   <small>
                     {batch.expiryDate
@@ -338,7 +461,6 @@ function LocationCheckCard({
             : ''}
         </p>
       )}
-      {message && <Notice kind="success">{message}</Notice>}
       {error && <Notice kind="error">{error}</Notice>}
       {(freshDecisionRequired || item.status === 'STALE') && (
         <p className="muted" role="status">
@@ -369,7 +491,6 @@ function LocationCheckCard({
           disabled={mutation.isPending}
           onClick={() => {
             setError('');
-            setMessage('');
             setBatchEditing(false);
             setCorrecting((current) => !current);
           }}
@@ -451,7 +572,9 @@ function LocationCheckCard({
                         : tr('common:unopened')}{' '}
                       ·{' '}
                       {batch.expiryDate
-                        ? `expires ${batch.expiryDate}`
+                        ? tr('location-check:expiresOn', {
+                            date: formatDateOnly(batch.expiryDate),
+                          })
                         : tr('common:expiry2')}
                       <input
                         type="number"

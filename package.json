@@ -7,5 +7,10 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "scripts": {
+    "local:api": ".local\\lumio.cmd api",
+    "local:web": ".local\\lumio.cmd web",
+    "local:funnel": ".local\\lumio.cmd funnel"
+  }
 }
