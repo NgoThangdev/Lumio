@@ -8,8 +8,9 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "oxlint --type-aware --react-plugin src/",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"public/*.{js,json,webmanifest}\" index.html",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"public/*.{js,json,webmanifest}\" index.html"
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"src/shared/i18n/locales/{en,vi}/*.json\" \"scripts/**/*.mjs\" \"public/*.{js,json,webmanifest}\" index.html vite.config.ts",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"src/shared/i18n/locales/{en,vi}/*.json\" \"scripts/**/*.mjs\" \"public/*.{js,json,webmanifest}\" index.html vite.config.ts",
+    "i18n:check": "node scripts/check-locales.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.104.1",

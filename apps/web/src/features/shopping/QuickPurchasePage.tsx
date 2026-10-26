@@ -1,7 +1,7 @@
 ﻿import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useHousehold } from '../../app/useHousehold';
+import { useHousehold } from '@/shared/household/HouseholdContext';
 import {
   ApiError,
   api,
@@ -122,7 +122,7 @@ export function QuickPurchasePage() {
       ),
       queryClient.invalidateQueries(
         {
-          queryKey: ['household', household.id, 'intelligence'],
+          queryKey: keys.intelligencePrefix(household.id),
           refetchType: 'all',
         },
         { throwOnError: true },

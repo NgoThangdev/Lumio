@@ -1,10 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import './index.css';
 import { App } from './app/App.tsx';
 import './shared/i18n';
 import { applyAppearance, readAppearanceChoice } from './shared/ui/appearance';
-import './index.css';
 
 applyAppearance();
 const appearanceMedia = window.matchMedia('(prefers-color-scheme: dark)');

@@ -5,14 +5,14 @@ import {
   api,
   isMutationOutcomeUnknown,
   OfflineBeforeSendError,
-} from '../../shared/api/client';
-import { keys } from '../../shared/api/keys';
-import type { Item } from '../../shared/api/types';
-import { Button, Card, Notice } from '../../shared/ui/primitives';
-import { refreshItemLifecycle } from './itemLifecycle';
+} from '@/shared/api/client';
+import { keys } from '@/shared/api/keys';
+import type { Item } from '@/shared/api/types';
+import { Button, Card, Notice } from '@/shared/ui/primitives';
+import { refreshItemLifecycle } from '../item-detail/itemLifecycle';
 
-import { tr } from '../../shared/i18n';
-import { localizedError } from '../../shared/i18n';
+import { tr } from '@/shared/i18n';
+import { localizedError } from '@/shared/i18n';
 type ArchivedItem = Pick<Item, 'id' | 'name' | 'primaryUnit' | 'archivedAt'>;
 
 export function ArchivedItems({ householdId }: { householdId: string }) {
@@ -21,7 +21,7 @@ export function ArchivedItems({ householdId }: { householdId: string }) {
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
   const archived = useQuery({
-    queryKey: ['household', householdId, 'archived-items'],
+    queryKey: keys.archivedItems(householdId),
     queryFn: () =>
       api<ArchivedItem[]>(`/households/${householdId}/items/archived`),
   });

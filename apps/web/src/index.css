@@ -1252,8 +1252,7 @@ em {
   text-decoration: none;
 }
 .settings-jump-links a:focus-visible,
-.settings-disclosure > summary:focus-visible,
-.attention-assessment > summary:focus-visible {
+.settings-disclosure > summary:focus-visible {
   outline: 3px solid var(--green);
   outline-offset: 3px;
 }
@@ -3362,9 +3361,6 @@ details[open] > .action-summary .disclosure-arrow {
   font-weight: 700;
 }
 
-.attention-page {
-  max-width: 800px;
-}
 .invitation-technical-details {
   display: grid;
   gap: 4px;
@@ -3381,159 +3377,4 @@ details[open] > .action-summary .disclosure-arrow {
   display: block;
   line-height: 1.45;
   overflow-wrap: anywhere;
-}
-.attention-heading {
-  display: grid;
-  gap: 8px;
-}
-.attention-heading h1 {
-  font-size: clamp(32px, 6vw, 46px);
-}
-.attention-heading .muted {
-  margin: 0;
-}
-.attention-groups {
-  display: grid;
-  gap: 16px;
-}
-.attention-household {
-  padding: 20px 24px;
-}
-.attention-household h2 {
-  margin: 0 0 8px;
-  font-size: 21px;
-}
-.attention-items {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.attention-items li + li {
-  border-top: 1px solid var(--border);
-}
-.attention-list-item {
-  padding-bottom: 8px;
-}
-.attention-list-item + .attention-list-item {
-  padding-top: 8px;
-}
-.attention-item {
-  display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) 20px;
-  align-items: center;
-  gap: 13px;
-  min-height: 84px;
-  padding: 12px 2px;
-  color: var(--ink);
-  text-decoration: none;
-  border-radius: 14px;
-}
-.attention-item:hover {
-  background: var(--surface-row-hover);
-}
-.attention-item-doodle {
-  display: block;
-  width: 60px;
-  height: 60px;
-}
-.attention-item-content {
-  display: grid;
-  gap: 3px;
-  min-width: 0;
-}
-.attention-item-content strong {
-  font-size: 17px;
-  font-weight: 900;
-  overflow-wrap: anywhere;
-}
-.attention-item-content > small {
-  color: var(--muted);
-  font-size: 12px;
-}
-.attention-assessment {
-  margin: -4px 0 0 75px;
-  color: var(--muted);
-}
-.attention-assessment > summary {
-  display: flex;
-  align-items: center;
-  width: fit-content;
-  min-height: 40px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.attention-assessment > div {
-  display: grid;
-  gap: 2px;
-  padding: 0 0 8px;
-}
-.attention-assessment small {
-  overflow-wrap: anywhere;
-}
-.attention-signals {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 3px 0;
-}
-.attention-signal {
-  display: inline-flex;
-  align-items: center;
-  min-height: 27px;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: var(--surface-soft);
-  color: var(--green-deep);
-  font-size: 11px;
-  font-weight: 900;
-}
-.attention-signal-use_soon {
-  background: var(--status-buy-bg);
-  color: var(--status-attention-use-soon-fg);
-}
-.attention-signal-low_stock {
-  background: var(--status-low-bg);
-  color: var(--status-low-fg);
-}
-.attention-arrow {
-  color: var(--green-deep);
-  font-size: 23px;
-  font-weight: 900;
-}
-.attention-empty {
-  display: grid;
-  justify-items: center;
-  text-align: center;
-  gap: 10px;
-  padding: 30px 24px;
-}
-.attention-empty > .doodle {
-  width: 105px;
-  height: 105px;
-}
-.attention-empty h2 {
-  margin: 0;
-  font-size: 21px;
-}
-.attention-empty p {
-  max-width: 420px;
-  margin: 0;
-}
-@media (max-width: 520px) {
-  .attention-household {
-    padding: 18px;
-  }
-  .attention-item {
-    grid-template-columns: 52px minmax(0, 1fr) 16px;
-    gap: 10px;
-  }
-  .attention-item-doodle {
-    width: 50px;
-    height: 50px;
-  }
-  .attention-assessment {
-    margin-left: 62px;
-  }
 }

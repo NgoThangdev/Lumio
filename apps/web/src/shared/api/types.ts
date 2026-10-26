@@ -74,6 +74,13 @@ export type LocationStockCheck = {
 export type TrackingMode = 'QUANTITY' | 'FIVE_LEVEL' | 'PRESENCE_BACKUP';
 export type StockLevel =
   'FULL' | 'THREE_QUARTERS' | 'HALF' | 'QUARTER' | 'EMPTY';
+export const STOCK_LEVELS = [
+  'FULL',
+  'THREE_QUARTERS',
+  'HALF',
+  'QUARTER',
+  'EMPTY',
+] as const satisfies readonly StockLevel[];
 export type Batch = {
   id: string;
   quantity: string;

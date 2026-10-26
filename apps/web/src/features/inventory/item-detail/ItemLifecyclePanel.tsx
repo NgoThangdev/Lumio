@@ -6,14 +6,14 @@ import {
   ApiError,
   isMutationOutcomeUnknown,
   OfflineBeforeSendError,
-} from '../../shared/api/client';
-import { keys } from '../../shared/api/keys';
-import type { CatalogOption, Item } from '../../shared/api/types';
-import { Button, Card, Notice } from '../../shared/ui/primitives';
+} from '@/shared/api/client';
+import { keys } from '@/shared/api/keys';
+import type { CatalogOption, Item } from '@/shared/api/types';
+import { Button, Card, Notice } from '@/shared/ui/primitives';
 import { refreshItemLifecycle } from './itemLifecycle';
 
-import { tr } from '../../shared/i18n';
-import { localizedError } from '../../shared/i18n';
+import { tr } from '@/shared/i18n';
+import { localizedError } from '@/shared/i18n';
 export function ItemLifecyclePanel({
   householdId,
   item,

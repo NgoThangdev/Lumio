@@ -1,5 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query';
-import { keys } from '../../shared/api/keys';
+import { keys } from '@/shared/api/keys';
 
 export async function refreshItemLifecycle(
   queryClient: QueryClient,
@@ -17,14 +17,14 @@ export async function refreshItemLifecycle(
     ),
     queryClient.invalidateQueries(
       {
-        queryKey: ['household', householdId, 'archived-items'],
+        queryKey: keys.archivedItems(householdId),
         refetchType: 'all',
       },
       { throwOnError: true },
     ),
     queryClient.invalidateQueries(
       {
-        queryKey: ['household', householdId, 'intelligence'],
+        queryKey: keys.intelligencePrefix(householdId),
         refetchType: 'all',
       },
       { throwOnError: true },
@@ -42,12 +42,12 @@ export async function refreshItemLifecycle(
       { throwOnError: true },
     ),
     queryClient.invalidateQueries(
-      { queryKey: ['household', householdId, 'trip'], refetchType: 'all' },
+      { queryKey: keys.tripDetailsPrefix(householdId), refetchType: 'all' },
       { throwOnError: true },
     ),
     queryClient.invalidateQueries(
       {
-        queryKey: ['household', householdId, 'location-stock-check'],
+        queryKey: keys.locationStockCheckPrefix(householdId),
         refetchType: 'all',
       },
       { throwOnError: true },

@@ -83,7 +83,8 @@ function Assert-NoExistingFunnelRoute {
     }
     $status = ConvertFrom-Json -InputObject $StatusJson -ErrorAction Stop
     if ($status -isnot [pscustomobject] -or
-        -not @($status.PSObject.Properties.Name | Where-Object { $_ -in @('Web', 'TCP', 'Foreground', 'Background') }).Count) {
+        ($status.PSObject.Properties.Count -gt 0 -and
+        -not @($status.PSObject.Properties.Name | Where-Object { $_ -in @('Web', 'TCP', 'Foreground', 'Background') }).Count)) {
       throw 'Unexpected status structure.'
     }
     $hasRoute = Test-FunnelRouteMap $status

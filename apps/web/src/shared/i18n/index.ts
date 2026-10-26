@@ -152,7 +152,7 @@ const apiLabels: Record<string, TranslationKey> = {
   CORRECTED: 'common:corrected',
   PURCHASED: 'common:purchased',
   SKIPPED: 'common:skipped',
-  MOVED: 'common:changeSaved',
+  MOVED: 'shopping:moved',
   FRESH_FOOD: 'common:freshFood',
   MEAT_SEAFOOD: 'common:meatSeafood',
   DAIRY: 'common:dairy',

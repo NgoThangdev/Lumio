@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router';
-import { api } from '../../shared/api/client';
+import { api } from '@/shared/api/client';
 import { keys } from '../../shared/api/keys';
 import type {
   CurrentAttention,
@@ -10,6 +10,7 @@ import type {
 import { Doodle } from '../../shared/ui/Doodle';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
 import { localizedEnum } from '../../shared/i18n';
+import './attention.css';
 
 import { tr } from '../../shared/i18n';
 import { localizedError } from '../../shared/i18n';
