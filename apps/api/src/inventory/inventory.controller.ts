@@ -2,7 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Patch,
   Param,
   Query,
@@ -151,6 +153,22 @@ export class InventoryController {
     @Param('itemId') itemId: string,
   ) {
     return this.lifecycle.restore(request.actorId, householdId, itemId);
+  }
+
+  @Delete(':itemId')
+  @HttpCode(204)
+  permanentlyDelete(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Param('itemId') itemId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.lifecycle.permanentlyDelete(
+      request.actorId,
+      householdId,
+      itemId,
+      body,
+    );
   }
 
   @Put(':itemId/config')

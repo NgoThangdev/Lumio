@@ -8,6 +8,7 @@ import {
 import { Prisma } from '../generated/prisma/browser.js';
 import type { TrackingMode } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { requireActiveHousehold } from '../households/active-household.js';
 import {
   effectiveExpiryDate,
   eligibleBatches,
@@ -143,6 +144,7 @@ export class InventoryService {
       : null;
 
     return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       const membership = await tx.membership.findUnique({
         where: { userId_householdId: { userId: actorId, householdId } },
         select: { userId: true },
@@ -260,88 +262,75 @@ export class InventoryService {
   }
 
   async readItem({ actorId, householdId, itemId }: ReadItemInput) {
-    const membership = await this.prisma.membership.findUnique({
-      where: { userId_householdId: { userId: actorId, householdId } },
-      select: { role: true },
+    return this.prisma.$transaction(async (tx) => {
+      const membership = await requireActiveHousehold(tx, actorId, householdId);
+      const item = await tx.inventoryItem.findFirst({
+        where: { id: itemId, householdId },
+        include: {
+          category: true,
+          currentLocation: true,
+          backupLocation: true,
+          preferredRestockLocation: true,
+          tagLinks: { include: { tag: true } },
+          batches: {
+            orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+            include: { location: true },
+          },
+          stateActions: {
+            orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+            include: { undo: true },
+          },
+          undos: { orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] },
+          stockChecks: {
+            orderBy: { checkedAt: 'asc' },
+          },
+          locationStockChecks: {
+            orderBy: [{ checkedAt: 'asc' }, { locationId: 'asc' }],
+          },
+          actions: {
+            orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+            include: { allocations: true, openTransfer: true, undo: true },
+          },
+          changes: { orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] },
+        },
+      });
+      if (!item) {
+        throw new NotFoundException(
+          'Inventory item was not found in this household.',
+        );
+      }
+      if (item.archivedAt && membership.role !== 'ADMIN')
+        throw new ForbiddenException('HOUSEHOLD_ADMIN_REQUIRED');
+      return withOpenedStock(item);
     });
-    if (!membership) {
-      throw new ForbiddenException(
-        'Household membership is required to read this item.',
-      );
-    }
-
-    const item = await this.prisma.inventoryItem.findFirst({
-      where: { id: itemId, householdId },
-      include: {
-        category: true,
-        currentLocation: true,
-        backupLocation: true,
-        preferredRestockLocation: true,
-        tagLinks: { include: { tag: true } },
-        batches: {
-          orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
-          include: { location: true },
-        },
-        stateActions: {
-          orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
-          include: { undo: true },
-        },
-        undos: { orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] },
-        stockChecks: {
-          orderBy: { checkedAt: 'asc' },
-        },
-        locationStockChecks: {
-          orderBy: [{ checkedAt: 'asc' }, { locationId: 'asc' }],
-        },
-        actions: {
-          orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
-          include: { allocations: true, openTransfer: true, undo: true },
-        },
-        changes: { orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] },
-      },
-    });
-    if (!item) {
-      throw new NotFoundException(
-        'Inventory item was not found in this household.',
-      );
-    }
-    if (item.archivedAt && membership.role !== 'ADMIN')
-      throw new ForbiddenException('HOUSEHOLD_ADMIN_REQUIRED');
-    return withOpenedStock(item);
   }
 
   async listItems(actorId: string, householdId: string) {
-    const membership = await this.prisma.membership.findUnique({
-      where: { userId_householdId: { userId: actorId, householdId } },
-      select: { userId: true },
-    });
-    if (!membership) {
-      throw new ForbiddenException(
-        'Household membership is required to list items.',
-      );
-    }
-    const items = await this.prisma.inventoryItem.findMany({
-      where: { householdId, archivedAt: null },
-      include: {
-        category: true,
-        currentLocation: true,
-        backupLocation: true,
-        preferredRestockLocation: true,
-        tagLinks: { include: { tag: true } },
-        batches: {
-          select: {
-            id: true,
-            quantity: true,
-            expiryDate: true,
-            openedAt: true,
-            openedUseByDate: true,
-            locationId: true,
+    return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
+      const items = await tx.inventoryItem.findMany({
+        where: { householdId, archivedAt: null },
+        include: {
+          category: true,
+          currentLocation: true,
+          backupLocation: true,
+          preferredRestockLocation: true,
+          tagLinks: { include: { tag: true } },
+          batches: {
+            select: {
+              id: true,
+              quantity: true,
+              expiryDate: true,
+              openedAt: true,
+              openedUseByDate: true,
+              locationId: true,
+            },
           },
         },
-      },
-      orderBy: [{ name: 'asc' }, { id: 'asc' }],
+        orderBy: [{ name: 'asc' }, { id: 'asc' }],
+      });
+      return items.map(withOpenedStock);
     });
-    return items.map(withOpenedStock);
   }
 
   async configureItem(input: ItemConfigurationInput) {
@@ -378,56 +367,64 @@ export class InventoryService {
         );
       }
     }
-    const membership = await this.prisma.membership.findUnique({
-      where: {
-        userId_householdId: {
-          userId: input.actorId,
-          householdId: input.householdId,
+    return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(
+        tx,
+        input.actorId,
+        input.householdId,
+        'ADMIN',
+      );
+      const membership = await tx.membership.findUnique({
+        where: {
+          userId_householdId: {
+            userId: input.actorId,
+            householdId: input.householdId,
+          },
         },
-      },
-      select: { role: true },
-    });
-    if (membership?.role !== 'ADMIN') {
-      throw new ForbiddenException(
-        'Household Admin membership is required to change stock settings.',
-      );
-    }
-    const item = await this.prisma.inventoryItem.findFirst({
-      where: { id: input.itemId, householdId: input.householdId },
-      select: { trackingMode: true, archivedAt: true },
-    });
-    if (!item)
-      throw new NotFoundException(
-        'Inventory item was not found in this household.',
-      );
-    if (item.archivedAt) throw new ConflictException('ITEM_ARCHIVED');
-    if (item.trackingMode !== 'QUANTITY') {
-      throw new BadRequestException(
-        'Quantity stock settings require QUANTITY tracking.',
-      );
-    }
-    const result = await this.prisma.inventoryItem.updateMany({
-      where: {
-        id: input.itemId,
-        householdId: input.householdId,
-        archivedAt: null,
-      },
-      data: {
-        minimumStock,
-        lowStockThreshold,
-        buyThreshold,
-        targetStock,
-        neverRunOut: input.neverRunOut,
-        predictionEnabled: input.predictionEnabled,
-      },
-    });
-    if (result.count !== 1) {
-      throw new NotFoundException(
-        'Inventory item was not found in this household.',
-      );
-    }
-    return this.prisma.inventoryItem.findUniqueOrThrow({
-      where: { id: input.itemId },
+        select: { role: true },
+      });
+      if (membership?.role !== 'ADMIN') {
+        throw new ForbiddenException(
+          'Household Admin membership is required to change stock settings.',
+        );
+      }
+      const item = await tx.inventoryItem.findFirst({
+        where: { id: input.itemId, householdId: input.householdId },
+        select: { trackingMode: true, archivedAt: true },
+      });
+      if (!item)
+        throw new NotFoundException(
+          'Inventory item was not found in this household.',
+        );
+      if (item.archivedAt) throw new ConflictException('ITEM_ARCHIVED');
+      if (item.trackingMode !== 'QUANTITY') {
+        throw new BadRequestException(
+          'Quantity stock settings require QUANTITY tracking.',
+        );
+      }
+      const result = await tx.inventoryItem.updateMany({
+        where: {
+          id: input.itemId,
+          householdId: input.householdId,
+          archivedAt: null,
+        },
+        data: {
+          minimumStock,
+          lowStockThreshold,
+          buyThreshold,
+          targetStock,
+          neverRunOut: input.neverRunOut as boolean,
+          predictionEnabled: input.predictionEnabled as boolean,
+        },
+      });
+      if (result.count !== 1) {
+        throw new NotFoundException(
+          'Inventory item was not found in this household.',
+        );
+      }
+      return tx.inventoryItem.findUniqueOrThrow({
+        where: { id: input.itemId },
+      });
     });
   }
 
@@ -454,6 +451,7 @@ export class InventoryService {
         'Confirm that one package equals one primary unit.',
       );
     return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId, 'ADMIN');
       const member = await tx.membership.findUnique({
         where: { userId_householdId: { userId: actorId, householdId } },
         select: { role: true },
@@ -579,6 +577,7 @@ export class InventoryService {
 
   async openQuantity(actorId: string, householdId: string, itemId: string) {
     return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       const member = await tx.membership.findUnique({
         where: { userId_householdId: { userId: actorId, householdId } },
         select: { userId: true },
@@ -632,6 +631,7 @@ export class InventoryService {
 
   async finishOpened(actorId: string, householdId: string, itemId: string) {
     return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       const member = await tx.membership.findUnique({
         where: { userId_householdId: { userId: actorId, householdId } },
         select: { userId: true },
@@ -709,6 +709,7 @@ export class InventoryService {
     const requestedQuantity = parseQuantity(quantity, 'Use');
 
     return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       const membership = await tx.membership.findUnique({
         where: { userId_householdId: { userId: actorId, householdId } },
         select: { userId: true },
@@ -855,16 +856,17 @@ export class InventoryService {
     locationId,
   }: RestockQuantityInput) {
     parseQuantity(quantity, 'Restock');
-    return this.prisma.$transaction((tx) =>
-      this.restockInTransaction(tx, {
+    return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
+      return this.restockInTransaction(tx, {
         actorId,
         householdId,
         itemId,
         quantity,
         expiryDate,
         locationId,
-      }),
-    );
+      });
+    });
   }
 
   async restockInTransaction(

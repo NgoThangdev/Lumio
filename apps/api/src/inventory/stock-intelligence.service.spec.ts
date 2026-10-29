@@ -29,6 +29,7 @@ function setup() {
     },
   ];
   const prisma = {
+    $transaction: async (run: (client: unknown) => unknown) => run(prisma),
     membership: {
       findUnique: vi.fn(
         async ({
@@ -145,3 +146,10 @@ describe('stock-intelligence shopping date resolution', () => {
     expect(prisma.household.findUniqueOrThrow).not.toHaveBeenCalled();
   });
 });
+// Access gating is covered by active-household tests; this suite isolates its existing rules.
+vi.mock('../households/active-household.js', () => ({
+  checkActiveHousehold: vi.fn(),
+  requireActiveHousehold: vi.fn(async (_tx, actorId: string) => {
+    if (actorId !== 'member') throw { status: 403 };
+  }),
+}));

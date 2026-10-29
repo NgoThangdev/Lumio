@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useHousehold } from '@/shared/household/HouseholdContext';
 import { tr } from '@/shared/i18n';
+import { Notice } from '@/shared/ui/primitives';
 import { AddItemForm } from '../add-item/AddItemForm';
 import type { QuickPurchaseSeed } from '../add-item/useAddItemForm';
 import { ArchivedItems } from './ArchivedItems';
@@ -28,6 +29,7 @@ export function InventoryPage() {
     mobileLayout && (addItemOpen || location.hash === '#add-item');
   const routeState = location.state as {
     quickPurchaseDraft?: Partial<QuickPurchaseSeed>;
+    notice?: string;
   } | null;
   const seed = routeState?.quickPurchaseDraft;
   const quickPurchaseSeed =
@@ -36,6 +38,10 @@ export function InventoryPage() {
       : undefined;
   const filters = useInventoryFilters();
   const [shoppingDate, setShoppingDate] = useState('');
+  const [lifecycleFeedback, setLifecycleFeedback] = useState<{
+    message: string;
+    kind: 'success' | 'error';
+  } | null>(null);
   const queries = useInventoryQueries({
     householdId: household.id,
     query: filters.query,
@@ -121,6 +127,14 @@ export function InventoryPage() {
   const base = `/households/${household.id}`;
   return (
     <div className="inventory-page">
+      {routeState?.notice && (
+        <Notice kind="success">{routeState.notice}</Notice>
+      )}
+      {lifecycleFeedback && (
+        <Notice kind={lifecycleFeedback.kind}>
+          {lifecycleFeedback.message}
+        </Notice>
+      )}
       <div className="grid inventory-grid">
         <section
           className="inventory-list"
@@ -194,6 +208,11 @@ export function InventoryPage() {
             base={base}
             locations={locations.data}
             hasFilters={filters.hasFilters}
+            householdId={household.id}
+            isAdmin={household.role === 'ADMIN'}
+            onLifecycleSaved={(message, kind) =>
+              setLifecycleFeedback({ message, kind })
+            }
           />
         </section>
         <div
@@ -224,7 +243,12 @@ export function InventoryPage() {
         </div>
       </div>
       {household.role === 'ADMIN' && (
-        <ArchivedItems householdId={household.id} />
+        <ArchivedItems
+          householdId={household.id}
+          onLifecycleSaved={(message, kind) =>
+            setLifecycleFeedback({ message, kind })
+          }
+        />
       )}
       <InventoryInsights
         base={base}

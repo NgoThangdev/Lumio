@@ -2414,6 +2414,9 @@ export type NotificationDeliveryScalarFieldEnum = (typeof NotificationDeliverySc
 export const HouseholdScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  deletionRequestId: 'deletionRequestId',
+  deletionRequestedAt: 'deletionRequestedAt',
+  deletionDueAt: 'deletionDueAt',
   defaultShoppingCycleDays: 'defaultShoppingCycleDays',
   defaultStore: 'defaultStore'
 } as const

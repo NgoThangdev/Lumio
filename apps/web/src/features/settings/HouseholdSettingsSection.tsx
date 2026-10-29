@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router';
+import type { User } from '@/shared/api/types';
 import { api } from '@/shared/api/client';
 import { keys } from '@/shared/api/keys';
 import type { Household } from '@/shared/api/types';
@@ -9,8 +10,9 @@ import { CatalogManagement } from './CatalogManagement';
 import { CategoryInventoryDefaults } from './CategoryInventoryDefaults';
 import { CategorySectionSettings } from './CategorySectionSettings';
 import { HouseholdShoppingDefaults } from './HouseholdShoppingDefaults';
+import { HouseholdDeletionSection } from './HouseholdDeletionSection';
 
-export function HouseholdSettingsSection() {
+export function HouseholdSettingsSection({ user }: { user: User }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const households = useQuery({
     queryKey: keys.households,
@@ -92,6 +94,13 @@ export function HouseholdSettingsSection() {
                   key={selected.id}
                   household={selected}
                 />
+                {selected.role === 'ADMIN' && (
+                  <HouseholdDeletionSection
+                    key={`${selected.id}-deletion`}
+                    household={selected}
+                    user={user}
+                  />
+                )}
                 <details className="settings-disclosure">
                   <summary>{tr('settings:manageCatalogCategory')}</summary>
                   <div className="settings-disclosure-content">

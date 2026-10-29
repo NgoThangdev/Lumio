@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import {
   api,
   ApiError,
@@ -10,7 +10,10 @@ import {
 import { keys } from '@/shared/api/keys';
 import type { CatalogOption, Item } from '@/shared/api/types';
 import { Button, Card, Notice } from '@/shared/ui/primitives';
-import { refreshItemLifecycle } from './itemLifecycle';
+import {
+  refreshAfterPermanentItemDeletion,
+  refreshItemLifecycle,
+} from './itemLifecycle';
 
 import { tr } from '@/shared/i18n';
 import { localizedError } from '@/shared/i18n';
@@ -22,6 +25,7 @@ export function ItemLifecyclePanel({
   item: Item;
 }) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [name, setName] = useState(item.name);
   const [categoryId, setCategoryId] = useState(item.categoryId ?? '');
   const [tagIds, setTagIds] = useState<string[]>(
@@ -34,6 +38,9 @@ export function ItemLifecyclePanel({
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [blockers, setBlockers] = useState<string[]>([]);
+  const [deleteName, setDeleteName] = useState('');
+  const [deleteBusy, setDeleteBusy] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   const categories = useQuery({
     queryKey: keys.catalog(householdId, 'categories'),
     queryFn: () =>
@@ -95,6 +102,135 @@ export function ItemLifecyclePanel({
   }
 
   const base = `/households/${householdId}/items/${item.id}`;
+
+  async function finishPermanentDeletion() {
+    queryClient.removeQueries({
+      queryKey: keys.item(householdId, item.id),
+      exact: true,
+    });
+    const refreshed = await refreshAfterPermanentItemDeletion(
+      queryClient,
+      householdId,
+    );
+    void navigate(`/households/${householdId}/inventory`, {
+      replace: true,
+      state: {
+        notice: refreshed
+          ? tr('item-detail:deleteSuccess', { name: item.name })
+          : tr('item-detail:deleteSavedRefreshWarning'),
+      },
+    });
+  }
+
+  async function reconcileUncertainDeletion() {
+    const [archivedResult, detailResult] = await Promise.allSettled([
+      api<Array<Pick<Item, 'id' | 'name'>>>(
+        `/households/${householdId}/items/archived`,
+      ),
+      api<Item>(base),
+    ]);
+    const archived =
+      archivedResult.status === 'fulfilled' ? archivedResult.value : null;
+    const detail =
+      detailResult.status === 'fulfilled' ? detailResult.value : null;
+    if (archived) {
+      queryClient.setQueryData(keys.archivedItems(householdId), archived);
+    }
+    if (detail) {
+      queryClient.setQueryData(keys.item(householdId, item.id), detail);
+    }
+
+    const detailConfirmsMissing =
+      detailResult.status === 'rejected' &&
+      detailResult.reason instanceof ApiError &&
+      detailResult.reason.code === 'ITEM_NOT_FOUND';
+    if (
+      archived &&
+      !archived.some((entry) => entry.id === item.id) &&
+      detailConfirmsMissing
+    ) {
+      await finishPermanentDeletion();
+      return;
+    }
+
+    setDeleteError(
+      archived?.some((entry) => entry.id === item.id) && detail
+        ? tr('item-detail:deleteOutcomeStillPresent')
+        : tr('item-detail:deleteOutcomeUncertain'),
+    );
+  }
+
+  async function deletePermanently() {
+    if (busy || deleteBusy || !item.archivedAt) return;
+    setDeleteError('');
+    setError('');
+
+    if (deleteName !== item.name) {
+      setDeleteError(tr('item-detail:deleteNameMismatch'));
+      return;
+    }
+
+    setDeleteBusy(true);
+    let deleteSent = false;
+    try {
+      const current = await api<Item>(base);
+      queryClient.setQueryData(keys.item(householdId, item.id), current);
+      if (current.name !== item.name) {
+        setDeleteName('');
+        setDeleteError(tr('item-detail:deleteNameChanged'));
+        return;
+      }
+      if (!current.archivedAt) {
+        setDeleteName('');
+        setDeleteError(tr('item-detail:deleteNoLongerArchived'));
+        return;
+      }
+      if (deleteName !== current.name) {
+        setDeleteError(tr('item-detail:deleteNameMismatch'));
+        return;
+      }
+
+      deleteSent = true;
+      await api<void>(base, 'DELETE', { confirmName: deleteName });
+      await finishPermanentDeletion();
+    } catch (cause) {
+      if (
+        deleteSent &&
+        !(cause instanceof OfflineBeforeSendError) &&
+        isMutationOutcomeUnknown(cause)
+      ) {
+        setDeleteError(tr('item-detail:deleteOutcomeUncertain'));
+        await reconcileUncertainDeletion();
+      } else {
+        if (
+          cause instanceof ApiError &&
+          ['DELETE_NAME_MISMATCH', 'ITEM_NOT_ARCHIVED'].includes(
+            cause.code ?? '',
+          )
+        ) {
+          try {
+            const current = await api<Item>(base);
+            queryClient.setQueryData(keys.item(householdId, item.id), current);
+            if (current.name !== item.name) {
+              setDeleteName('');
+              setDeleteError(tr('item-detail:deleteNameChanged'));
+              return;
+            }
+          } catch {
+            // Keep the server's deletion error visible if the detail refresh fails.
+          }
+        }
+        setDeleteError(
+          cause instanceof Error
+            ? localizedError(cause)
+            : tr('item-detail:deleteRejected'),
+        );
+      }
+    } finally {
+      setDeleteBusy(false);
+    }
+  }
+
   return (
     <Card>
       <h2>
@@ -116,14 +252,52 @@ export function ItemLifecyclePanel({
         </ul>
       )}
       {item.archivedAt ? (
-        <Button
-          disabled={busy}
-          onClick={() => void submit(`${base}/restore`, 'POST')}
-        >
-          {busy
-            ? tr('common:restoring')
-            : tr('item-detail:restoreActiveInventory')}
-        </Button>
+        <>
+          <Button
+            disabled={busy || deleteBusy}
+            onClick={() => void submit(`${base}/restore`, 'POST')}
+          >
+            {busy
+              ? tr('common:restoring')
+              : tr('item-detail:restoreActiveInventory')}
+          </Button>
+          <details>
+            <summary>{tr('item-detail:deletePermanently')}</summary>
+            <p className="muted">
+              {tr('item-detail:deleteCannotUndo', { name: item.name })}
+            </p>
+            {deleteError && <Notice kind="error">{deleteError}</Notice>}
+            <form
+              className="field-stack"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void deletePermanently();
+              }}
+            >
+              <label htmlFor={`delete-confirm-${item.id}`}>
+                {tr('item-detail:typeNameToDelete', { name: item.name })}
+              </label>
+              <input
+                id={`delete-confirm-${item.id}`}
+                autoComplete="off"
+                value={deleteName}
+                disabled={deleteBusy}
+                onChange={(event) => {
+                  setDeleteName(event.target.value);
+                  setDeleteError('');
+                }}
+              />
+              <Button
+                variant="secondary"
+                disabled={busy || deleteBusy || !deleteName}
+              >
+                {deleteBusy
+                  ? tr('item-detail:deletingPermanently')
+                  : tr('item-detail:deletePermanently')}
+              </Button>
+            </form>
+          </details>
+        </>
       ) : (
         <>
           <details>

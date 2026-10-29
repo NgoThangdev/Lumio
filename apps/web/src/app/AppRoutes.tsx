@@ -7,7 +7,6 @@ import {
 } from 'react-router';
 import { AuthPage } from '@/features/auth/AuthPage';
 import { authReturnPath } from '@/features/auth/returnPath';
-import { HouseholdsPage } from '@/features/households/HouseholdsPage';
 import { HouseholdMembersPage } from '@/features/households/HouseholdMembersPage';
 import { InvitationPage } from '@/features/households/InvitationPage';
 import { HomePage } from '@/features/home/HomePage';
@@ -23,6 +22,7 @@ import type { User } from '@/shared/api/types';
 import { SignedInShell } from './SignedInShell';
 import { RequireSignIn } from './RequireSignIn';
 import { HouseholdBoundary } from './household/HouseholdBoundary';
+import { HouseholdsRoute } from './HouseholdsRoute';
 
 export function AppRoutes({
   user,
@@ -67,7 +67,7 @@ export function AppRoutes({
             />
           }
         />
-        <Route path="/households" element={<HouseholdsPage />} />
+        <Route path="/households" element={<HouseholdsRoute user={user!} />} />
         <Route path="/households/:householdId" element={<HouseholdBoundary />}>
           <Route index element={<Navigate to="home" replace />} />
           <Route path="home" element={<HomePage />} />

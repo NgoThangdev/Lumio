@@ -10,12 +10,19 @@ import { keys } from '@/shared/api/keys';
 import type { Item } from '@/shared/api/types';
 import { Button, Card, Notice } from '@/shared/ui/primitives';
 import { refreshItemLifecycle } from '../item-detail/itemLifecycle';
+import { InventoryLifecycleSwipe } from './InventoryLifecycleSwipe';
 
 import { tr } from '@/shared/i18n';
 import { localizedError } from '@/shared/i18n';
 type ArchivedItem = Pick<Item, 'id' | 'name' | 'primaryUnit' | 'archivedAt'>;
 
-export function ArchivedItems({ householdId }: { householdId: string }) {
+export function ArchivedItems({
+  householdId,
+  onLifecycleSaved,
+}: {
+  householdId: string;
+  onLifecycleSaved: (message: string, kind: 'success' | 'error') => void;
+}) {
   const queryClient = useQueryClient();
   const [busyId, setBusyId] = useState('');
   const [notice, setNotice] = useState('');
@@ -79,18 +86,32 @@ export function ArchivedItems({ householdId }: { householdId: string }) {
         <p className="muted">{tr('inventory:archivedItems2')}</p>
       )}
       {archived.data?.map((item) => (
-        <div className="row" key={item.id}>
-          <Link to={`/households/${householdId}/inventory/${item.id}`}>
-            {item.name} · {item.primaryUnit}
-          </Link>
-          <Button
-            variant="secondary"
-            disabled={!!busyId}
-            onClick={() => void restore(item.id)}
-          >
-            {busyId === item.id ? tr('common:restoring') : tr('common:restore')}
-          </Button>
-        </div>
+        <InventoryLifecycleSwipe
+          key={item.id}
+          householdId={householdId}
+          item={item}
+          action="delete"
+          isAdmin
+          onSaved={onLifecycleSaved}
+        >
+          <div className="row archived-inventory-row">
+            <Link
+              draggable={false}
+              to={`/households/${householdId}/inventory/${item.id}`}
+            >
+              {item.name} · {item.primaryUnit}
+            </Link>
+            <Button
+              variant="secondary"
+              disabled={!!busyId}
+              onClick={() => void restore(item.id)}
+            >
+              {busyId === item.id
+                ? tr('common:restoring')
+                : tr('common:restore')}
+            </Button>
+          </div>
+        </InventoryLifecycleSwipe>
       ))}
     </Card>
   );

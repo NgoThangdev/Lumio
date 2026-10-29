@@ -1,10 +1,7 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import type { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { requireActiveHousehold } from '../households/active-household.js';
 import { addCalendarDays, assessItem } from './stock-intelligence.js';
 import { localCalendarDate } from './plan-use.js';
 import { assessStateItem } from './state-assessment.js';
@@ -19,13 +16,10 @@ export class StockIntelligenceService {
     shoppingDateInput?: string,
     at = new Date(),
   ) {
-    return this.assessWithClient(
-      this.prisma,
-      actorId,
-      householdId,
-      shoppingDateInput,
-      at,
-    );
+    return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
+      return this.assessWithClient(tx, householdId, shoppingDateInput, at);
+    });
   }
 
   async assessInTransaction(
@@ -35,13 +29,8 @@ export class StockIntelligenceService {
     shoppingDateInput?: string,
     at = new Date(),
   ) {
-    return this.assessWithClient(
-      tx,
-      actorId,
-      householdId,
-      shoppingDateInput,
-      at,
-    );
+    await requireActiveHousehold(tx, actorId, householdId);
+    return this.assessWithClient(tx, householdId, shoppingDateInput, at);
   }
 
   private async assessWithClient(
@@ -49,20 +38,10 @@ export class StockIntelligenceService {
       Prisma.TransactionClient,
       'membership' | 'inventoryItem' | 'shoppingTrip' | 'household'
     >,
-    actorId: string,
     householdId: string,
     shoppingDateInput?: string,
     at = new Date(),
   ) {
-    const membership = await client.membership.findUnique({
-      where: { userId_householdId: { userId: actorId, householdId } },
-      select: { userId: true },
-    });
-    if (!membership) {
-      throw new ForbiddenException(
-        'Household membership is required to view stock intelligence.',
-      );
-    }
     const now = at;
     const today = localCalendarDate(now);
     let shoppingDate = shoppingDateInput;

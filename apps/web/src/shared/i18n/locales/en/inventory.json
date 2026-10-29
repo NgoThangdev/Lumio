@@ -93,5 +93,22 @@
   "explanation.stateBuyRefillNoBackup": "No backup remains. Refill needed; never-run-out preference: {{neverRunOut}}.",
   "explanation.fiveLevelAtLowThreshold": "The current level has reached the low threshold of {{lowAtLevel}}.",
   "explanation.stateNoPurchaseNeeded": "The current state and backups do not indicate a purchase is needed.",
-  "explanation.predictionNotApplicable": "Consumption prediction does not apply to this tracking mode."
+  "explanation.predictionNotApplicable": "Consumption prediction does not apply to this tracking mode.",
+  "showActions": "Actions",
+  "hideActions": "Hide actions",
+  "showRowActions": "Show actions for {{name}}",
+  "hideRowActions": "Hide actions for {{name}}",
+  "confirmArchiveTitle": "Archive {{name}}?",
+  "confirmArchiveBody": "This removes the item from active Inventory. Its stock and history are kept.",
+  "confirmArchiveYes": "Yes, archive",
+  "confirmArchiveNo": "No, keep active",
+  "confirmDeleteTitle": "Delete {{name}} permanently?",
+  "confirmDeleteWarning": "This cannot be undone. The archived item and its permitted linked history will be permanently removed.",
+  "confirmDeleteNo": "Cancel",
+  "rowArchived": "{{name}} was archived.",
+  "rowArchiveReconciled": "{{name}} is archived. Its current state confirmed the result.",
+  "rowArchiveStillActive": "The item is still active. Review its current state before choosing Archive again.",
+  "rowDeleted": "{{name}} was permanently deleted.",
+  "rowDeleteReconciled": "{{name}} is no longer available; checking Item Detail and Archived Items confirmed the result.",
+  "lifecycleRefreshWarning": "Some views could not refresh. Reload Inventory or Home to verify."
 }

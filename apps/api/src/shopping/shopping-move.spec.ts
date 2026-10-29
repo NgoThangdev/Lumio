@@ -1,6 +1,11 @@
 import { ShoppingService } from './shopping.service.js';
 
 function service(tx: Record<string, unknown>) {
+  if (!tx.shoppingTrip) tx.shoppingTrip = {};
+  Object.assign(tx.shoppingTrip, {
+    ...(tx.shoppingTrip as object),
+    findFirst: vi.fn().mockResolvedValue({ id: 'source', entries: [] }),
+  });
   const prisma = {
     membership: { findUnique: vi.fn().mockResolvedValue({ userId: 'actor' }) },
     $transaction: (run: (client: typeof tx) => unknown) => run(tx),
@@ -151,3 +156,8 @@ describe('Shopping Move transaction boundary', () => {
     expect(tx.shoppingTrip.update).not.toHaveBeenCalled();
   });
 });
+// Access gating is covered by active-household tests; this suite isolates its existing rules.
+vi.mock('../households/active-household.js', () => ({
+  checkActiveHousehold: vi.fn(),
+  requireActiveHousehold: vi.fn(),
+}));

@@ -7,6 +7,10 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import {
+  checkActiveHousehold,
+  requireActiveHousehold,
+} from '../households/active-household.js';
 
 export type CatalogKind = 'categories' | 'locations' | 'tags';
 
@@ -129,6 +133,12 @@ export class CatalogService {
     householdId: string,
     admin: boolean,
   ) {
+    await checkActiveHousehold(
+      this.prisma,
+      actorId,
+      householdId,
+      admin ? 'ADMIN' : 'MEMBER',
+    );
     const membership = await this.prisma.membership.findUnique({
       where: { userId_householdId: { userId: actorId, householdId } },
       select: { role: true },
@@ -142,21 +152,34 @@ export class CatalogService {
     }
   }
 
+  private withActive<T>(
+    actorId: string,
+    householdId: string,
+    work: (tx: Prisma.TransactionClient) => Promise<T>,
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId, 'ADMIN');
+      return work(tx);
+    });
+  }
+
   async list(actorId: string, householdId: string, kind: CatalogKind) {
-    await this.requireMembership(actorId, householdId, false);
-    if (kind === 'categories')
-      return this.prisma.category.findMany({
+    return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
+      if (kind === 'categories')
+        return tx.category.findMany({
+          where: { householdId },
+          select: categorySelect,
+          orderBy: [{ name: 'asc' }, { id: 'asc' }],
+        });
+      const query = {
         where: { householdId },
-        select: categorySelect,
-        orderBy: [{ name: 'asc' }, { id: 'asc' }],
-      });
-    const query = {
-      where: { householdId },
-      select: { id: true, name: true },
-      orderBy: [{ name: 'asc' as const }, { id: 'asc' as const }],
-    };
-    if (kind === 'locations') return this.prisma.location.findMany(query);
-    return this.prisma.tag.findMany(query);
+        select: { id: true, name: true },
+        orderBy: [{ name: 'asc' as const }, { id: 'asc' as const }],
+      };
+      if (kind === 'locations') return tx.location.findMany(query);
+      return tx.tag.findMany(query);
+    });
   }
 
   async create(
@@ -169,19 +192,21 @@ export class CatalogService {
     await this.requireMembership(actorId, householdId, true);
     const data = { householdId, ...parsed };
     try {
-      if (kind === 'categories')
-        return await this.prisma.category.create({
-          data,
-          select: categorySelect,
-        });
-      if (kind === 'locations')
-        return await this.prisma.location.create({
+      return await this.withActive(actorId, householdId, async (tx) => {
+        if (kind === 'categories')
+          return tx.category.create({
+            data,
+            select: categorySelect,
+          });
+        if (kind === 'locations')
+          return tx.location.create({
+            data,
+            select: { id: true, name: true },
+          });
+        return tx.tag.create({
           data,
           select: { id: true, name: true },
         });
-      return await this.prisma.tag.create({
-        data,
-        select: { id: true, name: true },
       });
     } catch (error) {
       if (
@@ -205,11 +230,13 @@ export class CatalogService {
     await this.requireMembership(actorId, householdId, true);
     const shoppingSection = sectionUpdate(input);
     try {
-      return await this.prisma.category.update({
-        where: { id: categoryId, householdId },
-        data: { shoppingSection },
-        select: categorySelect,
-      });
+      return await this.withActive(actorId, householdId, (tx) =>
+        tx.category.update({
+          where: { id: categoryId, householdId },
+          data: { shoppingSection },
+          select: categorySelect,
+        }),
+      );
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -229,11 +256,13 @@ export class CatalogService {
     await this.requireMembership(actorId, householdId, true);
     const data = inventoryDefaultsUpdate(input);
     try {
-      return await this.prisma.category.update({
-        where: { id: categoryId, householdId },
-        data,
-        select: categorySelect,
-      });
+      return await this.withActive(actorId, householdId, (tx) =>
+        tx.category.update({
+          where: { id: categoryId, householdId },
+          data,
+          select: categorySelect,
+        }),
+      );
     } catch (error) {
       if (isPrismaError(error, 'P2025'))
         throw new NotFoundException('CATEGORY_NOT_FOUND');
@@ -265,25 +294,27 @@ export class CatalogService {
   ) {
     await this.requireMembership(actorId, householdId, true);
     const parsed = renameInput(input);
-    const existing = await this.prisma.category.findFirst({
-      where: { id: categoryId, householdId },
-      select: categorySelect,
-    });
-    if (!existing) throw new NotFoundException('CATEGORY_NOT_FOUND');
-    if (existing.name === parsed.name) return existing;
-    try {
-      return await this.prisma.category.update({
+    return this.withActive(actorId, householdId, async (tx) => {
+      const existing = await tx.category.findFirst({
         where: { id: categoryId, householdId },
-        data: parsed,
         select: categorySelect,
       });
-    } catch (error) {
-      if (isPrismaError(error, 'P2002'))
-        throw new ConflictException('CATALOG_NAME_EXISTS');
-      if (isPrismaError(error, 'P2025'))
-        throw new NotFoundException('CATEGORY_NOT_FOUND');
-      throw error;
-    }
+      if (!existing) throw new NotFoundException('CATEGORY_NOT_FOUND');
+      if (existing.name === parsed.name) return existing;
+      try {
+        return await tx.category.update({
+          where: { id: categoryId, householdId },
+          data: parsed,
+          select: categorySelect,
+        });
+      } catch (error) {
+        if (isPrismaError(error, 'P2002'))
+          throw new ConflictException('CATALOG_NAME_EXISTS');
+        if (isPrismaError(error, 'P2025'))
+          throw new NotFoundException('CATEGORY_NOT_FOUND');
+        throw error;
+      }
+    });
   }
 
   async renameLocation(
@@ -294,25 +325,27 @@ export class CatalogService {
   ) {
     await this.requireMembership(actorId, householdId, true);
     const parsed = renameInput(input);
-    const existing = await this.prisma.location.findFirst({
-      where: { id: locationId, householdId },
-      select: { id: true, name: true },
-    });
-    if (!existing) throw new NotFoundException('LOCATION_NOT_FOUND');
-    if (existing.name === parsed.name) return existing;
-    try {
-      return await this.prisma.location.update({
+    return this.withActive(actorId, householdId, async (tx) => {
+      const existing = await tx.location.findFirst({
         where: { id: locationId, householdId },
-        data: parsed,
         select: { id: true, name: true },
       });
-    } catch (error) {
-      if (isPrismaError(error, 'P2002'))
-        throw new ConflictException('CATALOG_NAME_EXISTS');
-      if (isPrismaError(error, 'P2025'))
-        throw new NotFoundException('LOCATION_NOT_FOUND');
-      throw error;
-    }
+      if (!existing) throw new NotFoundException('LOCATION_NOT_FOUND');
+      if (existing.name === parsed.name) return existing;
+      try {
+        return await tx.location.update({
+          where: { id: locationId, householdId },
+          data: parsed,
+          select: { id: true, name: true },
+        });
+      } catch (error) {
+        if (isPrismaError(error, 'P2002'))
+          throw new ConflictException('CATALOG_NAME_EXISTS');
+        if (isPrismaError(error, 'P2025'))
+          throw new NotFoundException('LOCATION_NOT_FOUND');
+        throw error;
+      }
+    });
   }
 
   async renameTag(
@@ -323,25 +356,27 @@ export class CatalogService {
   ) {
     await this.requireMembership(actorId, householdId, true);
     const parsed = renameInput(input);
-    const existing = await this.prisma.tag.findFirst({
-      where: { id: tagId, householdId },
-      select: { id: true, name: true },
-    });
-    if (!existing) throw new NotFoundException('TAG_NOT_FOUND');
-    if (existing.name === parsed.name) return existing;
-    try {
-      return await this.prisma.tag.update({
+    return this.withActive(actorId, householdId, async (tx) => {
+      const existing = await tx.tag.findFirst({
         where: { id: tagId, householdId },
-        data: parsed,
         select: { id: true, name: true },
       });
-    } catch (error) {
-      if (isPrismaError(error, 'P2002'))
-        throw new ConflictException('CATALOG_NAME_EXISTS');
-      if (isPrismaError(error, 'P2025'))
-        throw new NotFoundException('TAG_NOT_FOUND');
-      throw error;
-    }
+      if (!existing) throw new NotFoundException('TAG_NOT_FOUND');
+      if (existing.name === parsed.name) return existing;
+      try {
+        return await tx.tag.update({
+          where: { id: tagId, householdId },
+          data: parsed,
+          select: { id: true, name: true },
+        });
+      } catch (error) {
+        if (isPrismaError(error, 'P2002'))
+          throw new ConflictException('CATALOG_NAME_EXISTS');
+        if (isPrismaError(error, 'P2025'))
+          throw new NotFoundException('TAG_NOT_FOUND');
+        throw error;
+      }
+    });
   }
 
   private async categoryReferences(
@@ -417,6 +452,7 @@ export class CatalogService {
     await this.requireMembership(actorId, householdId, true);
     try {
       await this.prisma.$transaction(async (tx) => {
+        await requireActiveHousehold(tx, actorId, householdId, 'ADMIN');
         const locked = await tx.$queryRaw<Array<{ id: string }>>`
           SELECT "id" FROM "Category" WHERE "id" = ${categoryId}
             AND "householdId" = ${householdId} FOR UPDATE
@@ -433,9 +469,10 @@ export class CatalogService {
       });
     } catch (error) {
       if (isPrismaError(error, 'P2003')) {
-        const references = await this.prisma.$transaction((tx) =>
-          this.categoryReferences(tx, householdId, categoryId),
-        );
+        const references = await this.prisma.$transaction(async (tx) => {
+          await requireActiveHousehold(tx, actorId, householdId, 'ADMIN');
+          return this.categoryReferences(tx, householdId, categoryId);
+        });
         throw inUse('CATEGORY_IN_USE', references);
       }
       throw error;
@@ -450,6 +487,7 @@ export class CatalogService {
     await this.requireMembership(actorId, householdId, true);
     try {
       await this.prisma.$transaction(async (tx) => {
+        await requireActiveHousehold(tx, actorId, householdId, 'ADMIN');
         const locked = await tx.$queryRaw<Array<{ id: string }>>`
           SELECT "id" FROM "Location" WHERE "id" = ${locationId}
             AND "householdId" = ${householdId} FOR UPDATE
@@ -466,9 +504,10 @@ export class CatalogService {
       });
     } catch (error) {
       if (isPrismaError(error, 'P2003')) {
-        const references = await this.prisma.$transaction((tx) =>
-          this.locationReferences(tx, householdId, locationId),
-        );
+        const references = await this.prisma.$transaction(async (tx) => {
+          await requireActiveHousehold(tx, actorId, householdId, 'ADMIN');
+          return this.locationReferences(tx, householdId, locationId);
+        });
         throw inUse('LOCATION_IN_USE', references);
       }
       throw error;

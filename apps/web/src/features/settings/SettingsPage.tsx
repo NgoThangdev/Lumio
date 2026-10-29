@@ -8,6 +8,7 @@ import { HouseholdSettingsSection } from './HouseholdSettingsSection';
 import { NotificationPreferencesSection } from './NotificationPreferencesSection';
 import { OfflineAppSection } from './OfflineAppSection';
 import { SignOutSection } from './SignOutSection';
+import { PendingHouseholdDeletionsSection } from './PendingHouseholdDeletionsSection';
 
 export function SettingsPage({
   user,
@@ -36,12 +37,16 @@ export function SettingsPage({
       >
         <a href="#appearance-settings">{tr('settings:appearance')}</a>
         <a href="#household-settings">{tr('common:household')}</a>
+        <a href="#pending-deletions-settings">
+          {tr('settings:pendingHouseholdDeletions')}
+        </a>
         <a href="#notification-settings">{tr('notifications:notifications')}</a>
         <a href="#push-settings">{tr('notifications:browserPush')}</a>
         <a href="#offline-settings">{tr('settings:offlineApp')}</a>
       </nav>
       <AppearanceLanguageSection />
-      <HouseholdSettingsSection />
+      <HouseholdSettingsSection user={user} />
+      <PendingHouseholdDeletionsSection user={user} />
       <OfflineAppSection />
       <NotificationPreferencesSection user={user} />
       <BrowserPushSection user={user} />

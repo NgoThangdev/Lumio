@@ -37,6 +37,9 @@ export type HouseholdSumAggregateOutputType = {
 export type HouseholdMinAggregateOutputType = {
   id: string | null
   name: string | null
+  deletionRequestId: string | null
+  deletionRequestedAt: Date | null
+  deletionDueAt: Date | null
   defaultShoppingCycleDays: number | null
   defaultStore: string | null
 }
@@ -44,6 +47,9 @@ export type HouseholdMinAggregateOutputType = {
 export type HouseholdMaxAggregateOutputType = {
   id: string | null
   name: string | null
+  deletionRequestId: string | null
+  deletionRequestedAt: Date | null
+  deletionDueAt: Date | null
   defaultShoppingCycleDays: number | null
   defaultStore: string | null
 }
@@ -51,6 +57,9 @@ export type HouseholdMaxAggregateOutputType = {
 export type HouseholdCountAggregateOutputType = {
   id: number
   name: number
+  deletionRequestId: number
+  deletionRequestedAt: number
+  deletionDueAt: number
   defaultShoppingCycleDays: number
   defaultStore: number
   _all: number
@@ -68,6 +77,9 @@ export type HouseholdSumAggregateInputType = {
 export type HouseholdMinAggregateInputType = {
   id?: true
   name?: true
+  deletionRequestId?: true
+  deletionRequestedAt?: true
+  deletionDueAt?: true
   defaultShoppingCycleDays?: true
   defaultStore?: true
 }
@@ -75,6 +87,9 @@ export type HouseholdMinAggregateInputType = {
 export type HouseholdMaxAggregateInputType = {
   id?: true
   name?: true
+  deletionRequestId?: true
+  deletionRequestedAt?: true
+  deletionDueAt?: true
   defaultShoppingCycleDays?: true
   defaultStore?: true
 }
@@ -82,6 +97,9 @@ export type HouseholdMaxAggregateInputType = {
 export type HouseholdCountAggregateInputType = {
   id?: true
   name?: true
+  deletionRequestId?: true
+  deletionRequestedAt?: true
+  deletionDueAt?: true
   defaultShoppingCycleDays?: true
   defaultStore?: true
   _all?: true
@@ -176,6 +194,9 @@ export type HouseholdGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
 export type HouseholdGroupByOutputType = {
   id: string
   name: string
+  deletionRequestId: string | null
+  deletionRequestedAt: Date | null
+  deletionDueAt: Date | null
   defaultShoppingCycleDays: number
   defaultStore: string | null
   _count: HouseholdCountAggregateOutputType | null
@@ -206,6 +227,9 @@ export type HouseholdWhereInput = {
   NOT?: Prisma.HouseholdWhereInput | Prisma.HouseholdWhereInput[]
   id?: Prisma.StringFilter<"Household"> | string
   name?: Prisma.StringFilter<"Household"> | string
+  deletionRequestId?: Prisma.StringNullableFilter<"Household"> | string | null
+  deletionRequestedAt?: Prisma.DateTimeNullableFilter<"Household"> | Date | string | null
+  deletionDueAt?: Prisma.DateTimeNullableFilter<"Household"> | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFilter<"Household"> | number
   defaultStore?: Prisma.StringNullableFilter<"Household"> | string | null
   memberships?: Prisma.MembershipListRelationFilter
@@ -225,6 +249,9 @@ export type HouseholdWhereInput = {
 export type HouseholdOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  deletionRequestId?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletionRequestedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletionDueAt?: Prisma.SortOrderInput | Prisma.SortOrder
   defaultShoppingCycleDays?: Prisma.SortOrder
   defaultStore?: Prisma.SortOrderInput | Prisma.SortOrder
   memberships?: Prisma.MembershipOrderByRelationAggregateInput
@@ -247,6 +274,9 @@ export type HouseholdWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.HouseholdWhereInput[]
   NOT?: Prisma.HouseholdWhereInput | Prisma.HouseholdWhereInput[]
   name?: Prisma.StringFilter<"Household"> | string
+  deletionRequestId?: Prisma.StringNullableFilter<"Household"> | string | null
+  deletionRequestedAt?: Prisma.DateTimeNullableFilter<"Household"> | Date | string | null
+  deletionDueAt?: Prisma.DateTimeNullableFilter<"Household"> | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFilter<"Household"> | number
   defaultStore?: Prisma.StringNullableFilter<"Household"> | string | null
   memberships?: Prisma.MembershipListRelationFilter
@@ -266,6 +296,9 @@ export type HouseholdWhereUniqueInput = Prisma.AtLeast<{
 export type HouseholdOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  deletionRequestId?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletionRequestedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletionDueAt?: Prisma.SortOrderInput | Prisma.SortOrder
   defaultShoppingCycleDays?: Prisma.SortOrder
   defaultStore?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.HouseholdCountOrderByAggregateInput
@@ -281,6 +314,9 @@ export type HouseholdScalarWhereWithAggregatesInput = {
   NOT?: Prisma.HouseholdScalarWhereWithAggregatesInput | Prisma.HouseholdScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Household"> | string
   name?: Prisma.StringWithAggregatesFilter<"Household"> | string
+  deletionRequestId?: Prisma.StringNullableWithAggregatesFilter<"Household"> | string | null
+  deletionRequestedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Household"> | Date | string | null
+  deletionDueAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Household"> | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntWithAggregatesFilter<"Household"> | number
   defaultStore?: Prisma.StringNullableWithAggregatesFilter<"Household"> | string | null
 }
@@ -288,6 +324,9 @@ export type HouseholdScalarWhereWithAggregatesInput = {
 export type HouseholdCreateInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
@@ -307,6 +346,9 @@ export type HouseholdCreateInput = {
 export type HouseholdUncheckedCreateInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
@@ -326,6 +368,9 @@ export type HouseholdUncheckedCreateInput = {
 export type HouseholdUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
@@ -345,6 +390,9 @@ export type HouseholdUpdateInput = {
 export type HouseholdUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -364,6 +412,9 @@ export type HouseholdUncheckedUpdateInput = {
 export type HouseholdCreateManyInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
 }
@@ -371,6 +422,9 @@ export type HouseholdCreateManyInput = {
 export type HouseholdUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -378,6 +432,9 @@ export type HouseholdUpdateManyMutationInput = {
 export type HouseholdUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -385,6 +442,9 @@ export type HouseholdUncheckedUpdateManyInput = {
 export type HouseholdCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  deletionRequestId?: Prisma.SortOrder
+  deletionRequestedAt?: Prisma.SortOrder
+  deletionDueAt?: Prisma.SortOrder
   defaultShoppingCycleDays?: Prisma.SortOrder
   defaultStore?: Prisma.SortOrder
 }
@@ -396,6 +456,9 @@ export type HouseholdAvgOrderByAggregateInput = {
 export type HouseholdMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  deletionRequestId?: Prisma.SortOrder
+  deletionRequestedAt?: Prisma.SortOrder
+  deletionDueAt?: Prisma.SortOrder
   defaultShoppingCycleDays?: Prisma.SortOrder
   defaultStore?: Prisma.SortOrder
 }
@@ -403,6 +466,9 @@ export type HouseholdMaxOrderByAggregateInput = {
 export type HouseholdMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  deletionRequestId?: Prisma.SortOrder
+  deletionRequestedAt?: Prisma.SortOrder
+  deletionDueAt?: Prisma.SortOrder
   defaultShoppingCycleDays?: Prisma.SortOrder
   defaultStore?: Prisma.SortOrder
 }
@@ -587,6 +653,9 @@ export type HouseholdUpdateOneRequiredWithoutInventoryUndosNestedInput = {
 export type HouseholdCreateWithoutCategoriesInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
@@ -605,6 +674,9 @@ export type HouseholdCreateWithoutCategoriesInput = {
 export type HouseholdUncheckedCreateWithoutCategoriesInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
@@ -639,6 +711,9 @@ export type HouseholdUpdateToOneWithWhereWithoutCategoriesInput = {
 export type HouseholdUpdateWithoutCategoriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
@@ -657,6 +732,9 @@ export type HouseholdUpdateWithoutCategoriesInput = {
 export type HouseholdUncheckedUpdateWithoutCategoriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -675,6 +753,9 @@ export type HouseholdUncheckedUpdateWithoutCategoriesInput = {
 export type HouseholdCreateWithoutLocationsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
@@ -693,6 +774,9 @@ export type HouseholdCreateWithoutLocationsInput = {
 export type HouseholdUncheckedCreateWithoutLocationsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
@@ -727,6 +811,9 @@ export type HouseholdUpdateToOneWithWhereWithoutLocationsInput = {
 export type HouseholdUpdateWithoutLocationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
@@ -745,6 +832,9 @@ export type HouseholdUpdateWithoutLocationsInput = {
 export type HouseholdUncheckedUpdateWithoutLocationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -763,6 +853,9 @@ export type HouseholdUncheckedUpdateWithoutLocationsInput = {
 export type HouseholdCreateWithoutTagsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
@@ -781,6 +874,9 @@ export type HouseholdCreateWithoutTagsInput = {
 export type HouseholdUncheckedCreateWithoutTagsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
@@ -815,6 +911,9 @@ export type HouseholdUpdateToOneWithWhereWithoutTagsInput = {
 export type HouseholdUpdateWithoutTagsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
@@ -833,6 +932,9 @@ export type HouseholdUpdateWithoutTagsInput = {
 export type HouseholdUncheckedUpdateWithoutTagsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -851,6 +953,9 @@ export type HouseholdUncheckedUpdateWithoutTagsInput = {
 export type HouseholdCreateWithoutMembershipsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
@@ -869,6 +974,9 @@ export type HouseholdCreateWithoutMembershipsInput = {
 export type HouseholdUncheckedCreateWithoutMembershipsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
@@ -903,6 +1011,9 @@ export type HouseholdUpdateToOneWithWhereWithoutMembershipsInput = {
 export type HouseholdUpdateWithoutMembershipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
@@ -921,6 +1032,9 @@ export type HouseholdUpdateWithoutMembershipsInput = {
 export type HouseholdUncheckedUpdateWithoutMembershipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -939,6 +1053,9 @@ export type HouseholdUncheckedUpdateWithoutMembershipsInput = {
 export type HouseholdCreateWithoutInvitationsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
@@ -957,6 +1074,9 @@ export type HouseholdCreateWithoutInvitationsInput = {
 export type HouseholdUncheckedCreateWithoutInvitationsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
@@ -991,6 +1111,9 @@ export type HouseholdUpdateToOneWithWhereWithoutInvitationsInput = {
 export type HouseholdUpdateWithoutInvitationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
@@ -1009,6 +1132,9 @@ export type HouseholdUpdateWithoutInvitationsInput = {
 export type HouseholdUncheckedUpdateWithoutInvitationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1027,6 +1153,9 @@ export type HouseholdUncheckedUpdateWithoutInvitationsInput = {
 export type HouseholdCreateWithoutInventoryItemsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
@@ -1045,6 +1174,9 @@ export type HouseholdCreateWithoutInventoryItemsInput = {
 export type HouseholdUncheckedCreateWithoutInventoryItemsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1079,6 +1211,9 @@ export type HouseholdUpdateToOneWithWhereWithoutInventoryItemsInput = {
 export type HouseholdUpdateWithoutInventoryItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
@@ -1097,6 +1232,9 @@ export type HouseholdUpdateWithoutInventoryItemsInput = {
 export type HouseholdUncheckedUpdateWithoutInventoryItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1115,6 +1253,9 @@ export type HouseholdUncheckedUpdateWithoutInventoryItemsInput = {
 export type HouseholdCreateWithoutItemChangesInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
@@ -1133,6 +1274,9 @@ export type HouseholdCreateWithoutItemChangesInput = {
 export type HouseholdUncheckedCreateWithoutItemChangesInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1167,6 +1311,9 @@ export type HouseholdUpdateToOneWithWhereWithoutItemChangesInput = {
 export type HouseholdUpdateWithoutItemChangesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
@@ -1185,6 +1332,9 @@ export type HouseholdUpdateWithoutItemChangesInput = {
 export type HouseholdUncheckedUpdateWithoutItemChangesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1203,6 +1353,9 @@ export type HouseholdUncheckedUpdateWithoutItemChangesInput = {
 export type HouseholdCreateWithoutInventoryStateActionsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
@@ -1221,6 +1374,9 @@ export type HouseholdCreateWithoutInventoryStateActionsInput = {
 export type HouseholdUncheckedCreateWithoutInventoryStateActionsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1255,6 +1411,9 @@ export type HouseholdUpdateToOneWithWhereWithoutInventoryStateActionsInput = {
 export type HouseholdUpdateWithoutInventoryStateActionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
@@ -1273,6 +1432,9 @@ export type HouseholdUpdateWithoutInventoryStateActionsInput = {
 export type HouseholdUncheckedUpdateWithoutInventoryStateActionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1291,6 +1453,9 @@ export type HouseholdUncheckedUpdateWithoutInventoryStateActionsInput = {
 export type HouseholdCreateWithoutShoppingTripsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
@@ -1309,6 +1474,9 @@ export type HouseholdCreateWithoutShoppingTripsInput = {
 export type HouseholdUncheckedCreateWithoutShoppingTripsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1343,6 +1511,9 @@ export type HouseholdUpdateToOneWithWhereWithoutShoppingTripsInput = {
 export type HouseholdUpdateWithoutShoppingTripsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
@@ -1361,6 +1532,9 @@ export type HouseholdUpdateWithoutShoppingTripsInput = {
 export type HouseholdUncheckedUpdateWithoutShoppingTripsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1379,6 +1553,9 @@ export type HouseholdUncheckedUpdateWithoutShoppingTripsInput = {
 export type HouseholdCreateWithoutLocationStockChecksInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
@@ -1397,6 +1574,9 @@ export type HouseholdCreateWithoutLocationStockChecksInput = {
 export type HouseholdUncheckedCreateWithoutLocationStockChecksInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1431,6 +1611,9 @@ export type HouseholdUpdateToOneWithWhereWithoutLocationStockChecksInput = {
 export type HouseholdUpdateWithoutLocationStockChecksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
@@ -1449,6 +1632,9 @@ export type HouseholdUpdateWithoutLocationStockChecksInput = {
 export type HouseholdUncheckedUpdateWithoutLocationStockChecksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1467,6 +1653,9 @@ export type HouseholdUncheckedUpdateWithoutLocationStockChecksInput = {
 export type HouseholdCreateWithoutInventoryActionsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
@@ -1485,6 +1674,9 @@ export type HouseholdCreateWithoutInventoryActionsInput = {
 export type HouseholdUncheckedCreateWithoutInventoryActionsInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1519,6 +1711,9 @@ export type HouseholdUpdateToOneWithWhereWithoutInventoryActionsInput = {
 export type HouseholdUpdateWithoutInventoryActionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
@@ -1537,6 +1732,9 @@ export type HouseholdUpdateWithoutInventoryActionsInput = {
 export type HouseholdUncheckedUpdateWithoutInventoryActionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1555,6 +1753,9 @@ export type HouseholdUncheckedUpdateWithoutInventoryActionsInput = {
 export type HouseholdCreateWithoutInventoryUndosInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
@@ -1573,6 +1774,9 @@ export type HouseholdCreateWithoutInventoryUndosInput = {
 export type HouseholdUncheckedCreateWithoutInventoryUndosInput = {
   id?: string
   name: string
+  deletionRequestId?: string | null
+  deletionRequestedAt?: Date | string | null
+  deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1607,6 +1811,9 @@ export type HouseholdUpdateToOneWithWhereWithoutInventoryUndosInput = {
 export type HouseholdUpdateWithoutInventoryUndosInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
@@ -1625,6 +1832,9 @@ export type HouseholdUpdateWithoutInventoryUndosInput = {
 export type HouseholdUncheckedUpdateWithoutInventoryUndosInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  deletionRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1773,6 +1983,9 @@ export type HouseholdCountOutputTypeCountTagsArgs<ExtArgs extends runtime.Types.
 export type HouseholdSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  deletionRequestId?: boolean
+  deletionRequestedAt?: boolean
+  deletionDueAt?: boolean
   defaultShoppingCycleDays?: boolean
   defaultStore?: boolean
   memberships?: boolean | Prisma.Household$membershipsArgs<ExtArgs>
@@ -1793,6 +2006,9 @@ export type HouseholdSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type HouseholdSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  deletionRequestId?: boolean
+  deletionRequestedAt?: boolean
+  deletionDueAt?: boolean
   defaultShoppingCycleDays?: boolean
   defaultStore?: boolean
 }, ExtArgs["result"]["household"]>
@@ -1800,6 +2016,9 @@ export type HouseholdSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
 export type HouseholdSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  deletionRequestId?: boolean
+  deletionRequestedAt?: boolean
+  deletionDueAt?: boolean
   defaultShoppingCycleDays?: boolean
   defaultStore?: boolean
 }, ExtArgs["result"]["household"]>
@@ -1807,11 +2026,14 @@ export type HouseholdSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
 export type HouseholdSelectScalar = {
   id?: boolean
   name?: boolean
+  deletionRequestId?: boolean
+  deletionRequestedAt?: boolean
+  deletionDueAt?: boolean
   defaultShoppingCycleDays?: boolean
   defaultStore?: boolean
 }
 
-export type HouseholdOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "defaultShoppingCycleDays" | "defaultStore", ExtArgs["result"]["household"]>
+export type HouseholdOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "deletionRequestId" | "deletionRequestedAt" | "deletionDueAt" | "defaultShoppingCycleDays" | "defaultStore", ExtArgs["result"]["household"]>
 export type HouseholdInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   memberships?: boolean | Prisma.Household$membershipsArgs<ExtArgs>
   invitations?: boolean | Prisma.Household$invitationsArgs<ExtArgs>
@@ -1849,6 +2071,9 @@ export type $HouseholdPayload<ExtArgs extends runtime.Types.Extensions.InternalA
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
+    deletionRequestId: string | null
+    deletionRequestedAt: Date | null
+    deletionDueAt: Date | null
     defaultShoppingCycleDays: number
     defaultStore: string | null
   }, ExtArgs["result"]["household"]>
@@ -2288,6 +2513,9 @@ export interface Prisma__HouseholdClient<T, Null = never, ExtArgs extends runtim
 export interface HouseholdFieldRefs {
   readonly id: Prisma.FieldRef<"Household", 'String'>
   readonly name: Prisma.FieldRef<"Household", 'String'>
+  readonly deletionRequestId: Prisma.FieldRef<"Household", 'String'>
+  readonly deletionRequestedAt: Prisma.FieldRef<"Household", 'DateTime'>
+  readonly deletionDueAt: Prisma.FieldRef<"Household", 'DateTime'>
   readonly defaultShoppingCycleDays: Prisma.FieldRef<"Household", 'Int'>
   readonly defaultStore: Prisma.FieldRef<"Household", 'String'>
 }

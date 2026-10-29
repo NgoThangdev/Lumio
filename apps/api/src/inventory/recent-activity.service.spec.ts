@@ -6,7 +6,7 @@ const at = (minute: number) =>
   new Date(`2026-10-14T10:${String(minute).padStart(2, '0')}:00.000Z`);
 
 function database() {
-  return {
+  const prisma = {
     membership: { findUnique: vi.fn().mockResolvedValue({ userId: 'viewer' }) },
     inventoryAction: { findMany: vi.fn().mockResolvedValue([]) },
     inventoryStateAction: { findMany: vi.fn().mockResolvedValue([]) },
@@ -14,6 +14,10 @@ function database() {
     shoppingTrip: { findMany: vi.fn().mockResolvedValue([]) },
     tripStockCheck: { findMany: vi.fn().mockResolvedValue([]) },
     locationStockCheck: { findMany: vi.fn().mockResolvedValue([]) },
+  };
+  return {
+    ...prisma,
+    $transaction: (run: (tx: typeof prisma) => unknown) => run(prisma),
   };
 }
 
@@ -269,3 +273,21 @@ describe('Recent household activity', () => {
     expect(result.items.at(-1)?.id).toBe('inventory:02');
   });
 });
+// Access gating is covered by active-household tests; this suite isolates its existing rules.
+vi.mock('../households/active-household.js', () => ({
+  checkActiveHousehold: vi.fn(),
+  requireActiveHousehold: vi.fn(
+    async (
+      tx: { membership: { findUnique: (args: unknown) => Promise<unknown> } },
+      actorId: string,
+      householdId: string,
+    ) => {
+      if (
+        !(await tx.membership.findUnique({
+          where: { userId_householdId: { userId: actorId, householdId } },
+        }))
+      )
+        throw { status: 403 };
+    },
+  ),
+}));

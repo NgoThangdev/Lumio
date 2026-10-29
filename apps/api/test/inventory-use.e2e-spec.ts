@@ -213,7 +213,7 @@ describe('InventoryService quantity Use (database)', () => {
 
     await expect(
       inventory.useQuantity({ ...input, actorId: outsiderId, quantity: '1' }),
-    ).rejects.toThrow('Household membership is required');
+    ).rejects.toThrow('HOUSEHOLD_MEMBERSHIP_REQUIRED');
     const { batches, actions } = await stockAndActivity(input.itemId);
     expect(batches[0].quantity.toString()).toBe('4');
     expect(actions).toHaveLength(0);

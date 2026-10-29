@@ -4,7 +4,11 @@ export const keys = {
     ['user', userId, 'notification-preferences'] as const,
   attention: (userId: string) => ['user', userId, 'attention'] as const,
   households: ['households'] as const,
+  pendingDeletions: (userId: string) =>
+    ['user', userId, 'pending-deletions'] as const,
   household: (householdId: string) => ['household', householdId] as const,
+  householdDeletionImpact: (householdId: string) =>
+    ['household', householdId, 'deletion-impact'] as const,
   shoppingSettings: (householdId: string) =>
     ['household', householdId, 'shopping-settings'] as const,
   members: (householdId: string) =>

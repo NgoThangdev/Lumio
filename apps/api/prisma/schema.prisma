@@ -194,6 +194,9 @@ model NotificationDelivery {
 model Household {
   id               String                @id @default(uuid())
   name             String
+  deletionRequestId String?
+  deletionRequestedAt DateTime?
+  deletionDueAt DateTime?
   defaultShoppingCycleDays Int @default(7)
   defaultStore String? @db.VarChar(120)
   memberships      Membership[]
@@ -208,6 +211,8 @@ model Household {
   locations Location[]
   locationStockChecks LocationStockCheck[]
   tags Tag[]
+
+  @@index([deletionDueAt])
 }
 
 model Category {

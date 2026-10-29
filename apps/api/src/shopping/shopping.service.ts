@@ -24,6 +24,10 @@ import {
   localCalendarDate,
 } from '../inventory/plan-use.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import {
+  checkActiveHousehold,
+  requireActiveHousehold,
+} from '../households/active-household.js';
 
 function calendarDate(value: unknown, label: string): Date {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
@@ -89,6 +93,7 @@ export class ShoppingService {
   }
 
   private async requireMember(actorId: string, householdId: string) {
+    await checkActiveHousehold(this.prisma, actorId, householdId);
     const membership = await this.prisma.membership.findUnique({
       where: { userId_householdId: { userId: actorId, householdId } },
       select: { userId: true },
@@ -100,67 +105,73 @@ export class ShoppingService {
   }
 
   async list(actorId: string, householdId: string) {
-    await this.requireMember(actorId, householdId);
-    return this.prisma.shoppingTrip.findMany({
-      where: { householdId },
-      include: { _count: { select: { entries: true } } },
-      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
+      return tx.shoppingTrip.findMany({
+        where: { householdId },
+        include: { _count: { select: { entries: true } } },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      });
     });
   }
 
   async read(actorId: string, householdId: string, tripId: string) {
-    await this.requireMember(actorId, householdId);
-    const trip = await this.prisma.shoppingTrip.findFirst({
-      where: { id: tripId, householdId },
-      include: {
-        entries: {
-          include: {
-            location: true,
-            moveToTrip: {
-              select: {
-                id: true,
-                store: true,
-                plannedDate: true,
-                status: true,
-              },
-            },
-            item: {
-              select: {
-                id: true,
-                name: true,
-                primaryUnit: true,
-                trackingMode: true,
-                openedTrackingEnabled: true,
-                category: {
-                  select: { householdId: true, shoppingSection: true },
+    return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
+      const trip = await tx.shoppingTrip.findFirst({
+        where: { id: tripId, householdId },
+        include: {
+          entries: {
+            include: {
+              location: true,
+              moveToTrip: {
+                select: {
+                  id: true,
+                  store: true,
+                  plannedDate: true,
+                  status: true,
                 },
-                preferredRestockLocationId: true,
-                preferredRestockLocation: { select: { id: true, name: true } },
+              },
+              item: {
+                select: {
+                  id: true,
+                  name: true,
+                  primaryUnit: true,
+                  trackingMode: true,
+                  openedTrackingEnabled: true,
+                  category: {
+                    select: { householdId: true, shoppingSection: true },
+                  },
+                  preferredRestockLocationId: true,
+                  preferredRestockLocation: {
+                    select: { id: true, name: true },
+                  },
+                },
               },
             },
+            orderBy: [{ priority: 'asc' }, { id: 'asc' }],
           },
-          orderBy: [{ priority: 'asc' }, { id: 'asc' }],
         },
-      },
+      });
+      if (!trip)
+        throw new NotFoundException(
+          'Shopping trip was not found in this household.',
+        );
+      return {
+        ...trip,
+        entries: trip.entries.map((entry) => {
+          const { category, ...item } = entry.item;
+          return {
+            ...entry,
+            item,
+            shoppingSection:
+              category?.householdId === householdId
+                ? (category.shoppingSection ?? 'OTHER')
+                : 'OTHER',
+          };
+        }),
+      };
     });
-    if (!trip)
-      throw new NotFoundException(
-        'Shopping trip was not found in this household.',
-      );
-    return {
-      ...trip,
-      entries: trip.entries.map((entry) => {
-        const { category, ...item } = entry.item;
-        return {
-          ...entry,
-          item,
-          shoppingSection:
-            category?.householdId === householdId
-              ? (category.shoppingSection ?? 'OTHER')
-              : 'OTHER',
-        };
-      }),
-    };
   }
 
   async create(
@@ -187,13 +198,16 @@ export class ShoppingService {
       );
     }
     await this.requireMember(actorId, householdId);
-    return this.prisma.shoppingTrip.create({
-      data: {
-        householdId,
-        createdByUserId: actorId,
-        store: store.trim(),
-        plannedDate,
-      },
+    return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
+      return tx.shoppingTrip.create({
+        data: {
+          householdId,
+          createdByUserId: actorId,
+          store: store.trim(),
+          plannedDate,
+        },
+      });
     });
   }
 
@@ -204,6 +218,7 @@ export class ShoppingService {
   ) {
     await this.requireMember(actorId, householdId);
     await this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       const locked = await tx.$queryRaw<
         Array<{
           status: string;
@@ -381,6 +396,7 @@ export class ShoppingService {
     await this.requireMember(actorId, householdId);
     try {
       await this.prisma.$transaction(async (tx) => {
+        await requireActiveHousehold(tx, actorId, householdId);
         const locked = await tx.$queryRaw<Array<{ status: string }>>`
           SELECT "status" FROM "ShoppingTrip"
           WHERE "id" = ${tripId} AND "householdId" = ${householdId}
@@ -424,6 +440,7 @@ export class ShoppingService {
   async start(actorId: string, householdId: string, tripId: string) {
     await this.requireMember(actorId, householdId);
     await this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       const locked = await tx.$queryRaw<Array<{ status: string }>>`
         SELECT "status" FROM "ShoppingTrip"
         WHERE "id" = ${tripId} AND "householdId" = ${householdId}
@@ -451,6 +468,7 @@ export class ShoppingService {
   ) {
     await this.requireMember(actorId, householdId);
     await this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       const locked = await tx.$queryRaw<Array<{ status: string }>>`
         SELECT "status" FROM "ShoppingTrip"
         WHERE "id" = ${tripId} AND "householdId" = ${householdId}
@@ -499,6 +517,7 @@ export class ShoppingService {
     const purchased = status === 'PURCHASED';
     await this.requireMember(actorId, householdId);
     await this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       const locked = await tx.$queryRaw<Array<{ status: string }>>`
         SELECT "status" FROM "ShoppingTrip"
         WHERE "id" = ${tripId} AND "householdId" = ${householdId}
@@ -618,6 +637,7 @@ export class ShoppingService {
     await this.requireMember(actorId, householdId);
     await this.prisma.$transaction(
       async (tx) => {
+        await requireActiveHousehold(tx, actorId, householdId);
         const locked = await tx.$queryRaw<Array<{ status: string }>>`
         SELECT "status" FROM "ShoppingTrip"
         WHERE "id" = ${tripId} AND "householdId" = ${householdId}

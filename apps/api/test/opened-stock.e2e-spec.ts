@@ -190,7 +190,7 @@ describe('Opened quantity stock (database, requires opened_quantity_stock migrat
     });
     await expect(
       inventory.openQuantity(other.actorId, input.householdId, input.itemId),
-    ).rejects.toThrow('Household membership');
+    ).rejects.toThrow('HOUSEHOLD_MEMBERSHIP_REQUIRED');
     await expect(
       inventory.openQuantity(other.actorId, other.householdId, input.itemId),
     ).rejects.toThrow('not found');

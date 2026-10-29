@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import type { Prisma, StockLevel } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { requireActiveHousehold } from '../households/active-household.js';
 import { undoEligibility } from './undo-eligibility.js';
 
 export const LEVELS: StockLevel[] = [
@@ -67,38 +68,41 @@ export class InventoryStateService {
     if (typeof neverRunOut !== 'boolean') {
       throw new BadRequestException('Never-run-out must be true or false.');
     }
-    const membership = await this.prisma.membership.findUnique({
-      where: { userId_householdId: { userId: actorId, householdId } },
-      select: { role: true },
-    });
-    if (membership?.role !== 'ADMIN')
-      throw new ForbiddenException(
-        'Household Admin membership is required to change stock settings.',
-      );
-    const item = await this.prisma.inventoryItem.findFirst({
-      where: { id: itemId, householdId },
-      select: { archivedAt: true },
-    });
-    if (item?.archivedAt) throw new ConflictException('ITEM_ARCHIVED');
-    const updated = await this.prisma.inventoryItem.updateMany({
-      where: {
-        id: itemId,
-        householdId,
-        trackingMode: 'FIVE_LEVEL',
-        archivedAt: null,
-      },
-      data: {
-        lowAtLevel: lowAtLevel as StockLevel,
-        buyAtLevel: buyAtLevel as StockLevel,
-        neverRunOut,
-      },
-    });
-    if (updated.count !== 1)
-      throw new NotFoundException(
-        'Five-level item was not found in this household.',
-      );
-    return this.prisma.inventoryItem.findUniqueOrThrow({
-      where: { id: itemId },
+    return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId, 'ADMIN');
+      const membership = await tx.membership.findUnique({
+        where: { userId_householdId: { userId: actorId, householdId } },
+        select: { role: true },
+      });
+      if (membership?.role !== 'ADMIN')
+        throw new ForbiddenException(
+          'Household Admin membership is required to change stock settings.',
+        );
+      const item = await tx.inventoryItem.findFirst({
+        where: { id: itemId, householdId },
+        select: { archivedAt: true },
+      });
+      if (item?.archivedAt) throw new ConflictException('ITEM_ARCHIVED');
+      const updated = await tx.inventoryItem.updateMany({
+        where: {
+          id: itemId,
+          householdId,
+          trackingMode: 'FIVE_LEVEL',
+          archivedAt: null,
+        },
+        data: {
+          lowAtLevel: lowAtLevel as StockLevel,
+          buyAtLevel: buyAtLevel as StockLevel,
+          neverRunOut,
+        },
+      });
+      if (updated.count !== 1)
+        throw new NotFoundException(
+          'Five-level item was not found in this household.',
+        );
+      return tx.inventoryItem.findUniqueOrThrow({
+        where: { id: itemId },
+      });
     });
   }
 
@@ -120,6 +124,7 @@ export class InventoryStateService {
     itemId: string,
     command: StateCommand,
   ) {
+    await requireActiveHousehold(tx, actorId, householdId);
     if (
       command.type === 'UPDATE_LEVEL' &&
       !LEVELS.includes(command.level as StockLevel)

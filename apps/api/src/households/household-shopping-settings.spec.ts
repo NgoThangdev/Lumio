@@ -61,7 +61,11 @@ function setup() {
     shoppingTrip: { updateMany: vi.fn() },
   };
   const prisma = { $transaction: (run: (db: typeof tx) => unknown) => run(tx) };
-  return { service: new HouseholdsService(prisma as never), tx, settings };
+  return {
+    service: new HouseholdsService(prisma as never, {} as never),
+    tx,
+    settings,
+  };
 }
 
 describe('household shopping settings', () => {

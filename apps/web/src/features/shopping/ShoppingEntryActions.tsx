@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from 'react';
+import type { Dispatch, RefObject, SetStateAction } from 'react';
 import { Link } from 'react-router';
 import type { CatalogOption, TrackingMode } from '@/shared/api/types';
 import { formatDateOnly, tr } from '@/shared/i18n';
@@ -23,7 +23,7 @@ export function ShoppingEntryActions({
   locationsError,
   locationOptions,
   onPurchase,
-  onSkip,
+  amountInputRef,
   onMove,
 }: {
   entry: Entry;
@@ -43,7 +43,7 @@ export function ShoppingEntryActions({
   locationsError: boolean;
   locationOptions?: CatalogOption[];
   onPurchase: (entry: Entry, mode: TrackingMode) => void;
-  onSkip: (entry: Entry) => void;
+  amountInputRef: RefObject<HTMLInputElement | null>;
   onMove: (entry: Entry, destination?: TripSummary) => void;
 }) {
   const savedDestinationIsDraft = eligibleDraftTrips.some(
@@ -63,13 +63,16 @@ export function ShoppingEntryActions({
     entry.status === 'MOVED' && selectedMoveId === entry.moveToTripId;
   return (
     <div className="purchase-controls">
-      <label>
+      <label className="purchase-amount">
         {mode === 'QUANTITY'
           ? packageCount
-            ? `Whole packages bought (${entry.item.primaryUnit})`
-            : `Actual bought (${entry.item.primaryUnit})`
+            ? tr('shopping:wholePackagesBought', {
+                unit: entry.item.primaryUnit,
+              })
+            : tr('shopping:actualBought', { unit: entry.item.primaryUnit })
           : tr('shopping:backupUnitsBought')}
         <input
+          ref={amountInputRef}
           type="number"
           disabled={mode === 'QUANTITY' && !openingInfoAvailable}
           min={mode === 'QUANTITY' && !packageCount ? '0.000001' : '1'}
@@ -103,10 +106,12 @@ export function ShoppingEntryActions({
         />
       </label>
       {mode === 'QUANTITY' && packageCount && (
-        <p className="muted">{tr('shopping:itemTracksUnopened')}</p>
+        <p className="muted purchase-note">
+          {tr('shopping:itemTracksUnopened')}
+        </p>
       )}
       {mode === 'QUANTITY' && (
-        <label>
+        <label className="purchase-expiry">
           {tr('common:expiry')} <em>{tr('common:optional2')}</em>
           <input
             type="date"
@@ -129,7 +134,7 @@ export function ShoppingEntryActions({
         </label>
       )}
       {mode === 'QUANTITY' && (
-        <label>
+        <label className="purchase-location">
           {tr('shopping:locationPurchase')}
           <select
             value={drafts[entry.id]?.locationId ?? ''}
@@ -180,15 +185,6 @@ export function ShoppingEntryActions({
         {entry.status === 'PURCHASED'
           ? tr('common:savePurchase')
           : tr('common:markPurchased')}
-      </button>
-      <button
-        className="secondary"
-        disabled={busy}
-        onClick={() => onSkip(entry)}
-      >
-        {entry.status === 'SKIPPED'
-          ? tr('common:leavePending')
-          : tr('common:skip')}
       </button>
       {eligibleDraftTrips.length > 1 && (
         <label className="move-trip-choice">

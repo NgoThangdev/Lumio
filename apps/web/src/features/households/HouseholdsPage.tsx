@@ -1,22 +1,42 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { api } from '../../shared/api/client';
 import { keys } from '../../shared/api/keys';
 import type { Household } from '../../shared/api/types';
 import { Doodle } from '../../shared/ui/Doodle';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
+import { HouseholdSwipeCard } from './HouseholdSwipeCard';
 
 import { tr } from '../../shared/i18n';
 import { localizedError } from '../../shared/i18n';
-export function HouseholdsPage() {
+export function HouseholdsPage({
+  onDeleteHousehold,
+}: {
+  onDeleteHousehold: (household: Household) => void;
+}) {
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const households = useQuery({
     queryKey: keys.households,
     queryFn: () => api<Household[]>('/households'),
   });
+  const routeNotice =
+    location.state &&
+    typeof location.state === 'object' &&
+    'notice' in location.state &&
+    typeof location.state.notice === 'string'
+      ? location.state.notice
+      : null;
+  const routeNoticeKind =
+    location.state &&
+    typeof location.state === 'object' &&
+    'noticeKind' in location.state &&
+    location.state.noticeKind === 'error'
+      ? 'error'
+      : 'success';
   const create = useMutation({
     mutationFn: () =>
       api<{ id: string; name: string }>('/households', 'POST', { name }),
@@ -34,6 +54,7 @@ export function HouseholdsPage() {
         <h1>{tr('common:chooseHousehold')}</h1>
         <p>{tr('common:eachHouseholdKeeps')}</p>
       </div>
+      {routeNotice && <Notice kind={routeNoticeKind}>{routeNotice}</Notice>}
       {households.isPending ? (
         <Card>
           <p className="muted">{tr('common:loadingHouseholds')}</p>
@@ -44,22 +65,11 @@ export function HouseholdsPage() {
         <Card>
           <h2>{tr('common:households2')}</h2>
           {households.data.map((entry) => (
-            <button
-              className="row"
+            <HouseholdSwipeCard
               key={entry.id}
-              onClick={() => navigate(`/households/${entry.id}/home`)}
-            >
-              <Doodle kind="household" className="household-row-doodle" />
-              <span className="item-identity">
-                <strong>{entry.name}</strong>
-                <small>
-                  {entry.role === 'ADMIN'
-                    ? tr('common:admin')
-                    : tr('common:member')}
-                </small>
-              </span>
-              <span>→</span>
-            </button>
+              household={entry}
+              onDelete={onDeleteHousehold}
+            />
           ))}
         </Card>
       ) : (

@@ -49,6 +49,9 @@ function setup(role: 'ADMIN' | 'MEMBER' = 'ADMIN') {
     },
     $transaction: vi.fn((fn: (client: typeof tx) => unknown) => fn(tx)),
   };
+  Object.assign(tx.category, prisma.category);
+  Object.assign(tx.location, prisma.location);
+  Object.assign(tx, { tag: prisma.tag });
   return { service: new CatalogService(prisma as never), prisma, tx };
 }
 
@@ -209,3 +212,8 @@ describe('catalog rename and removal', () => {
     });
   });
 });
+// Access gating is covered by active-household tests; this suite isolates its existing rules.
+vi.mock('../households/active-household.js', () => ({
+  checkActiveHousehold: vi.fn(),
+  requireActiveHousehold: vi.fn(),
+}));

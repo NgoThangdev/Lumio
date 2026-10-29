@@ -4,6 +4,7 @@ export class ApiError extends Error {
   readonly itemId: string | null;
   readonly tripIds: string[];
   readonly references: Record<string, number> | null;
+  readonly impact: unknown;
 
   constructor(
     message: string,
@@ -12,6 +13,7 @@ export class ApiError extends Error {
     itemId: string | null = null,
     tripIds: string[] = [],
     references: Record<string, number> | null = null,
+    impact: unknown = null,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -20,6 +22,7 @@ export class ApiError extends Error {
     this.itemId = itemId;
     this.tripIds = tripIds;
     this.references = references;
+    this.impact = impact;
   }
 }
 
@@ -133,6 +136,7 @@ export async function api<T>(
             ),
           )
         : null,
+      body?.impact ?? null,
     );
   }
   return data as T;

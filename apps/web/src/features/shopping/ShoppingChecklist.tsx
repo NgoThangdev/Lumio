@@ -26,6 +26,7 @@ export function ShoppingChecklist({
   entryUsesPackages,
   entryOpeningInfoAvailable,
   onPurchase,
+  onPending,
   onSkip,
   onMove,
   onRemove,
@@ -48,6 +49,7 @@ export function ShoppingChecklist({
   entryUsesPackages: (entry: Entry) => boolean;
   entryOpeningInfoAvailable: (entry: Entry) => boolean;
   onPurchase: (entry: Entry, mode: TrackingMode) => void;
+  onPending: (entry: Entry) => void;
   onSkip: (entry: Entry) => void;
   onMove: (entry: Entry, destination?: TripSummary) => void;
   onRemove: (entry: Entry) => void;
@@ -67,14 +69,19 @@ export function ShoppingChecklist({
         shoppingSections.map(({ code }: (typeof shoppingSections)[number]) => {
           const entries = trip.entries
             .filter((entry) => entry.shoppingSection === code)
-            .sort(
-              (left, right) =>
+            .sort((left, right) => {
+              const purchasedOrder =
+                Number(left.status === 'PURCHASED') -
+                Number(right.status === 'PURCHASED');
+              return (
+                purchasedOrder ||
                 priorityOrder.indexOf(left.priority) -
-                priorityOrder.indexOf(right.priority),
-            );
+                  priorityOrder.indexOf(right.priority)
+              );
+            });
           return (
             entries.length > 0 && (
-              <section className="card" key={code}>
+              <section className="shopping-section" key={code}>
                 <h3 className="shopping-section-title">
                   {localizedEnum(code)}
                 </h3>
@@ -99,6 +106,7 @@ export function ShoppingChecklist({
                     entryUsesPackages={entryUsesPackages}
                     entryOpeningInfoAvailable={entryOpeningInfoAvailable}
                     onPurchase={onPurchase}
+                    onPending={onPending}
                     onSkip={onSkip}
                     onMove={onMove}
                     onRemove={onRemove}

@@ -10,6 +10,7 @@ import { Doodle } from '@/shared/ui/Doodle';
 import { ControlIcon } from '@/shared/ui/ControlIcon';
 import { formatNumber, localizedEnum, tr } from '@/shared/i18n';
 import { localizedError } from '@/shared/i18n';
+import { InventoryLifecycleSwipe } from './InventoryLifecycleSwipe';
 
 function locationLabel(item: Item, locations?: CatalogOption[]) {
   if (item.trackingMode === 'QUANTITY') {
@@ -44,6 +45,9 @@ function InventoryItemRow({
   place,
   stock,
   locations,
+  householdId,
+  isAdmin,
+  onSaved,
 }: {
   item: Item;
   assessment: InventoryRead['items'][number]['assessment'];
@@ -51,6 +55,9 @@ function InventoryItemRow({
   place?: string;
   stock?: InventoryGroupEntry;
   locations?: CatalogOption[];
+  householdId: string;
+  isAdmin: boolean;
+  onSaved: (message: string, kind: 'success' | 'error') => void;
 }) {
   const amount =
     item.trackingMode === 'QUANTITY'
@@ -60,27 +67,41 @@ function InventoryItemRow({
         : `${stock ? (stock.isPresent === null ? tr('inventory:currentItemHere') : tr(stock.isPresent ? 'common:present' : 'common:absent')) : tr(item.isPresent ? 'common:present' : 'common:absent')} · ${formatNumber(stock?.backupCount ?? item.backupCount)} ${tr('common:backups2')}`;
 
   return (
-    <Link className="row inventory-row" to={`${base}/inventory/${item.id}`}>
-      <ItemVisual name={item.name} />
-      <span className="item-identity">
-        <strong>{item.name}</strong>
-        <small className="inventory-amount">{amount}</small>
-        {(place ?? (stock ? '' : locationLabel(item, locations))) && (
-          <small className="location-note">
-            {place ?? locationLabel(item, locations)}
-          </small>
+    <InventoryLifecycleSwipe
+      householdId={householdId}
+      item={item}
+      action="archive"
+      isAdmin={isAdmin}
+      onSaved={onSaved}
+    >
+      <Link
+        className={`row inventory-row${isAdmin ? ' has-swipe-actions' : ''}`}
+        draggable={false}
+        to={`${base}/inventory/${item.id}`}
+      >
+        <ItemVisual name={item.name} />
+        <span className="item-identity">
+          <strong>{item.name}</strong>
+          <small className="inventory-amount">{amount}</small>
+          {(place ?? (stock ? '' : locationLabel(item, locations))) && (
+            <small className="location-note">
+              {place ?? locationLabel(item, locations)}
+            </small>
+          )}
+        </span>
+        <span className="item-status">
+          <StockBadge status={stock?.lowStockRisk ?? assessment.lowStockRisk} />
+          {(stock?.expiryRisk ?? assessment.expiryRisk) === 'USE_SOON' && (
+            <StockBadge status="USE_SOON" />
+          )}
+        </span>
+        {!isAdmin && (
+          <span className="row-arrow" aria-hidden="true">
+            ›
+          </span>
         )}
-      </span>
-      <span className="item-status">
-        <StockBadge status={stock?.lowStockRisk ?? assessment.lowStockRisk} />
-        {(stock?.expiryRisk ?? assessment.expiryRisk) === 'USE_SOON' && (
-          <StockBadge status="USE_SOON" />
-        )}
-      </span>
-      <span className="row-arrow" aria-hidden="true">
-        ›
-      </span>
-    </Link>
+      </Link>
+    </InventoryLifecycleSwipe>
   );
 }
 
@@ -92,6 +113,9 @@ export function InventoryResults({
   base,
   locations,
   hasFilters,
+  householdId,
+  isAdmin,
+  onLifecycleSaved,
 }: {
   inventory?: InventoryRead;
   isPending: boolean;
@@ -100,6 +124,9 @@ export function InventoryResults({
   base: string;
   locations?: CatalogOption[];
   hasFilters: boolean;
+  householdId: string;
+  isAdmin: boolean;
+  onLifecycleSaved: (message: string, kind: 'success' | 'error') => void;
 }) {
   if (isPending)
     return (
@@ -133,6 +160,9 @@ export function InventoryResults({
             assessment={assessment}
             base={base}
             locations={locations}
+            householdId={householdId}
+            isAdmin={isAdmin}
+            onSaved={onLifecycleSaved}
           />
         ))}
       </div>
@@ -175,6 +205,9 @@ export function InventoryResults({
                   }
                   stock={groupBy === 'location' ? entry : undefined}
                   locations={locations}
+                  householdId={householdId}
+                  isAdmin={isAdmin}
+                  onSaved={onLifecycleSaved}
                 />
               )
             );

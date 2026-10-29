@@ -164,6 +164,35 @@ export function ItemDetailPage() {
   return (
     <>
       <ItemDetailIdentity item={item} assessment={assessment} />
+      {!item.archivedAt && item.trackingMode === 'QUANTITY' && (
+        <div className="stack detail-actions">
+          <QuantityStockActions
+            item={item}
+            actions={quantityActions}
+            locations={{
+              data: locations.data,
+              isPending: locations.isPending,
+              isError: locations.isError,
+              error: locations.error,
+            }}
+          />
+          {item.openedTrackingEnabled && (
+            <OpeningActions
+              householdId={household.id}
+              item={item}
+              onRefresh={refresh}
+            />
+          )}
+        </div>
+      )}
+      {!item.archivedAt && item.trackingMode !== 'QUANTITY' && (
+        <StateModeActions
+          householdId={household.id}
+          item={item}
+          recommendedAction={assessment?.recommendedAction}
+          onRefresh={refresh}
+        />
+      )}
       {notice && <Notice kind="success">{notice}</Notice>}
       {!item.archivedAt &&
         !quantityActions.undoCandidate &&
@@ -178,13 +207,7 @@ export function ItemDetailPage() {
           {localizedError(intelligence.error)}
         </Notice>
       )}
-      <div
-        className={
-          item.trackingMode === 'QUANTITY'
-            ? 'detail-grid'
-            : 'detail-grid state-detail'
-        }
-      >
+      <div className="detail-grid">
         <div className="stack detail-overview">
           <ItemDetailStockSummary
             item={item}
@@ -201,35 +224,6 @@ export function ItemDetailPage() {
             showReasonExplanations={showReasonExplanations}
           />
         </div>
-        {!item.archivedAt && item.trackingMode === 'QUANTITY' && (
-          <div className="stack detail-actions">
-            <QuantityStockActions
-              item={item}
-              actions={quantityActions}
-              locations={{
-                data: locations.data,
-                isPending: locations.isPending,
-                isError: locations.isError,
-                error: locations.error,
-              }}
-            />
-            {item.openedTrackingEnabled && (
-              <OpeningActions
-                householdId={household.id}
-                item={item}
-                onRefresh={refresh}
-              />
-            )}
-          </div>
-        )}
-        {!item.archivedAt && item.trackingMode !== 'QUANTITY' && (
-          <StateModeActions
-            householdId={household.id}
-            item={item}
-            recommendedAction={assessment?.recommendedAction}
-            onRefresh={refresh}
-          />
-        )}
         <ItemDetailHistory
           item={item}
           locations={locations.data ?? []}

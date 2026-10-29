@@ -929,10 +929,11 @@ em {
   gap: 18px;
 }
 .home-attention-card {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 12px;
   min-width: 0;
-  min-height: 246px;
+  min-height: 218px;
   padding: 20px 22px 16px;
   background: var(--surface);
   border: 1px solid var(--surface-home-card-border);
@@ -966,8 +967,7 @@ em {
 .home-attention-body {
   display: flex;
   align-items: center;
-  gap: 19px;
-  flex: 1;
+  gap: 16px;
   min-width: 0;
 }
 .home-attention-visual {
@@ -976,28 +976,20 @@ em {
   width: 125px;
   height: 125px;
 }
-.home-attention-copy {
-  display: grid;
-  gap: 7px;
+.home-attention-name {
   min-width: 0;
-}
-.home-attention-copy strong {
   font-size: 26px;
   line-height: 1.12;
   font-weight: 900;
   overflow-wrap: anywhere;
 }
-.home-attention-copy small {
+.home-attention-stock {
+  display: block;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 11px;
   font-size: 15px;
   line-height: 1.4;
   color: var(--muted);
-  overflow-wrap: anywhere;
-}
-.home-attention-explanation {
-  margin: 0;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.35;
   overflow-wrap: anywhere;
 }
 .home-attention-footer {
@@ -1261,6 +1253,106 @@ em {
   gap: 12px;
   scroll-margin-top: 16px;
 }
+
+.deletion-impact-group {
+  margin-block: 1rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+}
+
+.deletion-impact-group h4,
+.deletion-schedule-area h4,
+.deletion-immediate-area h4 {
+  margin: 0 0 0.5rem;
+}
+
+.deletion-impact-group dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem 1rem;
+  margin: 0;
+}
+
+.deletion-impact-group dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.deletion-impact-group dt {
+  overflow-wrap: anywhere;
+}
+
+.deletion-impact-group dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.deletion-review-check {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin-block: 1rem;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.deletion-review-check input {
+  display: block;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  max-width: 22px;
+  min-height: 22px;
+  margin: 2px 0 0;
+  padding: 0;
+  border: 1.5px solid var(--border-control);
+  border-radius: 4px;
+  background: var(--surface-control);
+  accent-color: var(--green-deep);
+  appearance: auto;
+  -webkit-appearance: checkbox;
+}
+
+.deletion-review-check span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.deletion-schedule-area,
+.deletion-immediate-area {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+.deletion-danger-button {
+  background: var(--status-error-fg);
+  color: var(--surface);
+}
+
+.deletion-danger-button:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.deletion-danger-button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.pending-deletion-row {
+  border-top: 1px solid var(--border);
+  padding-block: 0.75rem;
+}
+
+@media (max-width: 360px) {
+  .deletion-impact-group dl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .settings-scope-heading h2 {
   margin: 0;
 }
@@ -1404,7 +1496,7 @@ em {
     font-size: 37px;
   }
   .home-attention-card {
-    min-height: 326px;
+    min-height: 274px;
     padding: 23px 27px 19px;
   }
   .home-attention-pill {
@@ -1417,10 +1509,10 @@ em {
     height: 185px;
     flex-basis: 185px;
   }
-  .home-attention-copy strong {
+  .home-attention-name {
     font-size: 35px;
   }
-  .home-attention-copy small {
+  .home-attention-stock {
     font-size: 21px;
   }
   .home-attention-footer {
@@ -1693,14 +1785,23 @@ em {
 }
 .detail-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 24px;
   align-items: start;
-}
-.state-detail {
-  grid-template-columns: minmax(0, 1fr);
   max-width: 850px;
   margin: 0 auto;
+}
+.detail-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  max-width: 850px;
+  margin: 0 auto 24px;
+}
+.detail-actions > .plain-action-card {
+  grid-column: 1 / -1;
+}
+.state-actions {
+  grid-template-columns: minmax(0, 1fr);
 }
 .detail-management {
   max-width: 850px;
@@ -1920,60 +2021,141 @@ details[open] > .action-summary .disclosure-arrow {
 }
 .trip-checklist {
   display: grid;
-  gap: 20px;
+  gap: 24px;
 }
-.shopping-section-title {
-  margin: 0 0 8px;
-}
-.checklist-entry {
-  border-top: 1px solid var(--border);
-  padding: 20px 0;
-}
-.checklist-entry:first-of-type {
-  border-top: 0;
-}
-.checklist-entry:last-child {
-  padding-bottom: 0;
-}
-.entry-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.shopping-item-heading {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+.shopping-section {
+  display: grid;
+  gap: 10px;
   min-width: 0;
 }
-.shopping-item-heading strong {
-  font-size: 22px;
+.shopping-section-title {
+  margin: 0 0 2px;
+}
+.checklist-entry {
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+}
+.checklist-entry-purchased {
+  background: var(--status-success-bg);
+  border-color: var(--status-success-border);
+}
+.entry-title {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+}
+.entry-title h4 {
+  min-width: 0;
+  margin: 0;
+}
+.entry-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+}
+.entry-toggle-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.entry-toggle-copy strong {
+  font-size: 18px;
   font-weight: 900;
+  line-height: 1.2;
   overflow-wrap: anywhere;
 }
-.shopping-item-heading .item-visual {
-  width: 66px;
-  height: 66px;
-  flex-basis: 66px;
+.entry-toggle-copy small {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.entry-toggle .item-visual {
+  width: 48px;
+  height: 52px;
+  flex: 0 0 48px;
+}
+.entry-head-actions {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+}
+.entry-purchased-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-height: 44px;
+  margin: 0;
+  font-size: 13px;
+  text-align: right;
+}
+.entry-purchased-toggle input {
+  width: 22px;
+  height: 22px;
+  min-height: 22px;
+  margin: 0;
+  padding: 0;
+  flex: 0 0 22px;
+  accent-color: var(--green);
+}
+.entry-skip-button {
+  min-height: 44px;
+  padding: 7px 10px;
+  font-size: 13px;
+}
+.entry-summary-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.entry-summary-meta .eyebrow {
+  margin: 0;
+}
+.entry-decision-status {
+  border-radius: 12px;
+  padding: 3px 8px;
+  background: var(--status-neutral-bg);
+  color: var(--status-neutral-fg);
+  font-size: 13px;
+  font-weight: 800;
+}
+.entry-details {
+  min-width: 0;
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
 }
 .checklist-entry .muted {
   margin: 8px 0;
 }
 .purchase-controls {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  align-items: end;
-  flex-wrap: wrap;
-  margin-top: 18px;
+  align-items: start;
+  margin-top: 14px;
 }
 .purchase-controls label {
-  min-width: 135px;
-  flex: 1;
+  min-width: 0;
   margin-bottom: 0;
 }
-.purchase-controls .primary {
-  width: auto;
+.purchase-location,
+.purchase-note,
+.purchase-controls .primary,
+.purchase-controls > .secondary,
+.purchase-controls .move-trip-choice,
+.purchase-controls .move-no-drafts {
+  grid-column: 1 / -1;
 }
 .move-saved {
   display: inline-block;
@@ -2526,18 +2708,7 @@ details[open] > .action-summary .disclosure-arrow {
   .detail-grid > .detail-overview {
     display: contents;
   }
-  .detail-grid .stock-summary {
-    grid-row: 1;
-  }
-  .detail-grid .stock-correction-entry {
-    grid-row: 2;
-  }
-  .detail-grid .assessment-card,
-  .detail-grid .assessment-loading {
-    grid-row: 4;
-  }
   .detail-actions {
-    grid-row: 3;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
@@ -2597,27 +2768,6 @@ details[open] > .action-summary .disclosure-arrow {
   .trip-tools > button {
     flex: 1;
   }
-  .purchase-controls {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .purchase-controls label {
-    min-width: 0;
-  }
-  .shopping-item-heading {
-    gap: 9px;
-  }
-  .shopping-item-heading strong {
-    font-size: 20px;
-  }
-  .shopping-item-heading .item-visual {
-    width: 57px;
-    height: 65px;
-    flex-basis: 57px;
-  }
-  .entry-title > .health {
-    flex-shrink: 0;
-  }
   .auth-layout {
     grid-template-columns: minmax(0, 1fr);
     gap: 20px;
@@ -2672,37 +2822,36 @@ details[open] > .action-summary .disclosure-arrow {
     font-size: 14px;
   }
   .home-attention-card {
-    min-height: 228px;
+    min-height: 205px;
     padding: 13px 10px 15px;
     border-radius: 25px;
+    gap: 9px;
   }
   .home-attention-body {
     flex-direction: column;
-    justify-content: center;
-    gap: 3px;
-    text-align: center;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 7px;
   }
   .home-attention-visual {
-    width: 84px;
-    height: 84px;
-    flex-basis: 84px;
+    width: 72px;
+    height: 72px;
+    flex-basis: 72px;
   }
-  .home-attention-copy {
-    gap: 3px;
-  }
-  .home-attention-copy strong {
+  .home-attention-name {
     font-size: 18px;
   }
-  .home-attention-copy small {
-    font-size: 12px;
+  .home-attention-stock {
+    padding-top: 8px;
+    font-size: 13px;
   }
   .home-attention-pill {
-    align-self: center;
+    justify-self: start;
     min-height: 31px;
     max-width: 100%;
-    font-size: 11px;
+    font-size: 12px;
     padding: 3px 10px;
-    text-align: center;
+    text-align: left;
   }
   .home-quick-card {
     display: grid;
@@ -2793,6 +2942,25 @@ details[open] > .action-summary .disclosure-arrow {
   }
 }
 @media (max-width: 360px) {
+  .detail-intro .item-visual-large {
+    width: 104px;
+    height: 125px;
+    flex-basis: 104px;
+  }
+  .detail-title {
+    font-size: 28px;
+  }
+  .entry-toggle .item-visual {
+    width: 40px;
+    height: 44px;
+    flex-basis: 40px;
+  }
+  .entry-toggle-copy strong {
+    font-size: 16px;
+  }
+  .purchase-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .topbar {
     padding: calc(8px + env(safe-area-inset-top)) 12px 8px;
     gap: 8px;
@@ -3377,4 +3545,219 @@ details[open] > .action-summary .disclosure-arrow {
   display: block;
   line-height: 1.45;
   overflow-wrap: anywhere;
+}
+
+.swipe-reveal {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-width: 0;
+  border-radius: 25px;
+  --inventory-action-width: 116px;
+}
+.inventory-swipe-item {
+  margin-bottom: 12px;
+}
+.swipe-reveal[data-action='delete'] {
+  --inventory-action-width: 168px;
+}
+.swipe-reveal-main {
+  position: relative;
+  z-index: 1;
+  transition: transform 220ms cubic-bezier(0.2, 0.75, 0.25, 1);
+  will-change: transform;
+}
+.swipe-reveal[data-revealed='true'] .swipe-reveal-main {
+  transform: translateX(calc(-1 * var(--inventory-action-width)));
+}
+.swipe-reveal-main > .inventory-row {
+  margin-bottom: 0;
+  touch-action: pan-y;
+  user-select: none;
+}
+.inventory-row.has-swipe-actions {
+  grid-template-columns: 82px minmax(0, 1fr) minmax(0, auto);
+}
+.swipe-reveal-keyboard-control {
+  position: absolute;
+  z-index: 3;
+  top: 8px;
+  right: 8px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.swipe-reveal-keyboard-control button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 7px 12px;
+}
+.swipe-reveal-keyboard-control:focus-within {
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+}
+.swipe-reveal-actions {
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 0 auto;
+  display: grid;
+  width: var(--inventory-action-width);
+  overflow: hidden;
+}
+.swipe-reveal-action-button {
+  width: 100%;
+  min-height: 100%;
+  padding: 10px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  white-space: normal;
+  line-height: 1.2;
+  font-size: 15px;
+  font-weight: 800;
+}
+.swipe-reveal-archive {
+  background: #2f9e59;
+  color: #fff;
+}
+.swipe-reveal-archive:hover:not(:disabled) {
+  background: #27834a;
+  color: #fff;
+}
+.swipe-reveal-delete {
+  background: var(--status-error-bg);
+  color: var(--status-error-fg);
+  border-left: 1px solid var(--status-error-border);
+}
+.swipe-reveal-delete:hover:not(:disabled) {
+  background: var(--status-error-border);
+  color: var(--status-error-fg);
+}
+.archived-inventory-row {
+  margin-bottom: 0;
+  gap: 10px;
+  min-height: 78px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 25px;
+  background: var(--surface);
+}
+.archived-inventory-row > a {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.household-swipe-item {
+  margin-bottom: 5px;
+  border-radius: 17px;
+}
+.household-row-select {
+  min-height: 78px;
+  margin-bottom: 0;
+  padding: 12px 14px;
+  border-radius: 17px;
+  background: var(--surface);
+  touch-action: pan-y;
+  user-select: none;
+}
+.household-delete-dialog {
+  width: min(680px, calc(100vw - 24px));
+  max-width: none;
+  max-height: calc(
+    100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px
+  );
+  margin: auto;
+  padding: 12px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.household-delete-dialog::backdrop {
+  background: rgb(17 28 22 / 60%);
+}
+.household-delete-dialog-close {
+  position: sticky;
+  z-index: 2;
+  top: -12px;
+  display: flex;
+  justify-content: flex-end;
+  margin: -12px -12px 8px;
+  padding: 12px;
+  background: var(--surface);
+}
+.household-delete-dialog .household-deletion-card {
+  margin: 0;
+}
+.inventory-lifecycle-dialog {
+  width: min(440px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(
+    100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 32px
+  );
+  margin: auto;
+  padding: 23px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.inventory-lifecycle-dialog::backdrop {
+  background: rgb(17 28 22 / 55%);
+}
+.inventory-lifecycle-dialog h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.inventory-lifecycle-dialog p {
+  margin: 0;
+}
+.inventory-dialog-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 8px;
+}
+.inventory-dialog-actions button {
+  min-height: 48px;
+  white-space: normal;
+}
+.inventory-permanent-delete {
+  border-color: var(--status-error-border);
+  background: var(--status-error-bg);
+  color: var(--status-error-fg);
+}
+.inventory-permanent-delete:hover {
+  border-color: var(--status-error-fg);
+  background: var(--status-error-bg);
+}
+
+@media (max-width: 380px) {
+  .inventory-lifecycle-dialog {
+    padding: 19px;
+  }
+  .inventory-dialog-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .inventory-row.has-swipe-actions {
+    grid-template-columns: 70px minmax(0, 1fr) 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swipe-reveal-main {
+    transition: none;
+  }
 }

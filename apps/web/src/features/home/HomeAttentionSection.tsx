@@ -3,11 +3,7 @@ import { Link } from 'react-router';
 import type { InventoryRead, NeedsAttention } from '../../shared/api/types';
 import { tr, formatNumber, localizedError } from '../../shared/i18n';
 import { Doodle } from '../../shared/ui/Doodle';
-import {
-  ExplanationText,
-  hasExplanationTranslation,
-  Notice,
-} from '../../shared/ui/primitives';
+import { Notice } from '../../shared/ui/primitives';
 import { alertLabel, alertTone } from './homePresentation';
 
 export function HomeAttentionSection({
@@ -55,20 +51,6 @@ export function HomeAttentionSection({
               : stock.isPending
                 ? tr('common:loadingStock')
                 : tr('home:stockUnavailable');
-            // Pair legacy fallback text in the API's full explanation
-            // order. The displayed primary descriptor remains API-owned.
-            const primaryReasonIndex =
-              entry.action === 'USE_SOON'
-                ? 0
-                : entry.action === 'OPEN_REFILL' ||
-                    entry.trackingMode !== 'QUANTITY'
-                  ? entry.reasons.length - 1
-                  : entry.expiryRisk === 'USE_SOON'
-                    ? 1
-                    : 0;
-            const supportingFallbacks = entry.reasons.filter(
-              (_, index) => index !== primaryReasonIndex,
-            );
             return (
               <Link
                 className="home-attention-card"
@@ -82,49 +64,9 @@ export function HomeAttentionSection({
                   <span className="home-attention-visual">
                     <Doodle itemName={entry.name} />
                   </span>
-                  <div className="home-attention-copy">
-                    <strong>{entry.name}</strong>
-                    <small>{amount}</small>
-                    {entry.primaryExplanation ? (
-                      <>
-                        <ExplanationText
-                          className="home-attention-explanation"
-                          explanation={entry.primaryExplanation}
-                          fallback={entry.reason}
-                        />
-                        {hasExplanationTranslation(entry.primaryExplanation) &&
-                          (entry.supportingExplanations?.length
-                            ? entry.supportingExplanations.map(
-                                (explanation, index) => (
-                                  <ExplanationText
-                                    className="home-attention-explanation"
-                                    key={`${explanation.code}-${index}`}
-                                    explanation={explanation}
-                                    fallback={supportingFallbacks[index]}
-                                  />
-                                ),
-                              )
-                            : supportingFallbacks.map((reason, index) => (
-                                <ExplanationText
-                                  className="home-attention-explanation"
-                                  key={`${reason}-${index}`}
-                                  explanation={undefined}
-                                  fallback={reason}
-                                />
-                              )))}
-                      </>
-                    ) : (
-                      entry.reasons.map((reason, index) => (
-                        <ExplanationText
-                          className="home-attention-explanation"
-                          key={`fallback-${reason}-${index}`}
-                          explanation={undefined}
-                          fallback={reason}
-                        />
-                      ))
-                    )}
-                  </div>
+                  <strong className="home-attention-name">{entry.name}</strong>
                 </span>
+                <span className="home-attention-stock">{amount}</span>
               </Link>
             );
           })}

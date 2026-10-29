@@ -111,3 +111,8 @@ describe('Location stock check service', () => {
     ).rejects.toThrow('STOCK_CHANGED');
   });
 });
+// Access gating is covered by active-household tests; this suite isolates its existing rules.
+vi.mock('../households/active-household.js', () => ({
+  checkActiveHousehold: vi.fn(),
+  requireActiveHousehold: vi.fn(),
+}));

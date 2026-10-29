@@ -9,6 +9,7 @@ import { Prisma } from '../generated/prisma/client.js';
 import { parseQuantity } from '../inventory/quantity-validation.js';
 import { LEVELS } from '../inventory/inventory-state.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { requireActiveHousehold } from '../households/active-household.js';
 import { rankStockChecks } from './stock-check-ranking.js';
 
 type Client = Prisma.TransactionClient;
@@ -138,6 +139,7 @@ export class StockCheckService {
 
   async list(actorId: string, householdId: string, tripId: string) {
     return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       await this.requireMember(tx, actorId, householdId);
       await this.requireCheckableTrip(tx, householdId, tripId);
       if (!(await tx.tripStockCheck.count({ where: { tripId } }))) {
@@ -186,6 +188,7 @@ export class StockCheckService {
     body: Record<string, unknown>,
   ) {
     return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       await this.requireMember(tx, actorId, householdId);
       await this.requireCheckableTrip(tx, householdId, tripId);
       const check = await tx.tripStockCheck.findUnique({

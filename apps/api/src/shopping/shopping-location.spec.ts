@@ -129,6 +129,9 @@ describe('Shopping Finish location resolution', () => {
         }),
         update,
       },
+      shoppingTrip: {
+        findFirst: vi.fn().mockResolvedValue({ id: 'trip', entries: [] }),
+      },
     };
     const prisma = {
       membership: { findUnique: vi.fn().mockResolvedValue({ userId: 'user' }) },
@@ -170,3 +173,8 @@ describe('Shopping Finish location resolution', () => {
     });
   });
 });
+// Access gating is covered by active-household tests; this suite isolates its existing rules.
+vi.mock('../households/active-household.js', () => ({
+  checkActiveHousehold: vi.fn(),
+  requireActiveHousehold: vi.fn(),
+}));

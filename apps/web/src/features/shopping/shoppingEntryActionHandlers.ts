@@ -42,6 +42,15 @@ export function createShoppingEntryActions({
     );
   }
 
+  function pending(entry: Entry) {
+    if (!trip) return;
+    void run(() =>
+      updateTrip(`${base}/${trip.id}/entries/${entry.id}`, 'PATCH', {
+        status: 'PENDING',
+      }),
+    );
+  }
+
   function move(entry: Entry, destination?: TripSummary) {
     if (!trip) return;
     void run(async () => {
@@ -62,5 +71,5 @@ export function createShoppingEntryActions({
     });
   }
 
-  return { purchase, skip, move, remove };
+  return { purchase, pending, skip, move, remove };
 }

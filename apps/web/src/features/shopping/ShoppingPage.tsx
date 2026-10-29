@@ -263,6 +263,7 @@ export function ShoppingPage() {
             entryUsesPackages={entryUsesPackages}
             entryOpeningInfoAvailable={entryOpeningInfoAvailable}
             onPurchase={entryActions.purchase}
+            onPending={entryActions.pending}
             onSkip={entryActions.skip}
             onMove={entryActions.move}
             onRemove={entryActions.remove}

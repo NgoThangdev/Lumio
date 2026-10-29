@@ -18,6 +18,11 @@ import { HouseholdsService } from './households.service.js';
 export class HouseholdsController {
   constructor(private readonly households: HouseholdsService) {}
 
+  @Get('pending-deletions')
+  pendingDeletions(@Req() request: AuthenticatedRequest) {
+    return this.households.pendingDeletions(request.actorId);
+  }
+
   @Get()
   list(@Req() request: AuthenticatedRequest) {
     return this.households.list(request.actorId);
@@ -29,6 +34,49 @@ export class HouseholdsController {
     @Body() body: { name?: unknown },
   ) {
     return this.households.create(request.actorId, body?.name);
+  }
+
+  @Delete(':householdId')
+  deleteImmediately(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Body() body: unknown,
+  ) {
+    return this.households.deleteImmediately(
+      request.actorId,
+      householdId,
+      body,
+    );
+  }
+
+  @Get(':householdId/deletion-impact')
+  deletionImpact(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+  ) {
+    return this.households.deletionImpactForAdmin(request.actorId, householdId);
+  }
+
+  @Post(':householdId/deletion-request')
+  scheduleDeletion(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Body() body: unknown,
+  ) {
+    return this.households.scheduleDeletion(request.actorId, householdId, body);
+  }
+
+  @Delete(':householdId/deletion-request/:requestId')
+  cancelDeletion(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Param('requestId') requestId: string,
+  ) {
+    return this.households.cancelDeletion(
+      request.actorId,
+      householdId,
+      requestId,
+    );
   }
 
   @Get(':householdId/shopping-settings')
