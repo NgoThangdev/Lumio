@@ -35,6 +35,8 @@ export type ShoppingTripMinAggregateOutputType = {
   createdAt: Date | null
   completedAt: Date | null
   suggestionsImportedAt: Date | null
+  archivedAt: Date | null
+  archivedByUserId: string | null
 }
 
 export type ShoppingTripMaxAggregateOutputType = {
@@ -48,6 +50,8 @@ export type ShoppingTripMaxAggregateOutputType = {
   createdAt: Date | null
   completedAt: Date | null
   suggestionsImportedAt: Date | null
+  archivedAt: Date | null
+  archivedByUserId: string | null
 }
 
 export type ShoppingTripCountAggregateOutputType = {
@@ -61,6 +65,8 @@ export type ShoppingTripCountAggregateOutputType = {
   createdAt: number
   completedAt: number
   suggestionsImportedAt: number
+  archivedAt: number
+  archivedByUserId: number
   _all: number
 }
 
@@ -76,6 +82,8 @@ export type ShoppingTripMinAggregateInputType = {
   createdAt?: true
   completedAt?: true
   suggestionsImportedAt?: true
+  archivedAt?: true
+  archivedByUserId?: true
 }
 
 export type ShoppingTripMaxAggregateInputType = {
@@ -89,6 +97,8 @@ export type ShoppingTripMaxAggregateInputType = {
   createdAt?: true
   completedAt?: true
   suggestionsImportedAt?: true
+  archivedAt?: true
+  archivedByUserId?: true
 }
 
 export type ShoppingTripCountAggregateInputType = {
@@ -102,6 +112,8 @@ export type ShoppingTripCountAggregateInputType = {
   createdAt?: true
   completedAt?: true
   suggestionsImportedAt?: true
+  archivedAt?: true
+  archivedByUserId?: true
   _all?: true
 }
 
@@ -188,6 +200,8 @@ export type ShoppingTripGroupByOutputType = {
   createdAt: Date
   completedAt: Date | null
   suggestionsImportedAt: Date | null
+  archivedAt: Date | null
+  archivedByUserId: string | null
   _count: ShoppingTripCountAggregateOutputType | null
   _min: ShoppingTripMinAggregateOutputType | null
   _max: ShoppingTripMaxAggregateOutputType | null
@@ -222,9 +236,12 @@ export type ShoppingTripWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"ShoppingTrip"> | Date | string
   completedAt?: Prisma.DateTimeNullableFilter<"ShoppingTrip"> | Date | string | null
   suggestionsImportedAt?: Prisma.DateTimeNullableFilter<"ShoppingTrip"> | Date | string | null
+  archivedAt?: Prisma.DateTimeNullableFilter<"ShoppingTrip"> | Date | string | null
+  archivedByUserId?: Prisma.StringNullableFilter<"ShoppingTrip"> | string | null
   household?: Prisma.XOR<Prisma.HouseholdScalarRelationFilter, Prisma.HouseholdWhereInput>
   createdBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   completedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  archivedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   entries?: Prisma.ShoppingEntryListRelationFilter
   incomingMoves?: Prisma.ShoppingEntryListRelationFilter
   stockChecks?: Prisma.TripStockCheckListRelationFilter
@@ -241,9 +258,12 @@ export type ShoppingTripOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   suggestionsImportedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  archivedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   household?: Prisma.HouseholdOrderByWithRelationInput
   createdBy?: Prisma.UserOrderByWithRelationInput
   completedBy?: Prisma.UserOrderByWithRelationInput
+  archivedBy?: Prisma.UserOrderByWithRelationInput
   entries?: Prisma.ShoppingEntryOrderByRelationAggregateInput
   incomingMoves?: Prisma.ShoppingEntryOrderByRelationAggregateInput
   stockChecks?: Prisma.TripStockCheckOrderByRelationAggregateInput
@@ -263,9 +283,12 @@ export type ShoppingTripWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"ShoppingTrip"> | Date | string
   completedAt?: Prisma.DateTimeNullableFilter<"ShoppingTrip"> | Date | string | null
   suggestionsImportedAt?: Prisma.DateTimeNullableFilter<"ShoppingTrip"> | Date | string | null
+  archivedAt?: Prisma.DateTimeNullableFilter<"ShoppingTrip"> | Date | string | null
+  archivedByUserId?: Prisma.StringNullableFilter<"ShoppingTrip"> | string | null
   household?: Prisma.XOR<Prisma.HouseholdScalarRelationFilter, Prisma.HouseholdWhereInput>
   createdBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   completedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  archivedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   entries?: Prisma.ShoppingEntryListRelationFilter
   incomingMoves?: Prisma.ShoppingEntryListRelationFilter
   stockChecks?: Prisma.TripStockCheckListRelationFilter
@@ -282,6 +305,8 @@ export type ShoppingTripOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   suggestionsImportedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  archivedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ShoppingTripCountOrderByAggregateInput
   _max?: Prisma.ShoppingTripMaxOrderByAggregateInput
   _min?: Prisma.ShoppingTripMinOrderByAggregateInput
@@ -301,6 +326,8 @@ export type ShoppingTripScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ShoppingTrip"> | Date | string
   completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ShoppingTrip"> | Date | string | null
   suggestionsImportedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ShoppingTrip"> | Date | string | null
+  archivedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ShoppingTrip"> | Date | string | null
+  archivedByUserId?: Prisma.StringNullableWithAggregatesFilter<"ShoppingTrip"> | string | null
 }
 
 export type ShoppingTripCreateInput = {
@@ -311,9 +338,11 @@ export type ShoppingTripCreateInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
   household: Prisma.HouseholdCreateNestedOneWithoutShoppingTripsInput
   createdBy: Prisma.UserCreateNestedOneWithoutCreatedShoppingTripsInput
   completedBy?: Prisma.UserCreateNestedOneWithoutCompletedShoppingTripsInput
+  archivedBy?: Prisma.UserCreateNestedOneWithoutArchivedShoppingTripsInput
   entries?: Prisma.ShoppingEntryCreateNestedManyWithoutTripInput
   incomingMoves?: Prisma.ShoppingEntryCreateNestedManyWithoutMoveToTripInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutTripInput
@@ -330,6 +359,8 @@ export type ShoppingTripUncheckedCreateInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
   entries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutTripInput
   incomingMoves?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutMoveToTripInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutTripInput
@@ -343,9 +374,11 @@ export type ShoppingTripUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutShoppingTripsNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutCreatedShoppingTripsNestedInput
   completedBy?: Prisma.UserUpdateOneWithoutCompletedShoppingTripsNestedInput
+  archivedBy?: Prisma.UserUpdateOneWithoutArchivedShoppingTripsNestedInput
   entries?: Prisma.ShoppingEntryUpdateManyWithoutTripNestedInput
   incomingMoves?: Prisma.ShoppingEntryUpdateManyWithoutMoveToTripNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutTripNestedInput
@@ -362,6 +395,8 @@ export type ShoppingTripUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutTripNestedInput
   incomingMoves?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutMoveToTripNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutTripNestedInput
@@ -378,6 +413,8 @@ export type ShoppingTripCreateManyInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
 }
 
 export type ShoppingTripUpdateManyMutationInput = {
@@ -388,6 +425,7 @@ export type ShoppingTripUpdateManyMutationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ShoppingTripUncheckedUpdateManyInput = {
@@ -401,6 +439,8 @@ export type ShoppingTripUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ShoppingTripListRelationFilter = {
@@ -424,6 +464,8 @@ export type ShoppingTripCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   suggestionsImportedAt?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrder
+  archivedByUserId?: Prisma.SortOrder
 }
 
 export type ShoppingTripMaxOrderByAggregateInput = {
@@ -437,6 +479,8 @@ export type ShoppingTripMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   suggestionsImportedAt?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrder
+  archivedByUserId?: Prisma.SortOrder
 }
 
 export type ShoppingTripMinOrderByAggregateInput = {
@@ -450,6 +494,8 @@ export type ShoppingTripMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   suggestionsImportedAt?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrder
+  archivedByUserId?: Prisma.SortOrder
 }
 
 export type ShoppingTripScalarRelationFilter = {
@@ -476,6 +522,13 @@ export type ShoppingTripCreateNestedManyWithoutCompletedByInput = {
   connect?: Prisma.ShoppingTripWhereUniqueInput | Prisma.ShoppingTripWhereUniqueInput[]
 }
 
+export type ShoppingTripCreateNestedManyWithoutArchivedByInput = {
+  create?: Prisma.XOR<Prisma.ShoppingTripCreateWithoutArchivedByInput, Prisma.ShoppingTripUncheckedCreateWithoutArchivedByInput> | Prisma.ShoppingTripCreateWithoutArchivedByInput[] | Prisma.ShoppingTripUncheckedCreateWithoutArchivedByInput[]
+  connectOrCreate?: Prisma.ShoppingTripCreateOrConnectWithoutArchivedByInput | Prisma.ShoppingTripCreateOrConnectWithoutArchivedByInput[]
+  createMany?: Prisma.ShoppingTripCreateManyArchivedByInputEnvelope
+  connect?: Prisma.ShoppingTripWhereUniqueInput | Prisma.ShoppingTripWhereUniqueInput[]
+}
+
 export type ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput = {
   create?: Prisma.XOR<Prisma.ShoppingTripCreateWithoutCreatedByInput, Prisma.ShoppingTripUncheckedCreateWithoutCreatedByInput> | Prisma.ShoppingTripCreateWithoutCreatedByInput[] | Prisma.ShoppingTripUncheckedCreateWithoutCreatedByInput[]
   connectOrCreate?: Prisma.ShoppingTripCreateOrConnectWithoutCreatedByInput | Prisma.ShoppingTripCreateOrConnectWithoutCreatedByInput[]
@@ -487,6 +540,13 @@ export type ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput = {
   create?: Prisma.XOR<Prisma.ShoppingTripCreateWithoutCompletedByInput, Prisma.ShoppingTripUncheckedCreateWithoutCompletedByInput> | Prisma.ShoppingTripCreateWithoutCompletedByInput[] | Prisma.ShoppingTripUncheckedCreateWithoutCompletedByInput[]
   connectOrCreate?: Prisma.ShoppingTripCreateOrConnectWithoutCompletedByInput | Prisma.ShoppingTripCreateOrConnectWithoutCompletedByInput[]
   createMany?: Prisma.ShoppingTripCreateManyCompletedByInputEnvelope
+  connect?: Prisma.ShoppingTripWhereUniqueInput | Prisma.ShoppingTripWhereUniqueInput[]
+}
+
+export type ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput = {
+  create?: Prisma.XOR<Prisma.ShoppingTripCreateWithoutArchivedByInput, Prisma.ShoppingTripUncheckedCreateWithoutArchivedByInput> | Prisma.ShoppingTripCreateWithoutArchivedByInput[] | Prisma.ShoppingTripUncheckedCreateWithoutArchivedByInput[]
+  connectOrCreate?: Prisma.ShoppingTripCreateOrConnectWithoutArchivedByInput | Prisma.ShoppingTripCreateOrConnectWithoutArchivedByInput[]
+  createMany?: Prisma.ShoppingTripCreateManyArchivedByInputEnvelope
   connect?: Prisma.ShoppingTripWhereUniqueInput | Prisma.ShoppingTripWhereUniqueInput[]
 }
 
@@ -518,6 +578,20 @@ export type ShoppingTripUpdateManyWithoutCompletedByNestedInput = {
   deleteMany?: Prisma.ShoppingTripScalarWhereInput | Prisma.ShoppingTripScalarWhereInput[]
 }
 
+export type ShoppingTripUpdateManyWithoutArchivedByNestedInput = {
+  create?: Prisma.XOR<Prisma.ShoppingTripCreateWithoutArchivedByInput, Prisma.ShoppingTripUncheckedCreateWithoutArchivedByInput> | Prisma.ShoppingTripCreateWithoutArchivedByInput[] | Prisma.ShoppingTripUncheckedCreateWithoutArchivedByInput[]
+  connectOrCreate?: Prisma.ShoppingTripCreateOrConnectWithoutArchivedByInput | Prisma.ShoppingTripCreateOrConnectWithoutArchivedByInput[]
+  upsert?: Prisma.ShoppingTripUpsertWithWhereUniqueWithoutArchivedByInput | Prisma.ShoppingTripUpsertWithWhereUniqueWithoutArchivedByInput[]
+  createMany?: Prisma.ShoppingTripCreateManyArchivedByInputEnvelope
+  set?: Prisma.ShoppingTripWhereUniqueInput | Prisma.ShoppingTripWhereUniqueInput[]
+  disconnect?: Prisma.ShoppingTripWhereUniqueInput | Prisma.ShoppingTripWhereUniqueInput[]
+  delete?: Prisma.ShoppingTripWhereUniqueInput | Prisma.ShoppingTripWhereUniqueInput[]
+  connect?: Prisma.ShoppingTripWhereUniqueInput | Prisma.ShoppingTripWhereUniqueInput[]
+  update?: Prisma.ShoppingTripUpdateWithWhereUniqueWithoutArchivedByInput | Prisma.ShoppingTripUpdateWithWhereUniqueWithoutArchivedByInput[]
+  updateMany?: Prisma.ShoppingTripUpdateManyWithWhereWithoutArchivedByInput | Prisma.ShoppingTripUpdateManyWithWhereWithoutArchivedByInput[]
+  deleteMany?: Prisma.ShoppingTripScalarWhereInput | Prisma.ShoppingTripScalarWhereInput[]
+}
+
 export type ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput = {
   create?: Prisma.XOR<Prisma.ShoppingTripCreateWithoutCreatedByInput, Prisma.ShoppingTripUncheckedCreateWithoutCreatedByInput> | Prisma.ShoppingTripCreateWithoutCreatedByInput[] | Prisma.ShoppingTripUncheckedCreateWithoutCreatedByInput[]
   connectOrCreate?: Prisma.ShoppingTripCreateOrConnectWithoutCreatedByInput | Prisma.ShoppingTripCreateOrConnectWithoutCreatedByInput[]
@@ -543,6 +617,20 @@ export type ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput = {
   connect?: Prisma.ShoppingTripWhereUniqueInput | Prisma.ShoppingTripWhereUniqueInput[]
   update?: Prisma.ShoppingTripUpdateWithWhereUniqueWithoutCompletedByInput | Prisma.ShoppingTripUpdateWithWhereUniqueWithoutCompletedByInput[]
   updateMany?: Prisma.ShoppingTripUpdateManyWithWhereWithoutCompletedByInput | Prisma.ShoppingTripUpdateManyWithWhereWithoutCompletedByInput[]
+  deleteMany?: Prisma.ShoppingTripScalarWhereInput | Prisma.ShoppingTripScalarWhereInput[]
+}
+
+export type ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput = {
+  create?: Prisma.XOR<Prisma.ShoppingTripCreateWithoutArchivedByInput, Prisma.ShoppingTripUncheckedCreateWithoutArchivedByInput> | Prisma.ShoppingTripCreateWithoutArchivedByInput[] | Prisma.ShoppingTripUncheckedCreateWithoutArchivedByInput[]
+  connectOrCreate?: Prisma.ShoppingTripCreateOrConnectWithoutArchivedByInput | Prisma.ShoppingTripCreateOrConnectWithoutArchivedByInput[]
+  upsert?: Prisma.ShoppingTripUpsertWithWhereUniqueWithoutArchivedByInput | Prisma.ShoppingTripUpsertWithWhereUniqueWithoutArchivedByInput[]
+  createMany?: Prisma.ShoppingTripCreateManyArchivedByInputEnvelope
+  set?: Prisma.ShoppingTripWhereUniqueInput | Prisma.ShoppingTripWhereUniqueInput[]
+  disconnect?: Prisma.ShoppingTripWhereUniqueInput | Prisma.ShoppingTripWhereUniqueInput[]
+  delete?: Prisma.ShoppingTripWhereUniqueInput | Prisma.ShoppingTripWhereUniqueInput[]
+  connect?: Prisma.ShoppingTripWhereUniqueInput | Prisma.ShoppingTripWhereUniqueInput[]
+  update?: Prisma.ShoppingTripUpdateWithWhereUniqueWithoutArchivedByInput | Prisma.ShoppingTripUpdateWithWhereUniqueWithoutArchivedByInput[]
+  updateMany?: Prisma.ShoppingTripUpdateManyWithWhereWithoutArchivedByInput | Prisma.ShoppingTripUpdateManyWithWhereWithoutArchivedByInput[]
   deleteMany?: Prisma.ShoppingTripScalarWhereInput | Prisma.ShoppingTripScalarWhereInput[]
 }
 
@@ -644,8 +732,10 @@ export type ShoppingTripCreateWithoutCreatedByInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
   household: Prisma.HouseholdCreateNestedOneWithoutShoppingTripsInput
   completedBy?: Prisma.UserCreateNestedOneWithoutCompletedShoppingTripsInput
+  archivedBy?: Prisma.UserCreateNestedOneWithoutArchivedShoppingTripsInput
   entries?: Prisma.ShoppingEntryCreateNestedManyWithoutTripInput
   incomingMoves?: Prisma.ShoppingEntryCreateNestedManyWithoutMoveToTripInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutTripInput
@@ -661,6 +751,8 @@ export type ShoppingTripUncheckedCreateWithoutCreatedByInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
   entries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutTripInput
   incomingMoves?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutMoveToTripInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutTripInput
@@ -684,8 +776,10 @@ export type ShoppingTripCreateWithoutCompletedByInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
   household: Prisma.HouseholdCreateNestedOneWithoutShoppingTripsInput
   createdBy: Prisma.UserCreateNestedOneWithoutCreatedShoppingTripsInput
+  archivedBy?: Prisma.UserCreateNestedOneWithoutArchivedShoppingTripsInput
   entries?: Prisma.ShoppingEntryCreateNestedManyWithoutTripInput
   incomingMoves?: Prisma.ShoppingEntryCreateNestedManyWithoutMoveToTripInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutTripInput
@@ -701,6 +795,8 @@ export type ShoppingTripUncheckedCreateWithoutCompletedByInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
   entries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutTripInput
   incomingMoves?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutMoveToTripInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutTripInput
@@ -713,6 +809,50 @@ export type ShoppingTripCreateOrConnectWithoutCompletedByInput = {
 
 export type ShoppingTripCreateManyCompletedByInputEnvelope = {
   data: Prisma.ShoppingTripCreateManyCompletedByInput | Prisma.ShoppingTripCreateManyCompletedByInput[]
+  skipDuplicates?: boolean
+}
+
+export type ShoppingTripCreateWithoutArchivedByInput = {
+  id?: string
+  store: string
+  plannedDate: Date | string
+  status?: $Enums.ShoppingTripStatus
+  createdAt?: Date | string
+  completedAt?: Date | string | null
+  suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  household: Prisma.HouseholdCreateNestedOneWithoutShoppingTripsInput
+  createdBy: Prisma.UserCreateNestedOneWithoutCreatedShoppingTripsInput
+  completedBy?: Prisma.UserCreateNestedOneWithoutCompletedShoppingTripsInput
+  entries?: Prisma.ShoppingEntryCreateNestedManyWithoutTripInput
+  incomingMoves?: Prisma.ShoppingEntryCreateNestedManyWithoutMoveToTripInput
+  stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutTripInput
+}
+
+export type ShoppingTripUncheckedCreateWithoutArchivedByInput = {
+  id?: string
+  householdId: string
+  createdByUserId: string
+  completedByUserId?: string | null
+  store: string
+  plannedDate: Date | string
+  status?: $Enums.ShoppingTripStatus
+  createdAt?: Date | string
+  completedAt?: Date | string | null
+  suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  entries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutTripInput
+  incomingMoves?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutMoveToTripInput
+  stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutTripInput
+}
+
+export type ShoppingTripCreateOrConnectWithoutArchivedByInput = {
+  where: Prisma.ShoppingTripWhereUniqueInput
+  create: Prisma.XOR<Prisma.ShoppingTripCreateWithoutArchivedByInput, Prisma.ShoppingTripUncheckedCreateWithoutArchivedByInput>
+}
+
+export type ShoppingTripCreateManyArchivedByInputEnvelope = {
+  data: Prisma.ShoppingTripCreateManyArchivedByInput | Prisma.ShoppingTripCreateManyArchivedByInput[]
   skipDuplicates?: boolean
 }
 
@@ -746,6 +886,8 @@ export type ShoppingTripScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"ShoppingTrip"> | Date | string
   completedAt?: Prisma.DateTimeNullableFilter<"ShoppingTrip"> | Date | string | null
   suggestionsImportedAt?: Prisma.DateTimeNullableFilter<"ShoppingTrip"> | Date | string | null
+  archivedAt?: Prisma.DateTimeNullableFilter<"ShoppingTrip"> | Date | string | null
+  archivedByUserId?: Prisma.StringNullableFilter<"ShoppingTrip"> | string | null
 }
 
 export type ShoppingTripUpsertWithWhereUniqueWithoutCompletedByInput = {
@@ -764,6 +906,22 @@ export type ShoppingTripUpdateManyWithWhereWithoutCompletedByInput = {
   data: Prisma.XOR<Prisma.ShoppingTripUpdateManyMutationInput, Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByInput>
 }
 
+export type ShoppingTripUpsertWithWhereUniqueWithoutArchivedByInput = {
+  where: Prisma.ShoppingTripWhereUniqueInput
+  update: Prisma.XOR<Prisma.ShoppingTripUpdateWithoutArchivedByInput, Prisma.ShoppingTripUncheckedUpdateWithoutArchivedByInput>
+  create: Prisma.XOR<Prisma.ShoppingTripCreateWithoutArchivedByInput, Prisma.ShoppingTripUncheckedCreateWithoutArchivedByInput>
+}
+
+export type ShoppingTripUpdateWithWhereUniqueWithoutArchivedByInput = {
+  where: Prisma.ShoppingTripWhereUniqueInput
+  data: Prisma.XOR<Prisma.ShoppingTripUpdateWithoutArchivedByInput, Prisma.ShoppingTripUncheckedUpdateWithoutArchivedByInput>
+}
+
+export type ShoppingTripUpdateManyWithWhereWithoutArchivedByInput = {
+  where: Prisma.ShoppingTripScalarWhereInput
+  data: Prisma.XOR<Prisma.ShoppingTripUpdateManyMutationInput, Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByInput>
+}
+
 export type ShoppingTripCreateWithoutHouseholdInput = {
   id?: string
   store: string
@@ -772,8 +930,10 @@ export type ShoppingTripCreateWithoutHouseholdInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
   createdBy: Prisma.UserCreateNestedOneWithoutCreatedShoppingTripsInput
   completedBy?: Prisma.UserCreateNestedOneWithoutCompletedShoppingTripsInput
+  archivedBy?: Prisma.UserCreateNestedOneWithoutArchivedShoppingTripsInput
   entries?: Prisma.ShoppingEntryCreateNestedManyWithoutTripInput
   incomingMoves?: Prisma.ShoppingEntryCreateNestedManyWithoutMoveToTripInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutTripInput
@@ -789,6 +949,8 @@ export type ShoppingTripUncheckedCreateWithoutHouseholdInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
   entries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutTripInput
   incomingMoves?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutMoveToTripInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutTripInput
@@ -828,9 +990,11 @@ export type ShoppingTripCreateWithoutEntriesInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
   household: Prisma.HouseholdCreateNestedOneWithoutShoppingTripsInput
   createdBy: Prisma.UserCreateNestedOneWithoutCreatedShoppingTripsInput
   completedBy?: Prisma.UserCreateNestedOneWithoutCompletedShoppingTripsInput
+  archivedBy?: Prisma.UserCreateNestedOneWithoutArchivedShoppingTripsInput
   incomingMoves?: Prisma.ShoppingEntryCreateNestedManyWithoutMoveToTripInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutTripInput
 }
@@ -846,6 +1010,8 @@ export type ShoppingTripUncheckedCreateWithoutEntriesInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
   incomingMoves?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutMoveToTripInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutTripInput
 }
@@ -863,9 +1029,11 @@ export type ShoppingTripCreateWithoutIncomingMovesInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
   household: Prisma.HouseholdCreateNestedOneWithoutShoppingTripsInput
   createdBy: Prisma.UserCreateNestedOneWithoutCreatedShoppingTripsInput
   completedBy?: Prisma.UserCreateNestedOneWithoutCompletedShoppingTripsInput
+  archivedBy?: Prisma.UserCreateNestedOneWithoutArchivedShoppingTripsInput
   entries?: Prisma.ShoppingEntryCreateNestedManyWithoutTripInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutTripInput
 }
@@ -881,6 +1049,8 @@ export type ShoppingTripUncheckedCreateWithoutIncomingMovesInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
   entries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutTripInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutTripInput
 }
@@ -909,9 +1079,11 @@ export type ShoppingTripUpdateWithoutEntriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutShoppingTripsNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutCreatedShoppingTripsNestedInput
   completedBy?: Prisma.UserUpdateOneWithoutCompletedShoppingTripsNestedInput
+  archivedBy?: Prisma.UserUpdateOneWithoutArchivedShoppingTripsNestedInput
   incomingMoves?: Prisma.ShoppingEntryUpdateManyWithoutMoveToTripNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutTripNestedInput
 }
@@ -927,6 +1099,8 @@ export type ShoppingTripUncheckedUpdateWithoutEntriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   incomingMoves?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutMoveToTripNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutTripNestedInput
 }
@@ -950,9 +1124,11 @@ export type ShoppingTripUpdateWithoutIncomingMovesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutShoppingTripsNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutCreatedShoppingTripsNestedInput
   completedBy?: Prisma.UserUpdateOneWithoutCompletedShoppingTripsNestedInput
+  archivedBy?: Prisma.UserUpdateOneWithoutArchivedShoppingTripsNestedInput
   entries?: Prisma.ShoppingEntryUpdateManyWithoutTripNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutTripNestedInput
 }
@@ -968,6 +1144,8 @@ export type ShoppingTripUncheckedUpdateWithoutIncomingMovesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutTripNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutTripNestedInput
 }
@@ -980,9 +1158,11 @@ export type ShoppingTripCreateWithoutStockChecksInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
   household: Prisma.HouseholdCreateNestedOneWithoutShoppingTripsInput
   createdBy: Prisma.UserCreateNestedOneWithoutCreatedShoppingTripsInput
   completedBy?: Prisma.UserCreateNestedOneWithoutCompletedShoppingTripsInput
+  archivedBy?: Prisma.UserCreateNestedOneWithoutArchivedShoppingTripsInput
   entries?: Prisma.ShoppingEntryCreateNestedManyWithoutTripInput
   incomingMoves?: Prisma.ShoppingEntryCreateNestedManyWithoutMoveToTripInput
 }
@@ -998,6 +1178,8 @@ export type ShoppingTripUncheckedCreateWithoutStockChecksInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
   entries?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutTripInput
   incomingMoves?: Prisma.ShoppingEntryUncheckedCreateNestedManyWithoutMoveToTripInput
 }
@@ -1026,9 +1208,11 @@ export type ShoppingTripUpdateWithoutStockChecksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutShoppingTripsNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutCreatedShoppingTripsNestedInput
   completedBy?: Prisma.UserUpdateOneWithoutCompletedShoppingTripsNestedInput
+  archivedBy?: Prisma.UserUpdateOneWithoutArchivedShoppingTripsNestedInput
   entries?: Prisma.ShoppingEntryUpdateManyWithoutTripNestedInput
   incomingMoves?: Prisma.ShoppingEntryUpdateManyWithoutMoveToTripNestedInput
 }
@@ -1044,6 +1228,8 @@ export type ShoppingTripUncheckedUpdateWithoutStockChecksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutTripNestedInput
   incomingMoves?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutMoveToTripNestedInput
 }
@@ -1058,6 +1244,8 @@ export type ShoppingTripCreateManyCreatedByInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
 }
 
 export type ShoppingTripCreateManyCompletedByInput = {
@@ -1070,6 +1258,22 @@ export type ShoppingTripCreateManyCompletedByInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
+}
+
+export type ShoppingTripCreateManyArchivedByInput = {
+  id?: string
+  householdId: string
+  createdByUserId: string
+  completedByUserId?: string | null
+  store: string
+  plannedDate: Date | string
+  status?: $Enums.ShoppingTripStatus
+  createdAt?: Date | string
+  completedAt?: Date | string | null
+  suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
 }
 
 export type ShoppingTripUpdateWithoutCreatedByInput = {
@@ -1080,8 +1284,10 @@ export type ShoppingTripUpdateWithoutCreatedByInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutShoppingTripsNestedInput
   completedBy?: Prisma.UserUpdateOneWithoutCompletedShoppingTripsNestedInput
+  archivedBy?: Prisma.UserUpdateOneWithoutArchivedShoppingTripsNestedInput
   entries?: Prisma.ShoppingEntryUpdateManyWithoutTripNestedInput
   incomingMoves?: Prisma.ShoppingEntryUpdateManyWithoutMoveToTripNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutTripNestedInput
@@ -1097,6 +1303,8 @@ export type ShoppingTripUncheckedUpdateWithoutCreatedByInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutTripNestedInput
   incomingMoves?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutMoveToTripNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutTripNestedInput
@@ -1112,6 +1320,8 @@ export type ShoppingTripUncheckedUpdateManyWithoutCreatedByInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ShoppingTripUpdateWithoutCompletedByInput = {
@@ -1122,8 +1332,10 @@ export type ShoppingTripUpdateWithoutCompletedByInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutShoppingTripsNestedInput
   createdBy?: Prisma.UserUpdateOneRequiredWithoutCreatedShoppingTripsNestedInput
+  archivedBy?: Prisma.UserUpdateOneWithoutArchivedShoppingTripsNestedInput
   entries?: Prisma.ShoppingEntryUpdateManyWithoutTripNestedInput
   incomingMoves?: Prisma.ShoppingEntryUpdateManyWithoutMoveToTripNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutTripNestedInput
@@ -1139,6 +1351,8 @@ export type ShoppingTripUncheckedUpdateWithoutCompletedByInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutTripNestedInput
   incomingMoves?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutMoveToTripNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutTripNestedInput
@@ -1154,6 +1368,56 @@ export type ShoppingTripUncheckedUpdateManyWithoutCompletedByInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type ShoppingTripUpdateWithoutArchivedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  store?: Prisma.StringFieldUpdateOperationsInput | string
+  plannedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumShoppingTripStatusFieldUpdateOperationsInput | $Enums.ShoppingTripStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  household?: Prisma.HouseholdUpdateOneRequiredWithoutShoppingTripsNestedInput
+  createdBy?: Prisma.UserUpdateOneRequiredWithoutCreatedShoppingTripsNestedInput
+  completedBy?: Prisma.UserUpdateOneWithoutCompletedShoppingTripsNestedInput
+  entries?: Prisma.ShoppingEntryUpdateManyWithoutTripNestedInput
+  incomingMoves?: Prisma.ShoppingEntryUpdateManyWithoutMoveToTripNestedInput
+  stockChecks?: Prisma.TripStockCheckUpdateManyWithoutTripNestedInput
+}
+
+export type ShoppingTripUncheckedUpdateWithoutArchivedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  householdId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  completedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.StringFieldUpdateOperationsInput | string
+  plannedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumShoppingTripStatusFieldUpdateOperationsInput | $Enums.ShoppingTripStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  entries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutTripNestedInput
+  incomingMoves?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutMoveToTripNestedInput
+  stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutTripNestedInput
+}
+
+export type ShoppingTripUncheckedUpdateManyWithoutArchivedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  householdId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  completedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.StringFieldUpdateOperationsInput | string
+  plannedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumShoppingTripStatusFieldUpdateOperationsInput | $Enums.ShoppingTripStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ShoppingTripCreateManyHouseholdInput = {
@@ -1166,6 +1430,8 @@ export type ShoppingTripCreateManyHouseholdInput = {
   createdAt?: Date | string
   completedAt?: Date | string | null
   suggestionsImportedAt?: Date | string | null
+  archivedAt?: Date | string | null
+  archivedByUserId?: string | null
 }
 
 export type ShoppingTripUpdateWithoutHouseholdInput = {
@@ -1176,8 +1442,10 @@ export type ShoppingTripUpdateWithoutHouseholdInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdBy?: Prisma.UserUpdateOneRequiredWithoutCreatedShoppingTripsNestedInput
   completedBy?: Prisma.UserUpdateOneWithoutCompletedShoppingTripsNestedInput
+  archivedBy?: Prisma.UserUpdateOneWithoutArchivedShoppingTripsNestedInput
   entries?: Prisma.ShoppingEntryUpdateManyWithoutTripNestedInput
   incomingMoves?: Prisma.ShoppingEntryUpdateManyWithoutMoveToTripNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutTripNestedInput
@@ -1193,6 +1461,8 @@ export type ShoppingTripUncheckedUpdateWithoutHouseholdInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entries?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutTripNestedInput
   incomingMoves?: Prisma.ShoppingEntryUncheckedUpdateManyWithoutMoveToTripNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutTripNestedInput
@@ -1208,6 +1478,8 @@ export type ShoppingTripUncheckedUpdateManyWithoutHouseholdInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suggestionsImportedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1270,9 +1542,12 @@ export type ShoppingTripSelect<ExtArgs extends runtime.Types.Extensions.Internal
   createdAt?: boolean
   completedAt?: boolean
   suggestionsImportedAt?: boolean
+  archivedAt?: boolean
+  archivedByUserId?: boolean
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   completedBy?: boolean | Prisma.ShoppingTrip$completedByArgs<ExtArgs>
+  archivedBy?: boolean | Prisma.ShoppingTrip$archivedByArgs<ExtArgs>
   entries?: boolean | Prisma.ShoppingTrip$entriesArgs<ExtArgs>
   incomingMoves?: boolean | Prisma.ShoppingTrip$incomingMovesArgs<ExtArgs>
   stockChecks?: boolean | Prisma.ShoppingTrip$stockChecksArgs<ExtArgs>
@@ -1290,9 +1565,12 @@ export type ShoppingTripSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   createdAt?: boolean
   completedAt?: boolean
   suggestionsImportedAt?: boolean
+  archivedAt?: boolean
+  archivedByUserId?: boolean
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   completedBy?: boolean | Prisma.ShoppingTrip$completedByArgs<ExtArgs>
+  archivedBy?: boolean | Prisma.ShoppingTrip$archivedByArgs<ExtArgs>
 }, ExtArgs["result"]["shoppingTrip"]>
 
 export type ShoppingTripSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1306,9 +1584,12 @@ export type ShoppingTripSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   createdAt?: boolean
   completedAt?: boolean
   suggestionsImportedAt?: boolean
+  archivedAt?: boolean
+  archivedByUserId?: boolean
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   completedBy?: boolean | Prisma.ShoppingTrip$completedByArgs<ExtArgs>
+  archivedBy?: boolean | Prisma.ShoppingTrip$archivedByArgs<ExtArgs>
 }, ExtArgs["result"]["shoppingTrip"]>
 
 export type ShoppingTripSelectScalar = {
@@ -1322,13 +1603,16 @@ export type ShoppingTripSelectScalar = {
   createdAt?: boolean
   completedAt?: boolean
   suggestionsImportedAt?: boolean
+  archivedAt?: boolean
+  archivedByUserId?: boolean
 }
 
-export type ShoppingTripOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "householdId" | "createdByUserId" | "completedByUserId" | "store" | "plannedDate" | "status" | "createdAt" | "completedAt" | "suggestionsImportedAt", ExtArgs["result"]["shoppingTrip"]>
+export type ShoppingTripOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "householdId" | "createdByUserId" | "completedByUserId" | "store" | "plannedDate" | "status" | "createdAt" | "completedAt" | "suggestionsImportedAt" | "archivedAt" | "archivedByUserId", ExtArgs["result"]["shoppingTrip"]>
 export type ShoppingTripInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   completedBy?: boolean | Prisma.ShoppingTrip$completedByArgs<ExtArgs>
+  archivedBy?: boolean | Prisma.ShoppingTrip$archivedByArgs<ExtArgs>
   entries?: boolean | Prisma.ShoppingTrip$entriesArgs<ExtArgs>
   incomingMoves?: boolean | Prisma.ShoppingTrip$incomingMovesArgs<ExtArgs>
   stockChecks?: boolean | Prisma.ShoppingTrip$stockChecksArgs<ExtArgs>
@@ -1338,11 +1622,13 @@ export type ShoppingTripIncludeCreateManyAndReturn<ExtArgs extends runtime.Types
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   completedBy?: boolean | Prisma.ShoppingTrip$completedByArgs<ExtArgs>
+  archivedBy?: boolean | Prisma.ShoppingTrip$archivedByArgs<ExtArgs>
 }
 export type ShoppingTripIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   completedBy?: boolean | Prisma.ShoppingTrip$completedByArgs<ExtArgs>
+  archivedBy?: boolean | Prisma.ShoppingTrip$archivedByArgs<ExtArgs>
 }
 
 export type $ShoppingTripPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1351,6 +1637,7 @@ export type $ShoppingTripPayload<ExtArgs extends runtime.Types.Extensions.Intern
     household: Prisma.$HouseholdPayload<ExtArgs>
     createdBy: Prisma.$UserPayload<ExtArgs>
     completedBy: Prisma.$UserPayload<ExtArgs> | null
+    archivedBy: Prisma.$UserPayload<ExtArgs> | null
     entries: Prisma.$ShoppingEntryPayload<ExtArgs>[]
     incomingMoves: Prisma.$ShoppingEntryPayload<ExtArgs>[]
     stockChecks: Prisma.$TripStockCheckPayload<ExtArgs>[]
@@ -1366,6 +1653,8 @@ export type $ShoppingTripPayload<ExtArgs extends runtime.Types.Extensions.Intern
     createdAt: Date
     completedAt: Date | null
     suggestionsImportedAt: Date | null
+    archivedAt: Date | null
+    archivedByUserId: string | null
   }, ExtArgs["result"]["shoppingTrip"]>
   composites: {}
 }
@@ -1763,6 +2052,7 @@ export interface Prisma__ShoppingTripClient<T, Null = never, ExtArgs extends run
   household<T extends Prisma.HouseholdDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.HouseholdDefaultArgs<ExtArgs>>): Prisma.Prisma__HouseholdClient<runtime.Types.Result.GetResult<Prisma.$HouseholdPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   createdBy<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   completedBy<T extends Prisma.ShoppingTrip$completedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ShoppingTrip$completedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  archivedBy<T extends Prisma.ShoppingTrip$archivedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ShoppingTrip$archivedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   entries<T extends Prisma.ShoppingTrip$entriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ShoppingTrip$entriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShoppingEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   incomingMoves<T extends Prisma.ShoppingTrip$incomingMovesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ShoppingTrip$incomingMovesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShoppingEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   stockChecks<T extends Prisma.ShoppingTrip$stockChecksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ShoppingTrip$stockChecksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TripStockCheckPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1805,6 +2095,8 @@ export interface ShoppingTripFieldRefs {
   readonly createdAt: Prisma.FieldRef<"ShoppingTrip", 'DateTime'>
   readonly completedAt: Prisma.FieldRef<"ShoppingTrip", 'DateTime'>
   readonly suggestionsImportedAt: Prisma.FieldRef<"ShoppingTrip", 'DateTime'>
+  readonly archivedAt: Prisma.FieldRef<"ShoppingTrip", 'DateTime'>
+  readonly archivedByUserId: Prisma.FieldRef<"ShoppingTrip", 'String'>
 }
     
 
@@ -2209,6 +2501,25 @@ export type ShoppingTripDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
  * ShoppingTrip.completedBy
  */
 export type ShoppingTrip$completedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+}
+
+/**
+ * ShoppingTrip.archivedBy
+ */
+export type ShoppingTrip$archivedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the User
    */

@@ -29,6 +29,29 @@ export function useShoppingActionFeedback(householdId: string) {
           queryKey: keys.trips(householdId),
         });
       } else {
+        if (
+          cause instanceof ApiError &&
+          [
+            'TRIP_ARCHIVED',
+            'DESTINATION_TRIP_ARCHIVED',
+            'TRIP_NOT_FOUND',
+          ].includes(cause.code ?? '')
+        ) {
+          await Promise.allSettled([
+            queryClient.invalidateQueries({
+              queryKey: keys.trips(householdId),
+            }),
+            queryClient.invalidateQueries({
+              queryKey: keys.archivedTrips(householdId),
+            }),
+            queryClient.invalidateQueries({
+              queryKey: keys.tripDetailsPrefix(householdId),
+            }),
+            queryClient.invalidateQueries({
+              queryKey: keys.intelligencePrefix(householdId),
+            }),
+          ]);
+        }
         setError(
           cause instanceof OfflineBeforeSendError
             ? localizedError(cause)

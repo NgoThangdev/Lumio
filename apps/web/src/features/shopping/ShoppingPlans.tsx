@@ -1,4 +1,5 @@
 import type { UseQueryResult } from '@tanstack/react-query';
+import { Link } from 'react-router';
 import type { HouseholdShoppingSettings } from '@/shared/api/types';
 import {
   formatDateOnly,
@@ -8,11 +9,14 @@ import {
   tr,
 } from '@/shared/i18n';
 import { ItemVisual, Notice } from '@/shared/ui/primitives';
+import { TripArchiveControl } from './TripArchiveControl';
 import type { TripSummary } from './shoppingTypes';
 
 export function ShoppingPlans({
   trips,
+  householdId,
   shoppingSettings,
+  routeBase,
   store,
   plannedDate,
   busy,
@@ -22,7 +26,9 @@ export function ShoppingPlans({
   onPlannedDateChange,
 }: {
   trips: UseQueryResult<TripSummary[]>;
+  householdId: string;
   shoppingSettings: UseQueryResult<HouseholdShoppingSettings>;
+  routeBase: string;
   store: string;
   plannedDate: string;
   busy: boolean;
@@ -36,6 +42,12 @@ export function ShoppingPlans({
       <section className="card">
         <p className="eyebrow">{tr('common:shoppingTrips')}</p>
         <h2>{tr('common:plans')}</h2>
+        <Link
+          className="secondary archived-trips-link"
+          to={`${routeBase}/archived`}
+        >
+          {tr('shopping:archivedTrips')}
+        </Link>
         {trips.isPending ? (
           <p className="muted">{tr('common:loadingTrips')}</p>
         ) : trips.isError ? (
@@ -44,23 +56,29 @@ export function ShoppingPlans({
           <p className="muted">{tr('common:tripsYetCreate')}</p>
         ) : (
           trips.data.map((entry) => (
-            <button
-              className="row"
+            <TripArchiveControl
               key={entry.id}
-              disabled={busy}
-              onClick={() => onOpen(entry)}
+              householdId={householdId}
+              routeBase={routeBase}
+              trip={entry}
             >
-              <ItemVisual name={entry.store} illustrationKey="basket" />
-              <span className="item-identity">
-                <strong>{entry.store}</strong>
-                <small>
-                  {formatDateOnly(entry.plannedDate)} ·{' '}
-                  {formatNumber(entry._count?.entries ?? 0)}{' '}
-                  {tr('common:items')}
-                </small>
-              </span>
-              <span className="pill">{localizedEnum(entry.status)}</span>
-            </button>
+              <button
+                className="row shopping-plan-row"
+                disabled={busy}
+                onClick={() => onOpen(entry)}
+              >
+                <ItemVisual name={entry.store} illustrationKey="basket" />
+                <span className="item-identity">
+                  <strong>{entry.store}</strong>
+                  <small>
+                    {formatDateOnly(entry.plannedDate)} ·{' '}
+                    {formatNumber(entry._count?.entries ?? 0)}{' '}
+                    {tr('common:items')}
+                  </small>
+                </span>
+                <span className="pill">{localizedEnum(entry.status)}</span>
+              </button>
+            </TripArchiveControl>
           ))
         )}
       </section>

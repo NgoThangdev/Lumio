@@ -2562,7 +2562,9 @@ export const ShoppingTripScalarFieldEnum = {
   status: 'status',
   createdAt: 'createdAt',
   completedAt: 'completedAt',
-  suggestionsImportedAt: 'suggestionsImportedAt'
+  suggestionsImportedAt: 'suggestionsImportedAt',
+  archivedAt: 'archivedAt',
+  archivedByUserId: 'archivedByUserId'
 } as const
 
 export type ShoppingTripScalarFieldEnum = (typeof ShoppingTripScalarFieldEnum)[keyof typeof ShoppingTripScalarFieldEnum]

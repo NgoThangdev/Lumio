@@ -7,7 +7,8 @@ import {
 } from 'react';
 import type { CatalogOption, TrackingMode } from '@/shared/api/types';
 import { formatDateOnly, formatNumber, localizedEnum, tr } from '@/shared/i18n';
-import { ItemVisual, Notice } from '@/shared/ui/primitives';
+import { Button, ItemVisual, Notice } from '@/shared/ui/primitives';
+import { SwipeReveal } from '@/shared/ui/SwipeReveal';
 import { priorityLabel, validPurchaseAmount } from './shoppingPresentation';
 import { ShoppingEntryActions } from './ShoppingEntryActions';
 import type { Entry, PurchaseDraft, Trip, TripSummary } from './shoppingTypes';
@@ -63,10 +64,13 @@ export function ShoppingEntry({
   const packageCount = entryUsesPackages(entry);
   const openingInfoAvailable = entryOpeningInfoAvailable(entry);
   const [expanded, setExpanded] = useState(false);
+  const [removeConfirmationOpen, setRemoveConfirmationOpen] = useState(false);
+  const removeDialogRef = useRef<HTMLDialogElement>(null);
   const amountInputRef = useRef<HTMLInputElement>(null);
   const focusAmountOnOpen = useRef(false);
   const purchased = entry.status === 'PURCHASED';
-  const shopping = trip.status === 'SHOPPING';
+  const archived = Boolean(trip.archivedAt);
+  const shopping = trip.status === 'SHOPPING' && !archived;
   const detailsId = `shopping-entry-${entry.id}-details`;
 
   useEffect(() => {
@@ -75,6 +79,12 @@ export function ShoppingEntry({
       amountInputRef.current?.focus();
     }
   }, [expanded]);
+
+  useEffect(() => {
+    const dialog = removeDialogRef.current;
+    if (removeConfirmationOpen && dialog && !dialog.open) dialog.showModal();
+    else if (!removeConfirmationOpen && dialog?.open) dialog.close();
+  }, [removeConfirmationOpen]);
 
   function togglePurchased() {
     setExpanded(true);
@@ -93,7 +103,7 @@ export function ShoppingEntry({
     onPurchase(entry, mode);
   }
 
-  return (
+  const card = (
     <article
       className={`card checklist-entry${purchased ? ' checklist-entry-purchased' : ''}`}
       aria-labelledby={`shopping-entry-${entry.id}-name`}
@@ -157,15 +167,17 @@ export function ShoppingEntry({
         )}
       </div>
       <div id={detailsId} className="entry-details" hidden={!expanded}>
-        {entry.status === 'MOVED' && trip.status !== 'RESTOCKED' && (
-          <p className="move-saved" role="status">
-            {tr('shopping:moveTripFinished')}
-            {entry.moveToTrip?.store
-              ? ` · ${entry.moveToTrip.store} (${formatDateOnly(entry.moveToTrip.plannedDate)})`
-              : ` · ${tr('shopping:selectedDraftTripLabel')}`}
-            .
-          </p>
-        )}
+        {entry.status === 'MOVED' &&
+          trip.status !== 'RESTOCKED' &&
+          !archived && (
+            <p className="move-saved" role="status">
+              {tr('shopping:moveTripFinished')}
+              {entry.moveToTrip?.store
+                ? ` · ${entry.moveToTrip.store} (${formatDateOnly(entry.moveToTrip.plannedDate)})`
+                : ` · ${tr('shopping:selectedDraftTripLabel')}`}
+              .
+            </p>
+          )}
         <p className="muted">
           {entry.suggestedQuantity
             ? tr('shopping:suggested', {
@@ -189,7 +201,7 @@ export function ShoppingEntry({
           !openingInfoAvailable && (
             <Notice kind="error">{tr('shopping:openingPolicyLoaded')}</Notice>
           )}
-        {trip.status === 'SHOPPING' && mode ? (
+        {shopping && mode ? (
           <ShoppingEntryActions
             entry={entry}
             mode={mode}
@@ -254,24 +266,75 @@ export function ShoppingEntry({
             </p>
           )
         )}
-        {trip.status !== 'RESTOCKED' && (
-          <details>
-            <summary>{tr('shopping:removeEntry')}</summary>
-            <p className="muted">
+      </div>
+    </article>
+  );
+
+  return (
+    <>
+      {trip.status === 'RESTOCKED' || archived ? (
+        card
+      ) : (
+        <SwipeReveal
+          className="shopping-entry-swipe"
+          action="delete"
+          actionLabel={tr('common:remove')}
+          itemName={entry.item.name}
+          showActionsLabel={tr('shopping:showEntryActions', {
+            name: entry.item.name,
+          })}
+          hideActionsLabel={tr('shopping:hideEntryActions', {
+            name: entry.item.name,
+          })}
+          targetSelector=".entry-title"
+          onAction={() => setRemoveConfirmationOpen(true)}
+        >
+          {card}
+        </SwipeReveal>
+      )}
+      {!archived && trip.status !== 'RESTOCKED' && (
+        <dialog
+          ref={removeDialogRef}
+          className="inventory-lifecycle-dialog shopping-entry-remove-dialog"
+          aria-labelledby={`shopping-entry-${entry.id}-remove-title`}
+          onClose={() => setRemoveConfirmationOpen(false)}
+          onCancel={(event) => {
+            if (busy) event.preventDefault();
+            else setRemoveConfirmationOpen(false);
+          }}
+        >
+          <div className="field-stack">
+            <h2 id={`shopping-entry-${entry.id}-remove-title`}>
+              {tr('shopping:removeEntry')}
+            </h2>
+            <p>
               {tr('shopping:removeOnly')} {entry.item.name}{' '}
               {tr('shopping:tripStockItem')}
             </p>
-            <button
-              type="button"
-              className="secondary"
-              disabled={busy}
-              onClick={() => onRemove(entry)}
-            >
-              {tr('shopping:confirmRemoval2')} {entry.item.name}
-            </button>
-          </details>
-        )}
-      </div>
-    </article>
+            <div className="inventory-dialog-actions">
+              <Button
+                variant="secondary"
+                type="button"
+                disabled={busy}
+                onClick={() => setRemoveConfirmationOpen(false)}
+              >
+                {tr('shopping:cancelRemoveEntry')}
+              </Button>
+              <Button
+                className="inventory-permanent-delete"
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  setRemoveConfirmationOpen(false);
+                  onRemove(entry);
+                }}
+              >
+                {tr('shopping:confirmRemoval2')}
+              </Button>
+            </div>
+          </div>
+        </dialog>
+      )}
+    </>
   );
 }

@@ -175,7 +175,9 @@ export function ShoppingPage() {
       ) : !trip ? (
         <ShoppingPlans
           trips={trips}
+          householdId={householdId}
           shoppingSettings={shoppingSettings}
+          routeBase={routeBase}
           store={store}
           plannedDate={plannedDate}
           busy={busy}
@@ -208,6 +210,11 @@ export function ShoppingPage() {
             purchasedCount={purchasedCount}
             onAllTrips={() => navigate(routeBase)}
           />
+          {trip.archivedAt && (
+            <Notice kind="success">
+              {tr('shopping:tripArchivedReadOnly')}
+            </Notice>
+          )}
           <ShoppingDraftTools
             householdId={householdId}
             trip={trip}

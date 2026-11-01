@@ -76,12 +76,18 @@ export class StockCheckService {
     tripId: string,
   ) {
     const rows = await client.$queryRaw<
-      Array<{ id: string; status: string; suggestionsImportedAt: Date | null }>
+      Array<{
+        id: string;
+        status: string;
+        suggestionsImportedAt: Date | null;
+        archivedAt: Date | null;
+      }>
     >`
-      SELECT "id", "status", "suggestionsImportedAt" FROM "ShoppingTrip"
+      SELECT "id", "status", "suggestionsImportedAt", "archivedAt" FROM "ShoppingTrip"
       WHERE "id" = ${tripId} AND "householdId" = ${householdId} FOR UPDATE
     `;
     if (!rows.length) throw new NotFoundException('TRIP_NOT_FOUND');
+    if (rows[0].archivedAt) throw new ConflictException('TRIP_ARCHIVED');
     if (rows[0].status !== 'DRAFT')
       throw new ConflictException('TRIP_NOT_DRAFT');
     if (rows[0].suggestionsImportedAt)

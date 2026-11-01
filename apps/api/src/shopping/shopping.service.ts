@@ -60,13 +60,17 @@ export class ShoppingService {
   ) {
     if (destinationTripId === sourceTripId)
       throw new BadRequestException('INVALID_DESTINATION_TRIP');
-    const rows = await tx.$queryRaw<Array<{ id: string; status: string }>>`
-      SELECT "id", "status" FROM "ShoppingTrip"
+    const rows = await tx.$queryRaw<
+      Array<{ id: string; status: string; archivedAt: Date | null }>
+    >`
+      SELECT "id", "status", "archivedAt" FROM "ShoppingTrip"
       WHERE "id" = ${destinationTripId} AND "householdId" = ${householdId}
       FOR UPDATE
     `;
     if (rows.length !== 1)
       throw new NotFoundException('DESTINATION_TRIP_NOT_FOUND');
+    if (rows[0].archivedAt)
+      throw new ConflictException('DESTINATION_TRIP_ARCHIVED');
     if (rows[0].status !== 'DRAFT')
       throw new ConflictException('DESTINATION_NOT_DRAFT');
   }
@@ -108,11 +112,74 @@ export class ShoppingService {
     return this.prisma.$transaction(async (tx) => {
       await requireActiveHousehold(tx, actorId, householdId);
       return tx.shoppingTrip.findMany({
-        where: { householdId },
+        where: { householdId, archivedAt: null },
         include: { _count: { select: { entries: true } } },
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       });
     });
+  }
+
+  async listArchived(actorId: string, householdId: string) {
+    return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
+      return tx.shoppingTrip.findMany({
+        where: { householdId, archivedAt: { not: null } },
+        include: { _count: { select: { entries: true } } },
+        orderBy: [{ archivedAt: 'desc' }, { id: 'desc' }],
+      });
+    });
+  }
+
+  async archive(actorId: string, householdId: string, tripId: string) {
+    await this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
+      const rows = await tx.$queryRaw<
+        Array<{ status: string; archivedAt: Date | null }>
+      >`
+        SELECT "status", "archivedAt" FROM "ShoppingTrip"
+        WHERE "id" = ${tripId} AND "householdId" = ${householdId} FOR UPDATE
+      `;
+      if (!rows.length) throw new NotFoundException('TRIP_NOT_FOUND');
+      if (rows[0].archivedAt) return;
+      if (rows[0].status === 'DRAFT') {
+        const blocking = await tx.shoppingEntry.findMany({
+          where: {
+            moveToTripId: tripId,
+            status: 'MOVED',
+            trip: { status: 'SHOPPING', archivedAt: null },
+          },
+          select: { tripId: true },
+          distinct: ['tripId'],
+        });
+        if (blocking.length)
+          throw new ConflictException({
+            code: 'TRIP_MOVE_DESTINATION_IN_USE',
+            tripIds: blocking.map((entry) => entry.tripId),
+          });
+      }
+      await tx.shoppingTrip.update({
+        where: { id: tripId },
+        data: { archivedAt: new Date(), archivedByUserId: actorId },
+      });
+    });
+    return this.read(actorId, householdId, tripId);
+  }
+
+  async restore(actorId: string, householdId: string, tripId: string) {
+    await this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
+      const rows = await tx.$queryRaw<Array<{ archivedAt: Date | null }>>`
+        SELECT "archivedAt" FROM "ShoppingTrip"
+        WHERE "id" = ${tripId} AND "householdId" = ${householdId} FOR UPDATE
+      `;
+      if (!rows.length) throw new NotFoundException('TRIP_NOT_FOUND');
+      if (!rows[0].archivedAt) return;
+      await tx.shoppingTrip.update({
+        where: { id: tripId },
+        data: { archivedAt: null, archivedByUserId: null },
+      });
+    });
+    return this.read(actorId, householdId, tripId);
   }
 
   async read(actorId: string, householdId: string, tripId: string) {
@@ -224,9 +291,10 @@ export class ShoppingService {
           status: string;
           plannedDate: Date;
           suggestionsImportedAt: Date | null;
+          archivedAt: Date | null;
         }>
       >`
-        SELECT "status", "plannedDate", "suggestionsImportedAt" FROM "ShoppingTrip"
+        SELECT "status", "plannedDate", "suggestionsImportedAt", "archivedAt" FROM "ShoppingTrip"
         WHERE "id" = ${tripId} AND "householdId" = ${householdId}
         FOR UPDATE
       `;
@@ -234,6 +302,7 @@ export class ShoppingService {
         throw new NotFoundException(
           'Shopping trip was not found in this household.',
         );
+      if (locked[0].archivedAt) throw new ConflictException('TRIP_ARCHIVED');
       if (locked[0]?.status !== 'DRAFT') {
         throw new ConflictException(
           'Suggestions can only be added to a draft trip.',
@@ -263,6 +332,7 @@ export class ShoppingService {
           householdId,
           id: { not: tripId },
           status: 'RESTOCKED',
+          archivedAt: null,
           plannedDate: { lte: locked[0].plannedDate },
           completedAt: { lte: new Date() },
         },
@@ -397,8 +467,10 @@ export class ShoppingService {
     try {
       await this.prisma.$transaction(async (tx) => {
         await requireActiveHousehold(tx, actorId, householdId);
-        const locked = await tx.$queryRaw<Array<{ status: string }>>`
-          SELECT "status" FROM "ShoppingTrip"
+        const locked = await tx.$queryRaw<
+          Array<{ status: string; archivedAt: Date | null }>
+        >`
+          SELECT "status", "archivedAt" FROM "ShoppingTrip"
           WHERE "id" = ${tripId} AND "householdId" = ${householdId}
           FOR UPDATE
         `;
@@ -406,6 +478,7 @@ export class ShoppingService {
           throw new NotFoundException(
             'Shopping trip was not found in this household.',
           );
+        if (locked[0].archivedAt) throw new ConflictException('TRIP_ARCHIVED');
         if (!['DRAFT', 'SHOPPING'].includes(locked[0].status)) {
           throw new ConflictException('This trip is already finished.');
         }
@@ -441,8 +514,10 @@ export class ShoppingService {
     await this.requireMember(actorId, householdId);
     await this.prisma.$transaction(async (tx) => {
       await requireActiveHousehold(tx, actorId, householdId);
-      const locked = await tx.$queryRaw<Array<{ status: string }>>`
-        SELECT "status" FROM "ShoppingTrip"
+      const locked = await tx.$queryRaw<
+        Array<{ status: string; archivedAt: Date | null }>
+      >`
+        SELECT "status", "archivedAt" FROM "ShoppingTrip"
         WHERE "id" = ${tripId} AND "householdId" = ${householdId}
         FOR UPDATE
       `;
@@ -450,6 +525,7 @@ export class ShoppingService {
         throw new NotFoundException(
           'Shopping trip was not found in this household.',
         );
+      if (locked[0].archivedAt) throw new ConflictException('TRIP_ARCHIVED');
       if (locked[0].status !== 'DRAFT')
         throw new ConflictException('Only a draft trip can start shopping.');
       await tx.shoppingTrip.update({
@@ -469,12 +545,15 @@ export class ShoppingService {
     await this.requireMember(actorId, householdId);
     await this.prisma.$transaction(async (tx) => {
       await requireActiveHousehold(tx, actorId, householdId);
-      const locked = await tx.$queryRaw<Array<{ status: string }>>`
-        SELECT "status" FROM "ShoppingTrip"
+      const locked = await tx.$queryRaw<
+        Array<{ status: string; archivedAt: Date | null }>
+      >`
+        SELECT "status", "archivedAt" FROM "ShoppingTrip"
         WHERE "id" = ${tripId} AND "householdId" = ${householdId}
         FOR UPDATE
       `;
       if (!locked.length) throw new NotFoundException('TRIP_NOT_FOUND');
+      if (locked[0].archivedAt) throw new ConflictException('TRIP_ARCHIVED');
       if (!['DRAFT', 'SHOPPING'].includes(locked[0].status))
         throw new ConflictException('TRIP_ALREADY_FINISHED');
       const removed = await tx.shoppingEntry.deleteMany({
@@ -518,8 +597,10 @@ export class ShoppingService {
     await this.requireMember(actorId, householdId);
     await this.prisma.$transaction(async (tx) => {
       await requireActiveHousehold(tx, actorId, householdId);
-      const locked = await tx.$queryRaw<Array<{ status: string }>>`
-        SELECT "status" FROM "ShoppingTrip"
+      const locked = await tx.$queryRaw<
+        Array<{ status: string; archivedAt: Date | null }>
+      >`
+        SELECT "status", "archivedAt" FROM "ShoppingTrip"
         WHERE "id" = ${tripId} AND "householdId" = ${householdId}
         FOR UPDATE
       `;
@@ -527,6 +608,7 @@ export class ShoppingService {
         throw new NotFoundException(
           'Shopping trip was not found in this household.',
         );
+      if (locked[0].archivedAt) throw new ConflictException('TRIP_ARCHIVED');
       if (locked[0].status !== 'SHOPPING')
         throw new ConflictException(
           'Shopping decisions require an active trip.',
@@ -638,8 +720,10 @@ export class ShoppingService {
     await this.prisma.$transaction(
       async (tx) => {
         await requireActiveHousehold(tx, actorId, householdId);
-        const locked = await tx.$queryRaw<Array<{ status: string }>>`
-        SELECT "status" FROM "ShoppingTrip"
+        const locked = await tx.$queryRaw<
+          Array<{ status: string; archivedAt: Date | null }>
+        >`
+        SELECT "status", "archivedAt" FROM "ShoppingTrip"
         WHERE "id" = ${tripId} AND "householdId" = ${householdId}
         FOR UPDATE
       `;
@@ -647,6 +731,7 @@ export class ShoppingService {
           throw new NotFoundException(
             'Shopping trip was not found in this household.',
           );
+        if (locked[0].archivedAt) throw new ConflictException('TRIP_ARCHIVED');
         if (locked[0].status === 'RESTOCKED') return;
         if (locked[0].status !== 'SHOPPING')
           throw new ConflictException(

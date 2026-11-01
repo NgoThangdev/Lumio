@@ -42,5 +42,12 @@ export function useShoppingQueries(householdId: string, tripId?: string) {
     queryFn: () => api<CatalogOption[]>(`/households/${householdId}/locations`),
   });
 
-  return { trips, trip, items, intelligence, shoppingSettings, locations };
+  return {
+    trips,
+    trip,
+    items,
+    intelligence,
+    shoppingSettings,
+    locations,
+  };
 }

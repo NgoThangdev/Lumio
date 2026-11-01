@@ -105,6 +105,7 @@ describe('stock-intelligence shopping date resolution', () => {
       expect.objectContaining({
         where: {
           householdId: 'home',
+          archivedAt: null,
           status: { not: 'RESTOCKED' },
           plannedDate: { gte: new Date('2026-10-17T00:00:00.000Z') },
         },

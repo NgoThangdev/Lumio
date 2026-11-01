@@ -6,6 +6,8 @@ export type TripSummary = {
   store: string;
   plannedDate: string;
   status: 'DRAFT' | 'SHOPPING' | 'RESTOCKED';
+  archivedAt?: string | null;
+  archivedByUserId?: string | null;
   _count?: { entries: number };
 };
 

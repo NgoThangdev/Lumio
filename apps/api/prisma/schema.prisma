@@ -110,6 +110,7 @@ model User {
   sessions            UserSession[]
   createdShoppingTrips ShoppingTrip[] @relation("ShoppingTripCreator")
   completedShoppingTrips ShoppingTrip[] @relation("ShoppingTripFinisher")
+  archivedShoppingTrips ShoppingTrip[] @relation("ShoppingTripArchiver")
   stockChecks TripStockCheck[]
   locationStockChecks LocationStockCheck[]
   notificationPreference NotificationPreference?
@@ -384,14 +385,18 @@ model ShoppingTrip {
   createdAt       DateTime           @default(now())
   completedAt     DateTime?
   suggestionsImportedAt DateTime?
+  archivedAt      DateTime?
+  archivedByUserId String?
   household       Household          @relation(fields: [householdId], references: [id])
   createdBy       User               @relation("ShoppingTripCreator", fields: [createdByUserId], references: [id])
   completedBy     User?              @relation("ShoppingTripFinisher", fields: [completedByUserId], references: [id])
+  archivedBy      User?              @relation("ShoppingTripArchiver", fields: [archivedByUserId], references: [id])
   entries         ShoppingEntry[]
   incomingMoves   ShoppingEntry[] @relation("MoveDestination")
   stockChecks     TripStockCheck[]
 
   @@index([householdId, createdAt])
+  @@index([householdId, archivedAt])
 }
 
 model ShoppingEntry {

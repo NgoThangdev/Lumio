@@ -136,7 +136,10 @@ export function SwipeReveal({
           className={`swipe-reveal-action-button swipe-reveal-${action}`}
           type="button"
           aria-label={`${actionLabel}: ${itemName}`}
-          onClick={onAction}
+          onClick={() => {
+            setRevealed(false);
+            onAction();
+          }}
         >
           {actionLabel}
         </Button>

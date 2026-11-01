@@ -69,6 +69,9 @@ const knownApiErrors: Record<string, string> = {
   CATEGORY_IN_USE: 'common:categoryStillReferenced',
   ACTIVE_TRIP_ENTRY: 'common:removeItemActive',
   DESTINATION_NOT_DRAFT: 'common:chooseDestinationTrip',
+  TRIP_MOVE_DESTINATION_IN_USE: 'shopping:tripMoveDestinationInUse',
+  TRIP_ARCHIVED: 'shopping:tripArchivedReadOnly',
+  DESTINATION_TRIP_ARCHIVED: 'shopping:destinationTripArchived',
   LAST_ADMIN: 'common:householdKeepLeast',
   ALREADY_MEMBER: 'common:alreadyMemberHousehold',
   INVITATION_EXPIRED: 'common:invitationHasExpired',
@@ -112,7 +115,7 @@ const knownApiErrors: Record<string, string> = {
     'item-detail:deleteBlockedStockProvenance',
   ITEM_NOTIFICATION_IN_FLIGHT: 'item-detail:deleteNotificationInFlight',
   ITEM_REFERENCE_CHANGED: 'item-detail:deleteReferenceChanged',
-  TRIP_NOT_FOUND: 'common:shoppingTripFound',
+  TRIP_NOT_FOUND: 'shopping:tripNoLongerAvailable',
 };
 
 export function localizedError(error: unknown): string {

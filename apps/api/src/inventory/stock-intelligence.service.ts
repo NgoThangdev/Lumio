@@ -50,6 +50,7 @@ export class StockIntelligenceService {
         where: {
           householdId,
           status: { not: 'RESTOCKED' },
+          archivedAt: null,
           plannedDate: { gte: new Date(`${today}T00:00:00.000Z`) },
         },
         select: { plannedDate: true },

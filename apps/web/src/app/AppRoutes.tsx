@@ -15,6 +15,7 @@ import { ItemDetailPage } from '@/features/inventory/item-detail/ItemDetailPage'
 import { LocationStockCheckPage } from '@/features/inventory/location-check/LocationStockCheckPage';
 import { QuickPurchasePage } from '@/features/shopping/QuickPurchasePage';
 import { ShoppingPage } from '@/features/shopping/ShoppingPage';
+import { ArchivedTripsPage } from '@/features/shopping/ArchivedTripsPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 import { AttentionPage } from '@/features/attention/AttentionPage';
 import { api } from '@/shared/api/client';
@@ -82,6 +83,7 @@ export function AppRoutes({
             element={<LocationStockCheckPage />}
           />
           <Route path="shopping" element={<ShoppingPage />} />
+          <Route path="shopping/archived" element={<ArchivedTripsPage />} />
           <Route
             path="shopping/quick-purchase"
             element={<QuickPurchasePage />}

@@ -38,6 +38,7 @@ export function ShoppingFinishPanel({
   onFinish: () => void;
   onConfirmLocation: () => void;
 }) {
+  if (trip.archivedAt) return null;
   return (
     <>
       {trip.status === 'SHOPPING' && (

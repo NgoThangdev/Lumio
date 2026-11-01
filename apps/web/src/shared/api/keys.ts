@@ -39,6 +39,8 @@ export const keys = {
   locationStockCheck: (householdId: string, locationId: string) =>
     ['household', householdId, 'location-stock-check', locationId] as const,
   trips: (householdId: string) => ['household', householdId, 'trips'] as const,
+  archivedTrips: (householdId: string) =>
+    ['household', householdId, 'archived-trips'] as const,
   trip: (householdId: string, tripId: string) =>
     ['household', householdId, 'trip', tripId] as const,
 };

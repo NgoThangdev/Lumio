@@ -34,12 +34,14 @@ export function ShoppingTripHeader({
             {formatDateOnly(trip.plannedDate)} · {purchasedCount} /{' '}
             {trip.entries.length} {tr('common:purchased2')}
           </p>
-          <Link
-            className="secondary trip-quick-purchase"
-            to={`${routeBase}/quick-purchase`}
-          >
-            {tr('shopping:quickPurchase')}
-          </Link>
+          {!trip.archivedAt && (
+            <Link
+              className="secondary trip-quick-purchase"
+              to={`${routeBase}/quick-purchase`}
+            >
+              {tr('shopping:quickPurchase')}
+            </Link>
+          )}
         </div>
       </div>
     </div>
@@ -61,7 +63,7 @@ export function ShoppingDraftTools({
   onImport: () => void;
   onStart: () => void;
 }) {
-  if (trip.status !== 'DRAFT') return null;
+  if (trip.archivedAt || trip.status !== 'DRAFT') return null;
   return (
     <>
       {suggestionsAlreadyImported ? (
@@ -104,7 +106,8 @@ export function ShoppingManualAdd({
   onManualItemChange: (value: string) => void;
   onAddManual: () => void;
 }) {
-  if (trip.status === 'RESTOCKED' || available.length === 0) return null;
+  if (trip.archivedAt || trip.status === 'RESTOCKED' || available.length === 0)
+    return null;
   return (
     <form
       className="card manual-add"
