@@ -122,6 +122,8 @@ export function ConfigForm({
     lowStockThreshold: item.lowStockThreshold,
     buyThreshold: item.buyThreshold,
     targetStock: item.targetStock,
+    safetyBuffer: item.safetyBuffer,
+    expiryReminderDays: item.expiryReminderDays,
     neverRunOut: item.neverRunOut,
     predictionEnabled: item.predictionEnabled,
   });
@@ -179,6 +181,40 @@ export function ConfigForm({
               />
             </label>
           ))}
+          <label>
+            {tr('common:safetyBuffer')}
+            <input
+              type="number"
+              min="1"
+              max="3"
+              step="0.01"
+              value={config.safetyBuffer}
+              onChange={(event) =>
+                setConfig((current) => ({
+                  ...current,
+                  safetyBuffer: event.target.value,
+                }))
+              }
+              required
+            />
+          </label>
+          <label>
+            {tr('common:expiryReminderDays')}
+            <input
+              type="number"
+              min="0"
+              max="30"
+              step="1"
+              value={config.expiryReminderDays}
+              onChange={(event) =>
+                setConfig((current) => ({
+                  ...current,
+                  expiryReminderDays: Number(event.target.value),
+                }))
+              }
+              required
+            />
+          </label>
           <label className="check-label">
             <input
               type="checkbox"

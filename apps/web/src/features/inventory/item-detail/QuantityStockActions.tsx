@@ -139,6 +139,31 @@ export function QuantityStockActions({
                   onChange={(event) => actions.setExpiry(event.target.value)}
                 />
               </label>
+              <details>
+                <summary>
+                  {tr('common:batchDates')} <em>{tr('common:optional2')}</em>
+                </summary>
+                <label>
+                  {tr('common:purchaseDate')}
+                  <input
+                    type="date"
+                    value={actions.purchaseDate}
+                    onChange={(event) =>
+                      actions.setPurchaseDate(event.target.value)
+                    }
+                  />
+                </label>
+                <label>
+                  {tr('common:freezeDate')}
+                  <input
+                    type="date"
+                    value={actions.freezeDate}
+                    onChange={(event) =>
+                      actions.setFreezeDate(event.target.value)
+                    }
+                  />
+                </label>
+              </details>
               {locations.isError && (
                 <Notice kind="error">
                   {tr('common:householdLocationsLoaded')}{' '}

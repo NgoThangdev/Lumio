@@ -154,6 +154,8 @@ export class ShoppingController {
       status?: unknown;
       actualQuantity?: unknown;
       expiryDate?: unknown;
+      purchaseDate?: unknown;
+      freezeDate?: unknown;
       locationId?: unknown;
       destinationTripId?: unknown;
     },
@@ -168,6 +170,8 @@ export class ShoppingController {
       body?.expiryDate,
       body?.locationId,
       body?.destinationTripId,
+      body?.purchaseDate,
+      body?.freezeDate,
     );
   }
 

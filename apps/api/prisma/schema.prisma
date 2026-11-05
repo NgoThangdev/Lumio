@@ -200,6 +200,13 @@ model Household {
   deletionDueAt DateTime?
   defaultShoppingCycleDays Int @default(7)
   defaultStore String? @db.VarChar(120)
+  defaultTrackingMode TrackingMode?
+  defaultPrimaryUnit String? @db.VarChar(40)
+  defaultLowStockThreshold Decimal? @db.Decimal(18, 6)
+  defaultBuyThreshold Decimal? @db.Decimal(18, 6)
+  defaultTargetStock Decimal? @db.Decimal(18, 6)
+  defaultSafetyBuffer Decimal @default(1.2) @db.Decimal(4, 2)
+  defaultExpiryReminderDays Int @default(3)
   memberships      Membership[]
   invitations      HouseholdInvitation[]
   inventoryItems   InventoryItem[]
@@ -224,6 +231,11 @@ model Category {
   shoppingSection ShoppingSection?
   defaultTrackingMode TrackingMode?
   defaultPrimaryUnit String? @db.VarChar(40)
+  defaultLowStockThreshold Decimal? @db.Decimal(18, 6)
+  defaultBuyThreshold Decimal? @db.Decimal(18, 6)
+  defaultTargetStock Decimal? @db.Decimal(18, 6)
+  defaultSafetyBuffer Decimal? @db.Decimal(4, 2)
+  defaultExpiryReminderDays Int?
   household Household @relation(fields: [householdId], references: [id])
   items InventoryItem[]
 
@@ -301,6 +313,8 @@ model InventoryItem {
   lowStockThreshold Decimal? @db.Decimal(18, 6)
   buyThreshold      Decimal? @db.Decimal(18, 6)
   targetStock       Decimal? @db.Decimal(18, 6)
+  safetyBuffer Decimal @default(1.2) @db.Decimal(4, 2)
+  expiryReminderDays Int @default(3)
   neverRunOut       Boolean  @default(false)
   predictionEnabled Boolean  @default(false)
   stockRevision Int @default(0)
@@ -410,6 +424,8 @@ model ShoppingEntry {
   suggestedReason   String?
   actualQuantity    Decimal?              @db.Decimal(18, 6)
   expiryDate        DateTime?             @db.Date
+  purchaseDate      DateTime?             @db.Date
+  freezeDate        DateTime?             @db.Date
   locationId        String?
   moveToTripId      String?
   trip              ShoppingTrip          @relation(fields: [tripId], references: [id])
@@ -467,6 +483,8 @@ model StockBatch {
   locationId String?
   quantity    Decimal                 @db.Decimal(18, 6)
   expiryDate  DateTime?               @db.Date
+  purchaseDate DateTime? @db.Date
+  freezeDate DateTime? @db.Date
   openedAt DateTime?
   openedUseByDate DateTime? @db.Date
   createdAt   DateTime                @default(now())

@@ -1,4 +1,6 @@
 {
+  "overrideStockDefaults": "Ghi đè mặc định tồn kho cho món này",
+  "overrideStockDefaultsHint": "Để trống để dùng mặc định tương thích của hộ gia đình hoặc danh mục. Thay đổi này chỉ áp dụng cho món này.",
   "lumioSStock": "(theo đánh giá tồn kho của Lumio)",
   "catalogFilterLoad": "Không thể tải bộ lọc danh mục:",
   "householdAdminNeeds": "Quản trị viên hộ gia đình cần thêm danh mục trước khi bạn có thể tạo mặt hàng.",

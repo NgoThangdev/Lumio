@@ -20,6 +20,8 @@ export function useQuantityStockActions({
 }) {
   const [restock, setRestock] = useState('');
   const [expiry, setExpiry] = useState('');
+  const [purchaseDate, setPurchaseDate] = useState('');
+  const [freezeDate, setFreezeDate] = useState('');
   const [restockLocation, setRestockLocation] = useState<string | null>(null);
   const [use, setUse] = useState('');
   const [undoCandidate, setUndoCandidate] = useState<UndoCandidate | null>(
@@ -30,6 +32,8 @@ export function useQuantityStockActions({
     mutationFn: (input: {
       quantity: string;
       expiryDate: string | null;
+      purchaseDate: string | null;
+      freezeDate: string | null;
       locationId?: string;
     }) =>
       api(`/households/${householdId}/items/${itemId}/restock`, 'POST', {
@@ -84,10 +88,14 @@ export function useQuantityStockActions({
     await restockAction.mutateAsync({
       quantity: restock,
       expiryDate: expiry || null,
+      purchaseDate: purchaseDate || null,
+      freezeDate: freezeDate || null,
       locationId: locationId ?? (restockLocationId || undefined),
     });
     setRestock('');
     setExpiry('');
+    setPurchaseDate('');
+    setFreezeDate('');
     setRestockLocation(null);
     onNotice('Stock added.');
   }
@@ -102,6 +110,10 @@ export function useQuantityStockActions({
     setRestock,
     expiry,
     setExpiry,
+    purchaseDate,
+    setPurchaseDate,
+    freezeDate,
+    setFreezeDate,
     restockLocationId,
     setRestockLocation,
     use,

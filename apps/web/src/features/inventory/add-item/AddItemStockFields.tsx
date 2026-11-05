@@ -12,6 +12,10 @@ export function AddItemStockFields({
   onQuantityChange,
   expiry,
   onExpiryChange,
+  purchaseDate,
+  onPurchaseDateChange,
+  freezeDate,
+  onFreezeDateChange,
   level,
   onLevelChange,
   present,
@@ -25,6 +29,10 @@ export function AddItemStockFields({
   onQuantityChange: (value: string) => void;
   expiry: string;
   onExpiryChange: (value: string) => void;
+  purchaseDate: string;
+  onPurchaseDateChange: (value: string) => void;
+  freezeDate: string;
+  onFreezeDateChange: (value: string) => void;
   level: StockLevel | '';
   onLevelChange: (value: StockLevel | '') => void;
   present: string;
@@ -54,7 +62,7 @@ export function AddItemStockFields({
         {quantity !== '0' && (
           <details className="catalog-disclosure">
             <summary>
-              {tr('common:expiryDate')} <em>{tr('common:optional2')}</em>
+              {tr('common:batchDates')} <em>{tr('common:optional2')}</em>
             </summary>
             <label>
               {tr('common:expiryDate')}
@@ -62,6 +70,22 @@ export function AddItemStockFields({
                 type="date"
                 value={expiry}
                 onChange={(event) => onExpiryChange(event.target.value)}
+              />
+            </label>
+            <label>
+              {tr('common:purchaseDate')}
+              <input
+                type="date"
+                value={purchaseDate}
+                onChange={(event) => onPurchaseDateChange(event.target.value)}
+              />
+            </label>
+            <label>
+              {tr('common:freezeDate')}
+              <input
+                type="date"
+                value={freezeDate}
+                onChange={(event) => onFreezeDateChange(event.target.value)}
               />
             </label>
           </details>

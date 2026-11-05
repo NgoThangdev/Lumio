@@ -47,6 +47,8 @@ export type ShoppingEntryMinAggregateOutputType = {
   suggestedReason: string | null
   actualQuantity: runtime.Decimal | null
   expiryDate: Date | null
+  purchaseDate: Date | null
+  freezeDate: Date | null
   locationId: string | null
   moveToTripId: string | null
 }
@@ -62,6 +64,8 @@ export type ShoppingEntryMaxAggregateOutputType = {
   suggestedReason: string | null
   actualQuantity: runtime.Decimal | null
   expiryDate: Date | null
+  purchaseDate: Date | null
+  freezeDate: Date | null
   locationId: string | null
   moveToTripId: string | null
 }
@@ -77,6 +81,8 @@ export type ShoppingEntryCountAggregateOutputType = {
   suggestedReason: number
   actualQuantity: number
   expiryDate: number
+  purchaseDate: number
+  freezeDate: number
   locationId: number
   moveToTripId: number
   _all: number
@@ -104,6 +110,8 @@ export type ShoppingEntryMinAggregateInputType = {
   suggestedReason?: true
   actualQuantity?: true
   expiryDate?: true
+  purchaseDate?: true
+  freezeDate?: true
   locationId?: true
   moveToTripId?: true
 }
@@ -119,6 +127,8 @@ export type ShoppingEntryMaxAggregateInputType = {
   suggestedReason?: true
   actualQuantity?: true
   expiryDate?: true
+  purchaseDate?: true
+  freezeDate?: true
   locationId?: true
   moveToTripId?: true
 }
@@ -134,6 +144,8 @@ export type ShoppingEntryCountAggregateInputType = {
   suggestedReason?: true
   actualQuantity?: true
   expiryDate?: true
+  purchaseDate?: true
+  freezeDate?: true
   locationId?: true
   moveToTripId?: true
   _all?: true
@@ -236,6 +248,8 @@ export type ShoppingEntryGroupByOutputType = {
   suggestedReason: string | null
   actualQuantity: runtime.Decimal | null
   expiryDate: Date | null
+  purchaseDate: Date | null
+  freezeDate: Date | null
   locationId: string | null
   moveToTripId: string | null
   _count: ShoppingEntryCountAggregateOutputType | null
@@ -274,6 +288,8 @@ export type ShoppingEntryWhereInput = {
   suggestedReason?: Prisma.StringNullableFilter<"ShoppingEntry"> | string | null
   actualQuantity?: Prisma.DecimalNullableFilter<"ShoppingEntry"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.DateTimeNullableFilter<"ShoppingEntry"> | Date | string | null
+  purchaseDate?: Prisma.DateTimeNullableFilter<"ShoppingEntry"> | Date | string | null
+  freezeDate?: Prisma.DateTimeNullableFilter<"ShoppingEntry"> | Date | string | null
   locationId?: Prisma.StringNullableFilter<"ShoppingEntry"> | string | null
   moveToTripId?: Prisma.StringNullableFilter<"ShoppingEntry"> | string | null
   trip?: Prisma.XOR<Prisma.ShoppingTripScalarRelationFilter, Prisma.ShoppingTripWhereInput>
@@ -293,6 +309,8 @@ export type ShoppingEntryOrderByWithRelationInput = {
   suggestedReason?: Prisma.SortOrderInput | Prisma.SortOrder
   actualQuantity?: Prisma.SortOrderInput | Prisma.SortOrder
   expiryDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  purchaseDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  freezeDate?: Prisma.SortOrderInput | Prisma.SortOrder
   locationId?: Prisma.SortOrderInput | Prisma.SortOrder
   moveToTripId?: Prisma.SortOrderInput | Prisma.SortOrder
   trip?: Prisma.ShoppingTripOrderByWithRelationInput
@@ -316,6 +334,8 @@ export type ShoppingEntryWhereUniqueInput = Prisma.AtLeast<{
   suggestedReason?: Prisma.StringNullableFilter<"ShoppingEntry"> | string | null
   actualQuantity?: Prisma.DecimalNullableFilter<"ShoppingEntry"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.DateTimeNullableFilter<"ShoppingEntry"> | Date | string | null
+  purchaseDate?: Prisma.DateTimeNullableFilter<"ShoppingEntry"> | Date | string | null
+  freezeDate?: Prisma.DateTimeNullableFilter<"ShoppingEntry"> | Date | string | null
   locationId?: Prisma.StringNullableFilter<"ShoppingEntry"> | string | null
   moveToTripId?: Prisma.StringNullableFilter<"ShoppingEntry"> | string | null
   trip?: Prisma.XOR<Prisma.ShoppingTripScalarRelationFilter, Prisma.ShoppingTripWhereInput>
@@ -335,6 +355,8 @@ export type ShoppingEntryOrderByWithAggregationInput = {
   suggestedReason?: Prisma.SortOrderInput | Prisma.SortOrder
   actualQuantity?: Prisma.SortOrderInput | Prisma.SortOrder
   expiryDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  purchaseDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  freezeDate?: Prisma.SortOrderInput | Prisma.SortOrder
   locationId?: Prisma.SortOrderInput | Prisma.SortOrder
   moveToTripId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ShoppingEntryCountOrderByAggregateInput
@@ -358,6 +380,8 @@ export type ShoppingEntryScalarWhereWithAggregatesInput = {
   suggestedReason?: Prisma.StringNullableWithAggregatesFilter<"ShoppingEntry"> | string | null
   actualQuantity?: Prisma.DecimalNullableWithAggregatesFilter<"ShoppingEntry"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.DateTimeNullableWithAggregatesFilter<"ShoppingEntry"> | Date | string | null
+  purchaseDate?: Prisma.DateTimeNullableWithAggregatesFilter<"ShoppingEntry"> | Date | string | null
+  freezeDate?: Prisma.DateTimeNullableWithAggregatesFilter<"ShoppingEntry"> | Date | string | null
   locationId?: Prisma.StringNullableWithAggregatesFilter<"ShoppingEntry"> | string | null
   moveToTripId?: Prisma.StringNullableWithAggregatesFilter<"ShoppingEntry"> | string | null
 }
@@ -371,6 +395,8 @@ export type ShoppingEntryCreateInput = {
   suggestedReason?: string | null
   actualQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   trip: Prisma.ShoppingTripCreateNestedOneWithoutEntriesInput
   moveToTrip?: Prisma.ShoppingTripCreateNestedOneWithoutIncomingMovesInput
   item: Prisma.InventoryItemCreateNestedOneWithoutShoppingEntriesInput
@@ -388,6 +414,8 @@ export type ShoppingEntryUncheckedCreateInput = {
   suggestedReason?: string | null
   actualQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   locationId?: string | null
   moveToTripId?: string | null
 }
@@ -401,6 +429,8 @@ export type ShoppingEntryUpdateInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   trip?: Prisma.ShoppingTripUpdateOneRequiredWithoutEntriesNestedInput
   moveToTrip?: Prisma.ShoppingTripUpdateOneWithoutIncomingMovesNestedInput
   item?: Prisma.InventoryItemUpdateOneRequiredWithoutShoppingEntriesNestedInput
@@ -418,6 +448,8 @@ export type ShoppingEntryUncheckedUpdateInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moveToTripId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -433,6 +465,8 @@ export type ShoppingEntryCreateManyInput = {
   suggestedReason?: string | null
   actualQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   locationId?: string | null
   moveToTripId?: string | null
 }
@@ -446,6 +480,8 @@ export type ShoppingEntryUpdateManyMutationInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ShoppingEntryUncheckedUpdateManyInput = {
@@ -459,6 +495,8 @@ export type ShoppingEntryUncheckedUpdateManyInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moveToTripId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -489,6 +527,8 @@ export type ShoppingEntryCountOrderByAggregateInput = {
   suggestedReason?: Prisma.SortOrder
   actualQuantity?: Prisma.SortOrder
   expiryDate?: Prisma.SortOrder
+  purchaseDate?: Prisma.SortOrder
+  freezeDate?: Prisma.SortOrder
   locationId?: Prisma.SortOrder
   moveToTripId?: Prisma.SortOrder
 }
@@ -509,6 +549,8 @@ export type ShoppingEntryMaxOrderByAggregateInput = {
   suggestedReason?: Prisma.SortOrder
   actualQuantity?: Prisma.SortOrder
   expiryDate?: Prisma.SortOrder
+  purchaseDate?: Prisma.SortOrder
+  freezeDate?: Prisma.SortOrder
   locationId?: Prisma.SortOrder
   moveToTripId?: Prisma.SortOrder
 }
@@ -524,6 +566,8 @@ export type ShoppingEntryMinOrderByAggregateInput = {
   suggestedReason?: Prisma.SortOrder
   actualQuantity?: Prisma.SortOrder
   expiryDate?: Prisma.SortOrder
+  purchaseDate?: Prisma.SortOrder
+  freezeDate?: Prisma.SortOrder
   locationId?: Prisma.SortOrder
   moveToTripId?: Prisma.SortOrder
 }
@@ -722,6 +766,8 @@ export type ShoppingEntryCreateWithoutLocationInput = {
   suggestedReason?: string | null
   actualQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   trip: Prisma.ShoppingTripCreateNestedOneWithoutEntriesInput
   moveToTrip?: Prisma.ShoppingTripCreateNestedOneWithoutIncomingMovesInput
   item: Prisma.InventoryItemCreateNestedOneWithoutShoppingEntriesInput
@@ -738,6 +784,8 @@ export type ShoppingEntryUncheckedCreateWithoutLocationInput = {
   suggestedReason?: string | null
   actualQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   moveToTripId?: string | null
 }
 
@@ -781,6 +829,8 @@ export type ShoppingEntryScalarWhereInput = {
   suggestedReason?: Prisma.StringNullableFilter<"ShoppingEntry"> | string | null
   actualQuantity?: Prisma.DecimalNullableFilter<"ShoppingEntry"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.DateTimeNullableFilter<"ShoppingEntry"> | Date | string | null
+  purchaseDate?: Prisma.DateTimeNullableFilter<"ShoppingEntry"> | Date | string | null
+  freezeDate?: Prisma.DateTimeNullableFilter<"ShoppingEntry"> | Date | string | null
   locationId?: Prisma.StringNullableFilter<"ShoppingEntry"> | string | null
   moveToTripId?: Prisma.StringNullableFilter<"ShoppingEntry"> | string | null
 }
@@ -794,6 +844,8 @@ export type ShoppingEntryCreateWithoutItemInput = {
   suggestedReason?: string | null
   actualQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   trip: Prisma.ShoppingTripCreateNestedOneWithoutEntriesInput
   moveToTrip?: Prisma.ShoppingTripCreateNestedOneWithoutIncomingMovesInput
   location?: Prisma.LocationCreateNestedOneWithoutShoppingEntriesInput
@@ -809,6 +861,8 @@ export type ShoppingEntryUncheckedCreateWithoutItemInput = {
   suggestedReason?: string | null
   actualQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   locationId?: string | null
   moveToTripId?: string | null
 }
@@ -848,6 +902,8 @@ export type ShoppingEntryCreateWithoutTripInput = {
   suggestedReason?: string | null
   actualQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   moveToTrip?: Prisma.ShoppingTripCreateNestedOneWithoutIncomingMovesInput
   item: Prisma.InventoryItemCreateNestedOneWithoutShoppingEntriesInput
   location?: Prisma.LocationCreateNestedOneWithoutShoppingEntriesInput
@@ -863,6 +919,8 @@ export type ShoppingEntryUncheckedCreateWithoutTripInput = {
   suggestedReason?: string | null
   actualQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   locationId?: string | null
   moveToTripId?: string | null
 }
@@ -886,6 +944,8 @@ export type ShoppingEntryCreateWithoutMoveToTripInput = {
   suggestedReason?: string | null
   actualQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   trip: Prisma.ShoppingTripCreateNestedOneWithoutEntriesInput
   item: Prisma.InventoryItemCreateNestedOneWithoutShoppingEntriesInput
   location?: Prisma.LocationCreateNestedOneWithoutShoppingEntriesInput
@@ -902,6 +962,8 @@ export type ShoppingEntryUncheckedCreateWithoutMoveToTripInput = {
   suggestedReason?: string | null
   actualQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   locationId?: string | null
 }
 
@@ -958,6 +1020,8 @@ export type ShoppingEntryCreateManyLocationInput = {
   suggestedReason?: string | null
   actualQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   moveToTripId?: string | null
 }
 
@@ -970,6 +1034,8 @@ export type ShoppingEntryUpdateWithoutLocationInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   trip?: Prisma.ShoppingTripUpdateOneRequiredWithoutEntriesNestedInput
   moveToTrip?: Prisma.ShoppingTripUpdateOneWithoutIncomingMovesNestedInput
   item?: Prisma.InventoryItemUpdateOneRequiredWithoutShoppingEntriesNestedInput
@@ -986,6 +1052,8 @@ export type ShoppingEntryUncheckedUpdateWithoutLocationInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moveToTripId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -1000,6 +1068,8 @@ export type ShoppingEntryUncheckedUpdateManyWithoutLocationInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moveToTripId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -1013,6 +1083,8 @@ export type ShoppingEntryCreateManyItemInput = {
   suggestedReason?: string | null
   actualQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   locationId?: string | null
   moveToTripId?: string | null
 }
@@ -1026,6 +1098,8 @@ export type ShoppingEntryUpdateWithoutItemInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   trip?: Prisma.ShoppingTripUpdateOneRequiredWithoutEntriesNestedInput
   moveToTrip?: Prisma.ShoppingTripUpdateOneWithoutIncomingMovesNestedInput
   location?: Prisma.LocationUpdateOneWithoutShoppingEntriesNestedInput
@@ -1041,6 +1115,8 @@ export type ShoppingEntryUncheckedUpdateWithoutItemInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moveToTripId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -1055,6 +1131,8 @@ export type ShoppingEntryUncheckedUpdateManyWithoutItemInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moveToTripId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -1069,6 +1147,8 @@ export type ShoppingEntryCreateManyTripInput = {
   suggestedReason?: string | null
   actualQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   locationId?: string | null
   moveToTripId?: string | null
 }
@@ -1084,6 +1164,8 @@ export type ShoppingEntryCreateManyMoveToTripInput = {
   suggestedReason?: string | null
   actualQuantity?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   locationId?: string | null
 }
 
@@ -1096,6 +1178,8 @@ export type ShoppingEntryUpdateWithoutTripInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moveToTrip?: Prisma.ShoppingTripUpdateOneWithoutIncomingMovesNestedInput
   item?: Prisma.InventoryItemUpdateOneRequiredWithoutShoppingEntriesNestedInput
   location?: Prisma.LocationUpdateOneWithoutShoppingEntriesNestedInput
@@ -1111,6 +1195,8 @@ export type ShoppingEntryUncheckedUpdateWithoutTripInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moveToTripId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -1125,6 +1211,8 @@ export type ShoppingEntryUncheckedUpdateManyWithoutTripInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moveToTripId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -1138,6 +1226,8 @@ export type ShoppingEntryUpdateWithoutMoveToTripInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   trip?: Prisma.ShoppingTripUpdateOneRequiredWithoutEntriesNestedInput
   item?: Prisma.InventoryItemUpdateOneRequiredWithoutShoppingEntriesNestedInput
   location?: Prisma.LocationUpdateOneWithoutShoppingEntriesNestedInput
@@ -1154,6 +1244,8 @@ export type ShoppingEntryUncheckedUpdateWithoutMoveToTripInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -1168,6 +1260,8 @@ export type ShoppingEntryUncheckedUpdateManyWithoutMoveToTripInput = {
   suggestedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualQuantity?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -1184,6 +1278,8 @@ export type ShoppingEntrySelect<ExtArgs extends runtime.Types.Extensions.Interna
   suggestedReason?: boolean
   actualQuantity?: boolean
   expiryDate?: boolean
+  purchaseDate?: boolean
+  freezeDate?: boolean
   locationId?: boolean
   moveToTripId?: boolean
   trip?: boolean | Prisma.ShoppingTripDefaultArgs<ExtArgs>
@@ -1203,6 +1299,8 @@ export type ShoppingEntrySelectCreateManyAndReturn<ExtArgs extends runtime.Types
   suggestedReason?: boolean
   actualQuantity?: boolean
   expiryDate?: boolean
+  purchaseDate?: boolean
+  freezeDate?: boolean
   locationId?: boolean
   moveToTripId?: boolean
   trip?: boolean | Prisma.ShoppingTripDefaultArgs<ExtArgs>
@@ -1222,6 +1320,8 @@ export type ShoppingEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   suggestedReason?: boolean
   actualQuantity?: boolean
   expiryDate?: boolean
+  purchaseDate?: boolean
+  freezeDate?: boolean
   locationId?: boolean
   moveToTripId?: boolean
   trip?: boolean | Prisma.ShoppingTripDefaultArgs<ExtArgs>
@@ -1241,11 +1341,13 @@ export type ShoppingEntrySelectScalar = {
   suggestedReason?: boolean
   actualQuantity?: boolean
   expiryDate?: boolean
+  purchaseDate?: boolean
+  freezeDate?: boolean
   locationId?: boolean
   moveToTripId?: boolean
 }
 
-export type ShoppingEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tripId" | "itemId" | "status" | "source" | "priority" | "suggestedQuantity" | "suggestedReason" | "actualQuantity" | "expiryDate" | "locationId" | "moveToTripId", ExtArgs["result"]["shoppingEntry"]>
+export type ShoppingEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tripId" | "itemId" | "status" | "source" | "priority" | "suggestedQuantity" | "suggestedReason" | "actualQuantity" | "expiryDate" | "purchaseDate" | "freezeDate" | "locationId" | "moveToTripId", ExtArgs["result"]["shoppingEntry"]>
 export type ShoppingEntryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   trip?: boolean | Prisma.ShoppingTripDefaultArgs<ExtArgs>
   moveToTrip?: boolean | Prisma.ShoppingEntry$moveToTripArgs<ExtArgs>
@@ -1284,6 +1386,8 @@ export type $ShoppingEntryPayload<ExtArgs extends runtime.Types.Extensions.Inter
     suggestedReason: string | null
     actualQuantity: runtime.Decimal | null
     expiryDate: Date | null
+    purchaseDate: Date | null
+    freezeDate: Date | null
     locationId: string | null
     moveToTripId: string | null
   }, ExtArgs["result"]["shoppingEntry"]>
@@ -1723,6 +1827,8 @@ export interface ShoppingEntryFieldRefs {
   readonly suggestedReason: Prisma.FieldRef<"ShoppingEntry", 'String'>
   readonly actualQuantity: Prisma.FieldRef<"ShoppingEntry", 'Decimal'>
   readonly expiryDate: Prisma.FieldRef<"ShoppingEntry", 'DateTime'>
+  readonly purchaseDate: Prisma.FieldRef<"ShoppingEntry", 'DateTime'>
+  readonly freezeDate: Prisma.FieldRef<"ShoppingEntry", 'DateTime'>
   readonly locationId: Prisma.FieldRef<"ShoppingEntry", 'String'>
   readonly moveToTripId: Prisma.FieldRef<"ShoppingEntry", 'String'>
 }

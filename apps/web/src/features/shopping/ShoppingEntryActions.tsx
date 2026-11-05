@@ -88,6 +88,8 @@ export function ShoppingEntryActions({
               [entry.id]: {
                 quantity: event.target.value,
                 expiryDate: current[entry.id]?.expiryDate ?? '',
+                purchaseDate: current[entry.id]?.purchaseDate ?? '',
+                freezeDate: current[entry.id]?.freezeDate ?? '',
                 locationId:
                   current[entry.id]?.locationId ??
                   entry.locationId ??
@@ -122,6 +124,8 @@ export function ShoppingEntryActions({
                 [entry.id]: {
                   quantity: current[entry.id]?.quantity ?? '',
                   expiryDate: event.target.value,
+                  purchaseDate: current[entry.id]?.purchaseDate ?? '',
+                  freezeDate: current[entry.id]?.freezeDate ?? '',
                   locationId:
                     current[entry.id]?.locationId ??
                     entry.locationId ??
@@ -132,6 +136,43 @@ export function ShoppingEntryActions({
             }
           />
         </label>
+      )}
+      {mode === 'QUANTITY' && (
+        <details className="purchase-expiry">
+          <summary>{tr('common:batchDates')}</summary>
+          <label>
+            {tr('common:purchaseDate')}
+            <input
+              type="date"
+              value={drafts[entry.id]?.purchaseDate ?? ''}
+              onChange={(event) =>
+                setDrafts((current) => ({
+                  ...current,
+                  [entry.id]: {
+                    ...current[entry.id],
+                    purchaseDate: event.target.value,
+                  },
+                }))
+              }
+            />
+          </label>
+          <label>
+            {tr('common:freezeDate')} <em>{tr('common:optional2')}</em>
+            <input
+              type="date"
+              value={drafts[entry.id]?.freezeDate ?? ''}
+              onChange={(event) =>
+                setDrafts((current) => ({
+                  ...current,
+                  [entry.id]: {
+                    ...current[entry.id],
+                    freezeDate: event.target.value,
+                  },
+                }))
+              }
+            />
+          </label>
+        </details>
       )}
       {mode === 'QUANTITY' && (
         <label className="purchase-location">
@@ -145,6 +186,8 @@ export function ShoppingEntryActions({
                 [entry.id]: {
                   quantity: current[entry.id]?.quantity ?? '',
                   expiryDate: current[entry.id]?.expiryDate ?? '',
+                  purchaseDate: current[entry.id]?.purchaseDate ?? '',
+                  freezeDate: current[entry.id]?.freezeDate ?? '',
                   locationId: event.target.value,
                 },
               }))

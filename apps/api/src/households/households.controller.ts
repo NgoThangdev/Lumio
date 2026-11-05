@@ -36,6 +36,15 @@ export class HouseholdsController {
     return this.households.create(request.actorId, body?.name);
   }
 
+  @Patch(':householdId')
+  rename(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Body() body: unknown,
+  ) {
+    return this.households.rename(request.actorId, householdId, body);
+  }
+
   @Delete(':householdId')
   deleteImmediately(
     @Req() request: AuthenticatedRequest,
@@ -85,6 +94,27 @@ export class HouseholdsController {
     @Param('householdId') householdId: string,
   ) {
     return this.households.shoppingSettings(request.actorId, householdId);
+  }
+
+  @Get(':householdId/inventory-defaults')
+  inventoryDefaults(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+  ) {
+    return this.households.inventoryDefaults(request.actorId, householdId);
+  }
+
+  @Patch(':householdId/inventory-defaults')
+  updateInventoryDefaults(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Body() body: unknown,
+  ) {
+    return this.households.updateInventoryDefaults(
+      request.actorId,
+      householdId,
+      body,
+    );
   }
 
   @Patch(':householdId/shopping-settings')

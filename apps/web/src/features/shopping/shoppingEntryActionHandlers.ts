@@ -26,6 +26,8 @@ export function createShoppingEntryActions({
         ...(mode === 'QUANTITY'
           ? {
               expiryDate: drafts[entry.id]?.expiryDate || null,
+              purchaseDate: drafts[entry.id]?.purchaseDate || null,
+              freezeDate: drafts[entry.id]?.freezeDate || null,
               locationId: drafts[entry.id]?.locationId || null,
             }
           : {}),

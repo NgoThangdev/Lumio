@@ -97,6 +97,20 @@ export function ItemDetailHistory({
                               date: asDate(batch.expiryDate),
                             })
                           : tr('item-detail:originalExpiry')}{' '}
+                        {batch.purchaseDate && (
+                          <>
+                            {' '}
+                            · {tr('common:purchaseDate')}:{' '}
+                            {asDate(batch.purchaseDate)}
+                          </>
+                        )}
+                        {batch.freezeDate && (
+                          <>
+                            {' '}
+                            · {tr('common:freezeDate')}:{' '}
+                            {asDate(batch.freezeDate)}
+                          </>
+                        )}
                         · {batch.location?.name ?? tr('common:locationSet')}
                         {batch.openedAt
                           ? tr('item-detail:opened3', {

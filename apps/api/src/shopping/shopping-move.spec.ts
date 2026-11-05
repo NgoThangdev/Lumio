@@ -58,6 +58,8 @@ describe('Shopping Move transaction boundary', () => {
         status: 'MOVED',
         actualQuantity: null,
         expiryDate: null,
+        purchaseDate: null,
+        freezeDate: null,
         locationId: null,
         moveToTripId: 'next',
       },

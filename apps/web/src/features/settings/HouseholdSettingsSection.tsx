@@ -10,6 +10,8 @@ import { CatalogManagement } from './CatalogManagement';
 import { CategoryInventoryDefaults } from './CategoryInventoryDefaults';
 import { CategorySectionSettings } from './CategorySectionSettings';
 import { HouseholdShoppingDefaults } from './HouseholdShoppingDefaults';
+import { HouseholdNameEditor } from './HouseholdNameEditor';
+import { HouseholdInventoryDefaults } from './HouseholdInventoryDefaults';
 import { HouseholdDeletionSection } from './HouseholdDeletionSection';
 
 export function HouseholdSettingsSection({ user }: { user: User }) {
@@ -90,8 +92,18 @@ export function HouseholdSettingsSection({ user }: { user: User }) {
                     ? tr('common:admin')
                     : tr('settings:memberViewOnly')}
                 </p>
+                {selected.role === 'ADMIN' && (
+                  <HouseholdNameEditor
+                    key={`${selected.id}-${selected.name}`}
+                    household={selected}
+                  />
+                )}
                 <HouseholdShoppingDefaults
                   key={selected.id}
+                  household={selected}
+                />
+                <HouseholdInventoryDefaults
+                  key={`${selected.id}-inventory-defaults`}
                   household={selected}
                 />
                 {selected.role === 'ADMIN' && (

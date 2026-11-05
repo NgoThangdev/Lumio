@@ -1,4 +1,6 @@
 {
+  "overrideStockDefaults": "Override stock defaults for this item",
+  "overrideStockDefaultsHint": "Leave a field blank to copy the compatible household or category default. These choices affect this item only.",
   "lumioSStock": "(from Lumio's stock assessment)",
   "catalogFilterLoad": "A catalog filter could not load:",
   "householdAdminNeeds": "A household Admin needs to add a category before you can create an item.",

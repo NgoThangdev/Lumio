@@ -7,6 +7,7 @@ import type {
   CatalogOption,
   CategoryOption,
   Household,
+  HouseholdInventoryDefaultSettings,
   Item,
   StockLevel,
   TrackingMode,
@@ -32,6 +33,13 @@ export function useAddItemForm({
   const [tagIds, setTagIds] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(quickPurchaseSeed?.quantity ?? '');
   const [expiry, setExpiry] = useState('');
+  const [purchaseDate, setPurchaseDate] = useState('');
+  const [freezeDate, setFreezeDate] = useState('');
+  const [lowOverride, setLowOverride] = useState('');
+  const [buyOverride, setBuyOverride] = useState('');
+  const [targetOverride, setTargetOverride] = useState('');
+  const [bufferOverride, setBufferOverride] = useState('');
+  const [reminderOverride, setReminderOverride] = useState('');
   const [level, setLevel] = useState<StockLevel | ''>('');
   const [present, setPresent] = useState('');
   const [backupCount, setBackupCount] = useState(quickPurchaseSeed ? '' : '0');
@@ -40,12 +48,24 @@ export function useAddItemForm({
     queryKey: keys.catalog(household.id, 'categories'),
     queryFn: () => api<CategoryOption[]>(`${base}/categories`),
   });
+  const householdDefaults = useQuery({
+    queryKey: ['household-inventory-defaults', household.id],
+    queryFn: () =>
+      api<HouseholdInventoryDefaultSettings>(`${base}/inventory-defaults`),
+  });
   const selectedCategory = categories.data?.find(
     (entry) => entry.id === categoryId,
   );
   const mode: TrackingMode =
-    manualMode ?? selectedCategory?.defaultTrackingMode ?? 'QUANTITY';
-  const unit = manualUnit ?? selectedCategory?.defaultPrimaryUnit ?? '';
+    manualMode ??
+    selectedCategory?.defaultTrackingMode ??
+    householdDefaults.data?.defaultTrackingMode ??
+    'QUANTITY';
+  const unit =
+    manualUnit ??
+    selectedCategory?.defaultPrimaryUnit ??
+    householdDefaults.data?.defaultPrimaryUnit ??
+    '';
   const locations = useQuery({
     queryKey: keys.catalog(household.id, 'locations'),
     queryFn: () => api<CatalogOption[]>(`${base}/locations`),
@@ -61,6 +81,8 @@ export function useAddItemForm({
           ? {
               quantity,
               ...(expiry && quantity !== '0' ? { expiryDate: expiry } : {}),
+              ...(purchaseDate && quantity !== '0' ? { purchaseDate } : {}),
+              ...(freezeDate && quantity !== '0' ? { freezeDate } : {}),
             }
           : mode === 'FIVE_LEVEL'
             ? { level, backupCount: Number(backupCount) }
@@ -73,6 +95,21 @@ export function useAddItemForm({
         locationId,
         ...(tagIds.length ? { tagIds } : {}),
         initialStock,
+        ...(mode === 'QUANTITY' && lowOverride !== ''
+          ? { lowStockThreshold: lowOverride }
+          : {}),
+        ...(mode === 'QUANTITY' && buyOverride !== ''
+          ? { buyThreshold: buyOverride }
+          : {}),
+        ...(mode === 'QUANTITY' && targetOverride !== ''
+          ? { targetStock: targetOverride }
+          : {}),
+        ...(mode === 'QUANTITY' && bufferOverride !== ''
+          ? { safetyBuffer: bufferOverride }
+          : {}),
+        ...(mode === 'QUANTITY' && reminderOverride !== ''
+          ? { expiryReminderDays: Number(reminderOverride) }
+          : {}),
       });
     },
     onSuccess: async (created) => {
@@ -133,8 +170,10 @@ export function useAddItemForm({
     !!categoryId &&
     !!locationId &&
     !categories.isPending &&
+    !householdDefaults.isPending &&
     !locations.isPending &&
     !categories.isError &&
+    !householdDefaults.isError &&
     !locations.isError &&
     !create.isPending &&
     quickQuantityValid;
@@ -161,6 +200,20 @@ export function useAddItemForm({
     setQuantity,
     expiry,
     setExpiry,
+    purchaseDate,
+    setPurchaseDate,
+    freezeDate,
+    setFreezeDate,
+    lowOverride,
+    setLowOverride,
+    buyOverride,
+    setBuyOverride,
+    targetOverride,
+    setTargetOverride,
+    bufferOverride,
+    setBufferOverride,
+    reminderOverride,
+    setReminderOverride,
     level,
     setLevel,
     present,
@@ -168,6 +221,7 @@ export function useAddItemForm({
     backupCount,
     setBackupCount,
     categories,
+    householdDefaults,
     locations,
     tags,
     create,

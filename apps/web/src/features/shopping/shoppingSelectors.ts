@@ -71,6 +71,10 @@ export function selectShoppingPageData({
           (entryMode(entry) === 'QUANTITY' &&
             drafts[entry.id]?.expiryDate !==
               (entry.expiryDate?.slice(0, 10) ?? '')) ||
+          drafts[entry.id]?.purchaseDate !==
+            (entry.purchaseDate?.slice(0, 10) ?? '') ||
+          drafts[entry.id]?.freezeDate !==
+            (entry.freezeDate?.slice(0, 10) ?? '') ||
           drafts[entry.id]?.locationId !==
             (entry.locationId ?? entry.item.preferredRestockLocationId ?? '')),
     ) ?? false;

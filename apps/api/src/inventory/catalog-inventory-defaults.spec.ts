@@ -79,7 +79,27 @@ function setup() {
   );
   const prisma = {
     membership: { findUnique: membership },
-    category: { update: categoryUpdate, findMany: categoryFindMany },
+    household: {
+      findUniqueOrThrow: vi.fn().mockResolvedValue({
+        defaultTrackingMode: null,
+        defaultPrimaryUnit: null,
+        defaultLowStockThreshold: null,
+        defaultBuyThreshold: null,
+        defaultTargetStock: null,
+        defaultSafetyBuffer: { toString: () => '1.2' },
+        defaultExpiryReminderDays: 3,
+      }),
+    },
+    category: {
+      update: categoryUpdate,
+      findMany: categoryFindMany,
+      findFirst: vi.fn(
+        async ({ where }: { where: { id: string; householdId: string } }) => {
+          const row = categories.get(where.id);
+          return row?.householdId === where.householdId ? { ...row } : null;
+        },
+      ),
+    },
   };
   Object.assign(prisma, {
     $transaction: (fn: (client: typeof prisma) => unknown) => fn(prisma),

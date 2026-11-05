@@ -1,5 +1,9 @@
 # Shopping Trip API contract
 
+## Phase 1 stock dates addendum
+
+Quantity `PURCHASED` entry decisions also accept optional `purchaseDate` and `freezeDate` as `YYYY-MM-DD` calendar dates or `null`; saved values appear on trip reads. Omitted values on a repeated purchase decision retain their saved values. Pending, skipped, and moved decisions clear them. Nonquantity purchases reject these batch dates. Finish snapshots the entry's purchase date into its new stock batch, defaulting to today's calendar date in `Asia/Ho_Chi_Minh` when absent. The freeze date is stored and displayed as batch metadata only. It does not change expiry, FEFO, or Use Soon. Existing entries and batches retain unknown (`null`) dates; no historical backfill is performed.
+
 All routes are under `/api/households/:householdId/trips` and require a session and household membership. Item IDs must belong to that household. `GET /:tripId` returns entries with `location: { id, name } | null`, `shoppingSection`, and `item: { id, name, primaryUnit, trackingMode, openedTrackingEnabled, preferredRestockLocationId, preferredRestockLocation: { id, name } | null }`. Entry `location` is an explicit quantity-purchase location; item preferred location is the default for future writes. The server-owned `openedTrackingEnabled` boolean tells clients whether a quantity item uses whole-package purchase amounts; it is `false` for items without opened tracking.
 
 ## Trip archive and restore

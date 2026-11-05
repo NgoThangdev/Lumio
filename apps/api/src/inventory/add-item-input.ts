@@ -3,7 +3,12 @@ import type { StockLevel, TrackingMode } from '../generated/prisma/client.js';
 import { parseQuantity } from './quantity-validation.js';
 
 export type InitialStock =
-  | { quantity: string; expiryDate?: Date | null }
+  | {
+      quantity: string;
+      expiryDate?: Date | null;
+      purchaseDate?: Date | null;
+      freezeDate?: Date | null;
+    }
   | { level: StockLevel; backupCount?: number }
   | { present: boolean; backupCount?: number };
 
@@ -65,15 +70,20 @@ export function parseAddItem(
       );
     }
     if (
-      value.expiryDate !== undefined &&
-      value.expiryDate !== null &&
-      !(
-        value.expiryDate instanceof Date &&
-        !Number.isNaN(value.expiryDate.getTime())
-      )
+      value.quantity === '0' &&
+      (value.purchaseDate != null || value.freezeDate != null)
     ) {
-      throw new BadRequestException('Initial expiry date is invalid.');
+      throw new BadRequestException(
+        'An empty starting quantity cannot have batch dates.',
+      );
     }
+    for (const key of ['expiryDate', 'purchaseDate', 'freezeDate'] as const)
+      if (
+        value[key] !== undefined &&
+        value[key] !== null &&
+        !(value[key] instanceof Date && !Number.isNaN(value[key].getTime()))
+      )
+        throw new BadRequestException(`Initial ${key} is invalid.`);
     return {
       categoryId,
       locationId,
@@ -81,6 +91,12 @@ export function parseAddItem(
       initialStock: {
         quantity: value.quantity,
         expiryDate: (value.expiryDate as Date | null | undefined) ?? null,
+        ...(value.purchaseDate != null
+          ? { purchaseDate: value.purchaseDate as Date }
+          : {}),
+        ...(value.freezeDate != null
+          ? { freezeDate: value.freezeDate as Date }
+          : {}),
       },
     };
   }
@@ -94,7 +110,12 @@ export function parseAddItem(
       'Backup count must be a non-negative 32-bit integer.',
     );
   }
-  if (value.quantity !== undefined || value.expiryDate !== undefined) {
+  if (
+    value.quantity !== undefined ||
+    value.expiryDate !== undefined ||
+    value.purchaseDate !== undefined ||
+    value.freezeDate !== undefined
+  ) {
     throw new BadRequestException(
       'Quantity and expiry are only valid for quantity tracking.',
     );

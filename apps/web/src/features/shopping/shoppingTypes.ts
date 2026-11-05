@@ -21,6 +21,8 @@ export type Entry = {
   suggestedReason: string | null;
   actualQuantity: string | null;
   expiryDate: string | null;
+  purchaseDate?: string | null;
+  freezeDate?: string | null;
   locationId?: string | null;
   location?: { id: string; name: string } | null;
   moveToTripId?: string | null;
@@ -50,5 +52,7 @@ export type Trip = TripSummary & {
 export type PurchaseDraft = {
   quantity: string;
   expiryDate: string;
+  purchaseDate: string;
+  freezeDate: string;
   locationId: string;
 };

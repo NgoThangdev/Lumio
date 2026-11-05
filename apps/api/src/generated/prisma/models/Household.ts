@@ -28,10 +28,20 @@ export type AggregateHousehold = {
 
 export type HouseholdAvgAggregateOutputType = {
   defaultShoppingCycleDays: number | null
+  defaultLowStockThreshold: runtime.Decimal | null
+  defaultBuyThreshold: runtime.Decimal | null
+  defaultTargetStock: runtime.Decimal | null
+  defaultSafetyBuffer: runtime.Decimal | null
+  defaultExpiryReminderDays: number | null
 }
 
 export type HouseholdSumAggregateOutputType = {
   defaultShoppingCycleDays: number | null
+  defaultLowStockThreshold: runtime.Decimal | null
+  defaultBuyThreshold: runtime.Decimal | null
+  defaultTargetStock: runtime.Decimal | null
+  defaultSafetyBuffer: runtime.Decimal | null
+  defaultExpiryReminderDays: number | null
 }
 
 export type HouseholdMinAggregateOutputType = {
@@ -42,6 +52,13 @@ export type HouseholdMinAggregateOutputType = {
   deletionDueAt: Date | null
   defaultShoppingCycleDays: number | null
   defaultStore: string | null
+  defaultTrackingMode: $Enums.TrackingMode | null
+  defaultPrimaryUnit: string | null
+  defaultLowStockThreshold: runtime.Decimal | null
+  defaultBuyThreshold: runtime.Decimal | null
+  defaultTargetStock: runtime.Decimal | null
+  defaultSafetyBuffer: runtime.Decimal | null
+  defaultExpiryReminderDays: number | null
 }
 
 export type HouseholdMaxAggregateOutputType = {
@@ -52,6 +69,13 @@ export type HouseholdMaxAggregateOutputType = {
   deletionDueAt: Date | null
   defaultShoppingCycleDays: number | null
   defaultStore: string | null
+  defaultTrackingMode: $Enums.TrackingMode | null
+  defaultPrimaryUnit: string | null
+  defaultLowStockThreshold: runtime.Decimal | null
+  defaultBuyThreshold: runtime.Decimal | null
+  defaultTargetStock: runtime.Decimal | null
+  defaultSafetyBuffer: runtime.Decimal | null
+  defaultExpiryReminderDays: number | null
 }
 
 export type HouseholdCountAggregateOutputType = {
@@ -62,16 +86,33 @@ export type HouseholdCountAggregateOutputType = {
   deletionDueAt: number
   defaultShoppingCycleDays: number
   defaultStore: number
+  defaultTrackingMode: number
+  defaultPrimaryUnit: number
+  defaultLowStockThreshold: number
+  defaultBuyThreshold: number
+  defaultTargetStock: number
+  defaultSafetyBuffer: number
+  defaultExpiryReminderDays: number
   _all: number
 }
 
 
 export type HouseholdAvgAggregateInputType = {
   defaultShoppingCycleDays?: true
+  defaultLowStockThreshold?: true
+  defaultBuyThreshold?: true
+  defaultTargetStock?: true
+  defaultSafetyBuffer?: true
+  defaultExpiryReminderDays?: true
 }
 
 export type HouseholdSumAggregateInputType = {
   defaultShoppingCycleDays?: true
+  defaultLowStockThreshold?: true
+  defaultBuyThreshold?: true
+  defaultTargetStock?: true
+  defaultSafetyBuffer?: true
+  defaultExpiryReminderDays?: true
 }
 
 export type HouseholdMinAggregateInputType = {
@@ -82,6 +123,13 @@ export type HouseholdMinAggregateInputType = {
   deletionDueAt?: true
   defaultShoppingCycleDays?: true
   defaultStore?: true
+  defaultTrackingMode?: true
+  defaultPrimaryUnit?: true
+  defaultLowStockThreshold?: true
+  defaultBuyThreshold?: true
+  defaultTargetStock?: true
+  defaultSafetyBuffer?: true
+  defaultExpiryReminderDays?: true
 }
 
 export type HouseholdMaxAggregateInputType = {
@@ -92,6 +140,13 @@ export type HouseholdMaxAggregateInputType = {
   deletionDueAt?: true
   defaultShoppingCycleDays?: true
   defaultStore?: true
+  defaultTrackingMode?: true
+  defaultPrimaryUnit?: true
+  defaultLowStockThreshold?: true
+  defaultBuyThreshold?: true
+  defaultTargetStock?: true
+  defaultSafetyBuffer?: true
+  defaultExpiryReminderDays?: true
 }
 
 export type HouseholdCountAggregateInputType = {
@@ -102,6 +157,13 @@ export type HouseholdCountAggregateInputType = {
   deletionDueAt?: true
   defaultShoppingCycleDays?: true
   defaultStore?: true
+  defaultTrackingMode?: true
+  defaultPrimaryUnit?: true
+  defaultLowStockThreshold?: true
+  defaultBuyThreshold?: true
+  defaultTargetStock?: true
+  defaultSafetyBuffer?: true
+  defaultExpiryReminderDays?: true
   _all?: true
 }
 
@@ -199,6 +261,13 @@ export type HouseholdGroupByOutputType = {
   deletionDueAt: Date | null
   defaultShoppingCycleDays: number
   defaultStore: string | null
+  defaultTrackingMode: $Enums.TrackingMode | null
+  defaultPrimaryUnit: string | null
+  defaultLowStockThreshold: runtime.Decimal | null
+  defaultBuyThreshold: runtime.Decimal | null
+  defaultTargetStock: runtime.Decimal | null
+  defaultSafetyBuffer: runtime.Decimal
+  defaultExpiryReminderDays: number
   _count: HouseholdCountAggregateOutputType | null
   _avg: HouseholdAvgAggregateOutputType | null
   _sum: HouseholdSumAggregateOutputType | null
@@ -232,6 +301,13 @@ export type HouseholdWhereInput = {
   deletionDueAt?: Prisma.DateTimeNullableFilter<"Household"> | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFilter<"Household"> | number
   defaultStore?: Prisma.StringNullableFilter<"Household"> | string | null
+  defaultTrackingMode?: Prisma.EnumTrackingModeNullableFilter<"Household"> | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.StringNullableFilter<"Household"> | string | null
+  defaultLowStockThreshold?: Prisma.DecimalNullableFilter<"Household"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.DecimalNullableFilter<"Household"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.DecimalNullableFilter<"Household"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFilter<"Household"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFilter<"Household"> | number
   memberships?: Prisma.MembershipListRelationFilter
   invitations?: Prisma.HouseholdInvitationListRelationFilter
   inventoryItems?: Prisma.InventoryItemListRelationFilter
@@ -254,6 +330,13 @@ export type HouseholdOrderByWithRelationInput = {
   deletionDueAt?: Prisma.SortOrderInput | Prisma.SortOrder
   defaultShoppingCycleDays?: Prisma.SortOrder
   defaultStore?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultTrackingMode?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultPrimaryUnit?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultLowStockThreshold?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultBuyThreshold?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultTargetStock?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultSafetyBuffer?: Prisma.SortOrder
+  defaultExpiryReminderDays?: Prisma.SortOrder
   memberships?: Prisma.MembershipOrderByRelationAggregateInput
   invitations?: Prisma.HouseholdInvitationOrderByRelationAggregateInput
   inventoryItems?: Prisma.InventoryItemOrderByRelationAggregateInput
@@ -279,6 +362,13 @@ export type HouseholdWhereUniqueInput = Prisma.AtLeast<{
   deletionDueAt?: Prisma.DateTimeNullableFilter<"Household"> | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFilter<"Household"> | number
   defaultStore?: Prisma.StringNullableFilter<"Household"> | string | null
+  defaultTrackingMode?: Prisma.EnumTrackingModeNullableFilter<"Household"> | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.StringNullableFilter<"Household"> | string | null
+  defaultLowStockThreshold?: Prisma.DecimalNullableFilter<"Household"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.DecimalNullableFilter<"Household"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.DecimalNullableFilter<"Household"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFilter<"Household"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFilter<"Household"> | number
   memberships?: Prisma.MembershipListRelationFilter
   invitations?: Prisma.HouseholdInvitationListRelationFilter
   inventoryItems?: Prisma.InventoryItemListRelationFilter
@@ -301,6 +391,13 @@ export type HouseholdOrderByWithAggregationInput = {
   deletionDueAt?: Prisma.SortOrderInput | Prisma.SortOrder
   defaultShoppingCycleDays?: Prisma.SortOrder
   defaultStore?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultTrackingMode?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultPrimaryUnit?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultLowStockThreshold?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultBuyThreshold?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultTargetStock?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultSafetyBuffer?: Prisma.SortOrder
+  defaultExpiryReminderDays?: Prisma.SortOrder
   _count?: Prisma.HouseholdCountOrderByAggregateInput
   _avg?: Prisma.HouseholdAvgOrderByAggregateInput
   _max?: Prisma.HouseholdMaxOrderByAggregateInput
@@ -319,6 +416,13 @@ export type HouseholdScalarWhereWithAggregatesInput = {
   deletionDueAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Household"> | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntWithAggregatesFilter<"Household"> | number
   defaultStore?: Prisma.StringNullableWithAggregatesFilter<"Household"> | string | null
+  defaultTrackingMode?: Prisma.EnumTrackingModeNullableWithAggregatesFilter<"Household"> | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.StringNullableWithAggregatesFilter<"Household"> | string | null
+  defaultLowStockThreshold?: Prisma.DecimalNullableWithAggregatesFilter<"Household"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.DecimalNullableWithAggregatesFilter<"Household"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.DecimalNullableWithAggregatesFilter<"Household"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalWithAggregatesFilter<"Household"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntWithAggregatesFilter<"Household"> | number
 }
 
 export type HouseholdCreateInput = {
@@ -329,6 +433,13 @@ export type HouseholdCreateInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
@@ -351,6 +462,13 @@ export type HouseholdUncheckedCreateInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
@@ -373,6 +491,13 @@ export type HouseholdUpdateInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
@@ -395,6 +520,13 @@ export type HouseholdUncheckedUpdateInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -417,6 +549,13 @@ export type HouseholdCreateManyInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
 }
 
 export type HouseholdUpdateManyMutationInput = {
@@ -427,6 +566,13 @@ export type HouseholdUpdateManyMutationInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type HouseholdUncheckedUpdateManyInput = {
@@ -437,6 +583,13 @@ export type HouseholdUncheckedUpdateManyInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type HouseholdCountOrderByAggregateInput = {
@@ -447,10 +600,22 @@ export type HouseholdCountOrderByAggregateInput = {
   deletionDueAt?: Prisma.SortOrder
   defaultShoppingCycleDays?: Prisma.SortOrder
   defaultStore?: Prisma.SortOrder
+  defaultTrackingMode?: Prisma.SortOrder
+  defaultPrimaryUnit?: Prisma.SortOrder
+  defaultLowStockThreshold?: Prisma.SortOrder
+  defaultBuyThreshold?: Prisma.SortOrder
+  defaultTargetStock?: Prisma.SortOrder
+  defaultSafetyBuffer?: Prisma.SortOrder
+  defaultExpiryReminderDays?: Prisma.SortOrder
 }
 
 export type HouseholdAvgOrderByAggregateInput = {
   defaultShoppingCycleDays?: Prisma.SortOrder
+  defaultLowStockThreshold?: Prisma.SortOrder
+  defaultBuyThreshold?: Prisma.SortOrder
+  defaultTargetStock?: Prisma.SortOrder
+  defaultSafetyBuffer?: Prisma.SortOrder
+  defaultExpiryReminderDays?: Prisma.SortOrder
 }
 
 export type HouseholdMaxOrderByAggregateInput = {
@@ -461,6 +626,13 @@ export type HouseholdMaxOrderByAggregateInput = {
   deletionDueAt?: Prisma.SortOrder
   defaultShoppingCycleDays?: Prisma.SortOrder
   defaultStore?: Prisma.SortOrder
+  defaultTrackingMode?: Prisma.SortOrder
+  defaultPrimaryUnit?: Prisma.SortOrder
+  defaultLowStockThreshold?: Prisma.SortOrder
+  defaultBuyThreshold?: Prisma.SortOrder
+  defaultTargetStock?: Prisma.SortOrder
+  defaultSafetyBuffer?: Prisma.SortOrder
+  defaultExpiryReminderDays?: Prisma.SortOrder
 }
 
 export type HouseholdMinOrderByAggregateInput = {
@@ -471,15 +643,47 @@ export type HouseholdMinOrderByAggregateInput = {
   deletionDueAt?: Prisma.SortOrder
   defaultShoppingCycleDays?: Prisma.SortOrder
   defaultStore?: Prisma.SortOrder
+  defaultTrackingMode?: Prisma.SortOrder
+  defaultPrimaryUnit?: Prisma.SortOrder
+  defaultLowStockThreshold?: Prisma.SortOrder
+  defaultBuyThreshold?: Prisma.SortOrder
+  defaultTargetStock?: Prisma.SortOrder
+  defaultSafetyBuffer?: Prisma.SortOrder
+  defaultExpiryReminderDays?: Prisma.SortOrder
 }
 
 export type HouseholdSumOrderByAggregateInput = {
   defaultShoppingCycleDays?: Prisma.SortOrder
+  defaultLowStockThreshold?: Prisma.SortOrder
+  defaultBuyThreshold?: Prisma.SortOrder
+  defaultTargetStock?: Prisma.SortOrder
+  defaultSafetyBuffer?: Prisma.SortOrder
+  defaultExpiryReminderDays?: Prisma.SortOrder
 }
 
 export type HouseholdScalarRelationFilter = {
   is?: Prisma.HouseholdWhereInput
   isNot?: Prisma.HouseholdWhereInput
+}
+
+export type NullableEnumTrackingModeFieldUpdateOperationsInput = {
+  set?: $Enums.TrackingMode | null
+}
+
+export type NullableDecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type DecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type HouseholdCreateNestedOneWithoutCategoriesInput = {
@@ -658,6 +862,13 @@ export type HouseholdCreateWithoutCategoriesInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
@@ -679,6 +890,13 @@ export type HouseholdUncheckedCreateWithoutCategoriesInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
@@ -716,6 +934,13 @@ export type HouseholdUpdateWithoutCategoriesInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
@@ -737,6 +962,13 @@ export type HouseholdUncheckedUpdateWithoutCategoriesInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -758,6 +990,13 @@ export type HouseholdCreateWithoutLocationsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
@@ -779,6 +1018,13 @@ export type HouseholdUncheckedCreateWithoutLocationsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
@@ -816,6 +1062,13 @@ export type HouseholdUpdateWithoutLocationsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
@@ -837,6 +1090,13 @@ export type HouseholdUncheckedUpdateWithoutLocationsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -858,6 +1118,13 @@ export type HouseholdCreateWithoutTagsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
@@ -879,6 +1146,13 @@ export type HouseholdUncheckedCreateWithoutTagsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
@@ -916,6 +1190,13 @@ export type HouseholdUpdateWithoutTagsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
@@ -937,6 +1218,13 @@ export type HouseholdUncheckedUpdateWithoutTagsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -958,6 +1246,13 @@ export type HouseholdCreateWithoutMembershipsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutHouseholdInput
@@ -979,6 +1274,13 @@ export type HouseholdUncheckedCreateWithoutMembershipsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1016,6 +1318,13 @@ export type HouseholdUpdateWithoutMembershipsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUpdateManyWithoutHouseholdNestedInput
@@ -1037,6 +1346,13 @@ export type HouseholdUncheckedUpdateWithoutMembershipsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1058,6 +1374,13 @@ export type HouseholdCreateWithoutInvitationsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutHouseholdInput
@@ -1079,6 +1402,13 @@ export type HouseholdUncheckedCreateWithoutInvitationsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1116,6 +1446,13 @@ export type HouseholdUpdateWithoutInvitationsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUpdateManyWithoutHouseholdNestedInput
@@ -1137,6 +1474,13 @@ export type HouseholdUncheckedUpdateWithoutInvitationsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1158,6 +1502,13 @@ export type HouseholdCreateWithoutInventoryItemsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutHouseholdInput
@@ -1179,6 +1530,13 @@ export type HouseholdUncheckedCreateWithoutInventoryItemsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1216,6 +1574,13 @@ export type HouseholdUpdateWithoutInventoryItemsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUpdateManyWithoutHouseholdNestedInput
@@ -1237,6 +1602,13 @@ export type HouseholdUncheckedUpdateWithoutInventoryItemsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1258,6 +1630,13 @@ export type HouseholdCreateWithoutItemChangesInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
@@ -1279,6 +1658,13 @@ export type HouseholdUncheckedCreateWithoutItemChangesInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1316,6 +1702,13 @@ export type HouseholdUpdateWithoutItemChangesInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
@@ -1337,6 +1730,13 @@ export type HouseholdUncheckedUpdateWithoutItemChangesInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1358,6 +1758,13 @@ export type HouseholdCreateWithoutInventoryStateActionsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
@@ -1379,6 +1786,13 @@ export type HouseholdUncheckedCreateWithoutInventoryStateActionsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1416,6 +1830,13 @@ export type HouseholdUpdateWithoutInventoryStateActionsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
@@ -1437,6 +1858,13 @@ export type HouseholdUncheckedUpdateWithoutInventoryStateActionsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1458,6 +1886,13 @@ export type HouseholdCreateWithoutShoppingTripsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
@@ -1479,6 +1914,13 @@ export type HouseholdUncheckedCreateWithoutShoppingTripsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1516,6 +1958,13 @@ export type HouseholdUpdateWithoutShoppingTripsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
@@ -1537,6 +1986,13 @@ export type HouseholdUncheckedUpdateWithoutShoppingTripsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1558,6 +2014,13 @@ export type HouseholdCreateWithoutLocationStockChecksInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
@@ -1579,6 +2042,13 @@ export type HouseholdUncheckedCreateWithoutLocationStockChecksInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1616,6 +2086,13 @@ export type HouseholdUpdateWithoutLocationStockChecksInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
@@ -1637,6 +2114,13 @@ export type HouseholdUncheckedUpdateWithoutLocationStockChecksInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1658,6 +2142,13 @@ export type HouseholdCreateWithoutInventoryActionsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
@@ -1679,6 +2170,13 @@ export type HouseholdUncheckedCreateWithoutInventoryActionsInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1716,6 +2214,13 @@ export type HouseholdUpdateWithoutInventoryActionsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
@@ -1737,6 +2242,13 @@ export type HouseholdUncheckedUpdateWithoutInventoryActionsInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1758,6 +2270,13 @@ export type HouseholdCreateWithoutInventoryUndosInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutHouseholdInput
@@ -1779,6 +2298,13 @@ export type HouseholdUncheckedCreateWithoutInventoryUndosInput = {
   deletionDueAt?: Date | string | null
   defaultShoppingCycleDays?: number
   defaultStore?: string | null
+  defaultTrackingMode?: $Enums.TrackingMode | null
+  defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: number
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutHouseholdInput
   invitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutHouseholdInput
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutHouseholdInput
@@ -1816,6 +2342,13 @@ export type HouseholdUpdateWithoutInventoryUndosInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutHouseholdNestedInput
@@ -1837,6 +2370,13 @@ export type HouseholdUncheckedUpdateWithoutInventoryUndosInput = {
   deletionDueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   defaultShoppingCycleDays?: Prisma.IntFieldUpdateOperationsInput | number
   defaultStore?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
+  defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  defaultExpiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutHouseholdNestedInput
   invitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutHouseholdNestedInput
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutHouseholdNestedInput
@@ -1988,6 +2528,13 @@ export type HouseholdSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   deletionDueAt?: boolean
   defaultShoppingCycleDays?: boolean
   defaultStore?: boolean
+  defaultTrackingMode?: boolean
+  defaultPrimaryUnit?: boolean
+  defaultLowStockThreshold?: boolean
+  defaultBuyThreshold?: boolean
+  defaultTargetStock?: boolean
+  defaultSafetyBuffer?: boolean
+  defaultExpiryReminderDays?: boolean
   memberships?: boolean | Prisma.Household$membershipsArgs<ExtArgs>
   invitations?: boolean | Prisma.Household$invitationsArgs<ExtArgs>
   inventoryItems?: boolean | Prisma.Household$inventoryItemsArgs<ExtArgs>
@@ -2011,6 +2558,13 @@ export type HouseholdSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   deletionDueAt?: boolean
   defaultShoppingCycleDays?: boolean
   defaultStore?: boolean
+  defaultTrackingMode?: boolean
+  defaultPrimaryUnit?: boolean
+  defaultLowStockThreshold?: boolean
+  defaultBuyThreshold?: boolean
+  defaultTargetStock?: boolean
+  defaultSafetyBuffer?: boolean
+  defaultExpiryReminderDays?: boolean
 }, ExtArgs["result"]["household"]>
 
 export type HouseholdSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2021,6 +2575,13 @@ export type HouseholdSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   deletionDueAt?: boolean
   defaultShoppingCycleDays?: boolean
   defaultStore?: boolean
+  defaultTrackingMode?: boolean
+  defaultPrimaryUnit?: boolean
+  defaultLowStockThreshold?: boolean
+  defaultBuyThreshold?: boolean
+  defaultTargetStock?: boolean
+  defaultSafetyBuffer?: boolean
+  defaultExpiryReminderDays?: boolean
 }, ExtArgs["result"]["household"]>
 
 export type HouseholdSelectScalar = {
@@ -2031,9 +2592,16 @@ export type HouseholdSelectScalar = {
   deletionDueAt?: boolean
   defaultShoppingCycleDays?: boolean
   defaultStore?: boolean
+  defaultTrackingMode?: boolean
+  defaultPrimaryUnit?: boolean
+  defaultLowStockThreshold?: boolean
+  defaultBuyThreshold?: boolean
+  defaultTargetStock?: boolean
+  defaultSafetyBuffer?: boolean
+  defaultExpiryReminderDays?: boolean
 }
 
-export type HouseholdOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "deletionRequestId" | "deletionRequestedAt" | "deletionDueAt" | "defaultShoppingCycleDays" | "defaultStore", ExtArgs["result"]["household"]>
+export type HouseholdOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "deletionRequestId" | "deletionRequestedAt" | "deletionDueAt" | "defaultShoppingCycleDays" | "defaultStore" | "defaultTrackingMode" | "defaultPrimaryUnit" | "defaultLowStockThreshold" | "defaultBuyThreshold" | "defaultTargetStock" | "defaultSafetyBuffer" | "defaultExpiryReminderDays", ExtArgs["result"]["household"]>
 export type HouseholdInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   memberships?: boolean | Prisma.Household$membershipsArgs<ExtArgs>
   invitations?: boolean | Prisma.Household$invitationsArgs<ExtArgs>
@@ -2076,6 +2644,13 @@ export type $HouseholdPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     deletionDueAt: Date | null
     defaultShoppingCycleDays: number
     defaultStore: string | null
+    defaultTrackingMode: $Enums.TrackingMode | null
+    defaultPrimaryUnit: string | null
+    defaultLowStockThreshold: runtime.Decimal | null
+    defaultBuyThreshold: runtime.Decimal | null
+    defaultTargetStock: runtime.Decimal | null
+    defaultSafetyBuffer: runtime.Decimal
+    defaultExpiryReminderDays: number
   }, ExtArgs["result"]["household"]>
   composites: {}
 }
@@ -2518,6 +3093,13 @@ export interface HouseholdFieldRefs {
   readonly deletionDueAt: Prisma.FieldRef<"Household", 'DateTime'>
   readonly defaultShoppingCycleDays: Prisma.FieldRef<"Household", 'Int'>
   readonly defaultStore: Prisma.FieldRef<"Household", 'String'>
+  readonly defaultTrackingMode: Prisma.FieldRef<"Household", 'TrackingMode'>
+  readonly defaultPrimaryUnit: Prisma.FieldRef<"Household", 'String'>
+  readonly defaultLowStockThreshold: Prisma.FieldRef<"Household", 'Decimal'>
+  readonly defaultBuyThreshold: Prisma.FieldRef<"Household", 'Decimal'>
+  readonly defaultTargetStock: Prisma.FieldRef<"Household", 'Decimal'>
+  readonly defaultSafetyBuffer: Prisma.FieldRef<"Household", 'Decimal'>
+  readonly defaultExpiryReminderDays: Prisma.FieldRef<"Household", 'Int'>
 }
     
 

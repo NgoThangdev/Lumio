@@ -1,0 +1,18 @@
+ALTER TABLE "ShoppingEntry" ADD COLUMN "purchaseDate" DATE;
+ALTER TABLE "ShoppingEntry" ADD COLUMN "freezeDate" DATE;
+ALTER TABLE "StockBatch" ADD COLUMN "purchaseDate" DATE;
+ALTER TABLE "StockBatch" ADD COLUMN "freezeDate" DATE;
+ALTER TABLE "Household" ADD COLUMN "defaultTrackingMode" "TrackingMode";
+ALTER TABLE "Household" ADD COLUMN "defaultPrimaryUnit" VARCHAR(40);
+ALTER TABLE "Household" ADD COLUMN "defaultLowStockThreshold" DECIMAL(18,6);
+ALTER TABLE "Household" ADD COLUMN "defaultBuyThreshold" DECIMAL(18,6);
+ALTER TABLE "Household" ADD COLUMN "defaultTargetStock" DECIMAL(18,6);
+ALTER TABLE "Household" ADD COLUMN "defaultSafetyBuffer" DECIMAL(4,2) NOT NULL DEFAULT 1.2;
+ALTER TABLE "Household" ADD COLUMN "defaultExpiryReminderDays" INTEGER NOT NULL DEFAULT 3;
+ALTER TABLE "Category" ADD COLUMN "defaultLowStockThreshold" DECIMAL(18,6);
+ALTER TABLE "Category" ADD COLUMN "defaultBuyThreshold" DECIMAL(18,6);
+ALTER TABLE "Category" ADD COLUMN "defaultTargetStock" DECIMAL(18,6);
+ALTER TABLE "Category" ADD COLUMN "defaultSafetyBuffer" DECIMAL(4,2);
+ALTER TABLE "Category" ADD COLUMN "defaultExpiryReminderDays" INTEGER;
+ALTER TABLE "InventoryItem" ADD COLUMN "safetyBuffer" DECIMAL(4,2) NOT NULL DEFAULT 1.2;
+ALTER TABLE "InventoryItem" ADD COLUMN "expiryReminderDays" INTEGER NOT NULL DEFAULT 3;

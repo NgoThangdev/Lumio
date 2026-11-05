@@ -2418,7 +2418,14 @@ export const HouseholdScalarFieldEnum = {
   deletionRequestedAt: 'deletionRequestedAt',
   deletionDueAt: 'deletionDueAt',
   defaultShoppingCycleDays: 'defaultShoppingCycleDays',
-  defaultStore: 'defaultStore'
+  defaultStore: 'defaultStore',
+  defaultTrackingMode: 'defaultTrackingMode',
+  defaultPrimaryUnit: 'defaultPrimaryUnit',
+  defaultLowStockThreshold: 'defaultLowStockThreshold',
+  defaultBuyThreshold: 'defaultBuyThreshold',
+  defaultTargetStock: 'defaultTargetStock',
+  defaultSafetyBuffer: 'defaultSafetyBuffer',
+  defaultExpiryReminderDays: 'defaultExpiryReminderDays'
 } as const
 
 export type HouseholdScalarFieldEnum = (typeof HouseholdScalarFieldEnum)[keyof typeof HouseholdScalarFieldEnum]
@@ -2431,7 +2438,12 @@ export const CategoryScalarFieldEnum = {
   nameKey: 'nameKey',
   shoppingSection: 'shoppingSection',
   defaultTrackingMode: 'defaultTrackingMode',
-  defaultPrimaryUnit: 'defaultPrimaryUnit'
+  defaultPrimaryUnit: 'defaultPrimaryUnit',
+  defaultLowStockThreshold: 'defaultLowStockThreshold',
+  defaultBuyThreshold: 'defaultBuyThreshold',
+  defaultTargetStock: 'defaultTargetStock',
+  defaultSafetyBuffer: 'defaultSafetyBuffer',
+  defaultExpiryReminderDays: 'defaultExpiryReminderDays'
 } as const
 
 export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
@@ -2500,6 +2512,8 @@ export const InventoryItemScalarFieldEnum = {
   lowStockThreshold: 'lowStockThreshold',
   buyThreshold: 'buyThreshold',
   targetStock: 'targetStock',
+  safetyBuffer: 'safetyBuffer',
+  expiryReminderDays: 'expiryReminderDays',
   neverRunOut: 'neverRunOut',
   predictionEnabled: 'predictionEnabled',
   stockRevision: 'stockRevision',
@@ -2581,6 +2595,8 @@ export const ShoppingEntryScalarFieldEnum = {
   suggestedReason: 'suggestedReason',
   actualQuantity: 'actualQuantity',
   expiryDate: 'expiryDate',
+  purchaseDate: 'purchaseDate',
+  freezeDate: 'freezeDate',
   locationId: 'locationId',
   moveToTripId: 'moveToTripId'
 } as const
@@ -2625,6 +2641,8 @@ export const StockBatchScalarFieldEnum = {
   locationId: 'locationId',
   quantity: 'quantity',
   expiryDate: 'expiryDate',
+  purchaseDate: 'purchaseDate',
+  freezeDate: 'freezeDate',
   openedAt: 'openedAt',
   openedUseByDate: 'openedUseByDate',
   createdAt: 'createdAt'
@@ -2841,20 +2859,6 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
- * Reference to a field of type 'ShoppingSection'
- */
-export type EnumShoppingSectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ShoppingSection'>
-    
-
-
-/**
- * Reference to a field of type 'ShoppingSection[]'
- */
-export type ListEnumShoppingSectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ShoppingSection[]'>
-    
-
-
-/**
  * Reference to a field of type 'TrackingMode'
  */
 export type EnumTrackingModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TrackingMode'>
@@ -2865,6 +2869,34 @@ export type EnumTrackingModeFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
  * Reference to a field of type 'TrackingMode[]'
  */
 export type ListEnumTrackingModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TrackingMode[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal'
+ */
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal[]'
+ */
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ShoppingSection'
+ */
+export type EnumShoppingSectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ShoppingSection'>
+    
+
+
+/**
+ * Reference to a field of type 'ShoppingSection[]'
+ */
+export type ListEnumShoppingSectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ShoppingSection[]'>
     
 
 
@@ -2893,20 +2925,6 @@ export type EnumStockLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
  * Reference to a field of type 'StockLevel[]'
  */
 export type ListEnumStockLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockLevel[]'>
-    
-
-
-/**
- * Reference to a field of type 'Decimal'
- */
-export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
-    
-
-
-/**
- * Reference to a field of type 'Decimal[]'
- */
-export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
     
 
 

@@ -20,8 +20,26 @@ export type CategoryModel = runtime.Types.Result.DefaultSelection<Prisma.$Catego
 
 export type AggregateCategory = {
   _count: CategoryCountAggregateOutputType | null
+  _avg: CategoryAvgAggregateOutputType | null
+  _sum: CategorySumAggregateOutputType | null
   _min: CategoryMinAggregateOutputType | null
   _max: CategoryMaxAggregateOutputType | null
+}
+
+export type CategoryAvgAggregateOutputType = {
+  defaultLowStockThreshold: runtime.Decimal | null
+  defaultBuyThreshold: runtime.Decimal | null
+  defaultTargetStock: runtime.Decimal | null
+  defaultSafetyBuffer: runtime.Decimal | null
+  defaultExpiryReminderDays: number | null
+}
+
+export type CategorySumAggregateOutputType = {
+  defaultLowStockThreshold: runtime.Decimal | null
+  defaultBuyThreshold: runtime.Decimal | null
+  defaultTargetStock: runtime.Decimal | null
+  defaultSafetyBuffer: runtime.Decimal | null
+  defaultExpiryReminderDays: number | null
 }
 
 export type CategoryMinAggregateOutputType = {
@@ -32,6 +50,11 @@ export type CategoryMinAggregateOutputType = {
   shoppingSection: $Enums.ShoppingSection | null
   defaultTrackingMode: $Enums.TrackingMode | null
   defaultPrimaryUnit: string | null
+  defaultLowStockThreshold: runtime.Decimal | null
+  defaultBuyThreshold: runtime.Decimal | null
+  defaultTargetStock: runtime.Decimal | null
+  defaultSafetyBuffer: runtime.Decimal | null
+  defaultExpiryReminderDays: number | null
 }
 
 export type CategoryMaxAggregateOutputType = {
@@ -42,6 +65,11 @@ export type CategoryMaxAggregateOutputType = {
   shoppingSection: $Enums.ShoppingSection | null
   defaultTrackingMode: $Enums.TrackingMode | null
   defaultPrimaryUnit: string | null
+  defaultLowStockThreshold: runtime.Decimal | null
+  defaultBuyThreshold: runtime.Decimal | null
+  defaultTargetStock: runtime.Decimal | null
+  defaultSafetyBuffer: runtime.Decimal | null
+  defaultExpiryReminderDays: number | null
 }
 
 export type CategoryCountAggregateOutputType = {
@@ -52,9 +80,30 @@ export type CategoryCountAggregateOutputType = {
   shoppingSection: number
   defaultTrackingMode: number
   defaultPrimaryUnit: number
+  defaultLowStockThreshold: number
+  defaultBuyThreshold: number
+  defaultTargetStock: number
+  defaultSafetyBuffer: number
+  defaultExpiryReminderDays: number
   _all: number
 }
 
+
+export type CategoryAvgAggregateInputType = {
+  defaultLowStockThreshold?: true
+  defaultBuyThreshold?: true
+  defaultTargetStock?: true
+  defaultSafetyBuffer?: true
+  defaultExpiryReminderDays?: true
+}
+
+export type CategorySumAggregateInputType = {
+  defaultLowStockThreshold?: true
+  defaultBuyThreshold?: true
+  defaultTargetStock?: true
+  defaultSafetyBuffer?: true
+  defaultExpiryReminderDays?: true
+}
 
 export type CategoryMinAggregateInputType = {
   id?: true
@@ -64,6 +113,11 @@ export type CategoryMinAggregateInputType = {
   shoppingSection?: true
   defaultTrackingMode?: true
   defaultPrimaryUnit?: true
+  defaultLowStockThreshold?: true
+  defaultBuyThreshold?: true
+  defaultTargetStock?: true
+  defaultSafetyBuffer?: true
+  defaultExpiryReminderDays?: true
 }
 
 export type CategoryMaxAggregateInputType = {
@@ -74,6 +128,11 @@ export type CategoryMaxAggregateInputType = {
   shoppingSection?: true
   defaultTrackingMode?: true
   defaultPrimaryUnit?: true
+  defaultLowStockThreshold?: true
+  defaultBuyThreshold?: true
+  defaultTargetStock?: true
+  defaultSafetyBuffer?: true
+  defaultExpiryReminderDays?: true
 }
 
 export type CategoryCountAggregateInputType = {
@@ -84,6 +143,11 @@ export type CategoryCountAggregateInputType = {
   shoppingSection?: true
   defaultTrackingMode?: true
   defaultPrimaryUnit?: true
+  defaultLowStockThreshold?: true
+  defaultBuyThreshold?: true
+  defaultTargetStock?: true
+  defaultSafetyBuffer?: true
+  defaultExpiryReminderDays?: true
   _all?: true
 }
 
@@ -125,6 +189,18 @@ export type CategoryAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inter
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: CategoryAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   *
+   * Select which fields to sum
+  **/
+  _sum?: CategorySumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   *
    * Select which fields to find the minimum value
   **/
   _min?: CategoryMinAggregateInputType
@@ -155,6 +231,8 @@ export type CategoryGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   _count?: CategoryCountAggregateInputType | true
+  _avg?: CategoryAvgAggregateInputType
+  _sum?: CategorySumAggregateInputType
   _min?: CategoryMinAggregateInputType
   _max?: CategoryMaxAggregateInputType
 }
@@ -167,7 +245,14 @@ export type CategoryGroupByOutputType = {
   shoppingSection: $Enums.ShoppingSection | null
   defaultTrackingMode: $Enums.TrackingMode | null
   defaultPrimaryUnit: string | null
+  defaultLowStockThreshold: runtime.Decimal | null
+  defaultBuyThreshold: runtime.Decimal | null
+  defaultTargetStock: runtime.Decimal | null
+  defaultSafetyBuffer: runtime.Decimal | null
+  defaultExpiryReminderDays: number | null
   _count: CategoryCountAggregateOutputType | null
+  _avg: CategoryAvgAggregateOutputType | null
+  _sum: CategorySumAggregateOutputType | null
   _min: CategoryMinAggregateOutputType | null
   _max: CategoryMaxAggregateOutputType | null
 }
@@ -198,6 +283,11 @@ export type CategoryWhereInput = {
   shoppingSection?: Prisma.EnumShoppingSectionNullableFilter<"Category"> | $Enums.ShoppingSection | null
   defaultTrackingMode?: Prisma.EnumTrackingModeNullableFilter<"Category"> | $Enums.TrackingMode | null
   defaultPrimaryUnit?: Prisma.StringNullableFilter<"Category"> | string | null
+  defaultLowStockThreshold?: Prisma.DecimalNullableFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.DecimalNullableFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.DecimalNullableFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalNullableFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: Prisma.IntNullableFilter<"Category"> | number | null
   household?: Prisma.XOR<Prisma.HouseholdScalarRelationFilter, Prisma.HouseholdWhereInput>
   items?: Prisma.InventoryItemListRelationFilter
 }
@@ -210,6 +300,11 @@ export type CategoryOrderByWithRelationInput = {
   shoppingSection?: Prisma.SortOrderInput | Prisma.SortOrder
   defaultTrackingMode?: Prisma.SortOrderInput | Prisma.SortOrder
   defaultPrimaryUnit?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultLowStockThreshold?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultBuyThreshold?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultTargetStock?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultSafetyBuffer?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultExpiryReminderDays?: Prisma.SortOrderInput | Prisma.SortOrder
   household?: Prisma.HouseholdOrderByWithRelationInput
   items?: Prisma.InventoryItemOrderByRelationAggregateInput
 }
@@ -226,6 +321,11 @@ export type CategoryWhereUniqueInput = Prisma.AtLeast<{
   shoppingSection?: Prisma.EnumShoppingSectionNullableFilter<"Category"> | $Enums.ShoppingSection | null
   defaultTrackingMode?: Prisma.EnumTrackingModeNullableFilter<"Category"> | $Enums.TrackingMode | null
   defaultPrimaryUnit?: Prisma.StringNullableFilter<"Category"> | string | null
+  defaultLowStockThreshold?: Prisma.DecimalNullableFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.DecimalNullableFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.DecimalNullableFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalNullableFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: Prisma.IntNullableFilter<"Category"> | number | null
   household?: Prisma.XOR<Prisma.HouseholdScalarRelationFilter, Prisma.HouseholdWhereInput>
   items?: Prisma.InventoryItemListRelationFilter
 }, "id" | "householdId_nameKey">
@@ -238,9 +338,16 @@ export type CategoryOrderByWithAggregationInput = {
   shoppingSection?: Prisma.SortOrderInput | Prisma.SortOrder
   defaultTrackingMode?: Prisma.SortOrderInput | Prisma.SortOrder
   defaultPrimaryUnit?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultLowStockThreshold?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultBuyThreshold?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultTargetStock?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultSafetyBuffer?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultExpiryReminderDays?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.CategoryCountOrderByAggregateInput
+  _avg?: Prisma.CategoryAvgOrderByAggregateInput
   _max?: Prisma.CategoryMaxOrderByAggregateInput
   _min?: Prisma.CategoryMinOrderByAggregateInput
+  _sum?: Prisma.CategorySumOrderByAggregateInput
 }
 
 export type CategoryScalarWhereWithAggregatesInput = {
@@ -254,6 +361,11 @@ export type CategoryScalarWhereWithAggregatesInput = {
   shoppingSection?: Prisma.EnumShoppingSectionNullableWithAggregatesFilter<"Category"> | $Enums.ShoppingSection | null
   defaultTrackingMode?: Prisma.EnumTrackingModeNullableWithAggregatesFilter<"Category"> | $Enums.TrackingMode | null
   defaultPrimaryUnit?: Prisma.StringNullableWithAggregatesFilter<"Category"> | string | null
+  defaultLowStockThreshold?: Prisma.DecimalNullableWithAggregatesFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.DecimalNullableWithAggregatesFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.DecimalNullableWithAggregatesFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalNullableWithAggregatesFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: Prisma.IntNullableWithAggregatesFilter<"Category"> | number | null
 }
 
 export type CategoryCreateInput = {
@@ -263,6 +375,11 @@ export type CategoryCreateInput = {
   shoppingSection?: $Enums.ShoppingSection | null
   defaultTrackingMode?: $Enums.TrackingMode | null
   defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: number | null
   household: Prisma.HouseholdCreateNestedOneWithoutCategoriesInput
   items?: Prisma.InventoryItemCreateNestedManyWithoutCategoryInput
 }
@@ -275,6 +392,11 @@ export type CategoryUncheckedCreateInput = {
   shoppingSection?: $Enums.ShoppingSection | null
   defaultTrackingMode?: $Enums.TrackingMode | null
   defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: number | null
   items?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutCategoryInput
 }
 
@@ -285,6 +407,11 @@ export type CategoryUpdateInput = {
   shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
   defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
   defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutCategoriesNestedInput
   items?: Prisma.InventoryItemUpdateManyWithoutCategoryNestedInput
 }
@@ -297,6 +424,11 @@ export type CategoryUncheckedUpdateInput = {
   shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
   defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
   defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   items?: Prisma.InventoryItemUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
@@ -308,6 +440,11 @@ export type CategoryCreateManyInput = {
   shoppingSection?: $Enums.ShoppingSection | null
   defaultTrackingMode?: $Enums.TrackingMode | null
   defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: number | null
 }
 
 export type CategoryUpdateManyMutationInput = {
@@ -317,6 +454,11 @@ export type CategoryUpdateManyMutationInput = {
   shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
   defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
   defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type CategoryUncheckedUpdateManyInput = {
@@ -327,6 +469,11 @@ export type CategoryUncheckedUpdateManyInput = {
   shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
   defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
   defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type CategoryListRelationFilter = {
@@ -352,6 +499,19 @@ export type CategoryCountOrderByAggregateInput = {
   shoppingSection?: Prisma.SortOrder
   defaultTrackingMode?: Prisma.SortOrder
   defaultPrimaryUnit?: Prisma.SortOrder
+  defaultLowStockThreshold?: Prisma.SortOrder
+  defaultBuyThreshold?: Prisma.SortOrder
+  defaultTargetStock?: Prisma.SortOrder
+  defaultSafetyBuffer?: Prisma.SortOrder
+  defaultExpiryReminderDays?: Prisma.SortOrder
+}
+
+export type CategoryAvgOrderByAggregateInput = {
+  defaultLowStockThreshold?: Prisma.SortOrder
+  defaultBuyThreshold?: Prisma.SortOrder
+  defaultTargetStock?: Prisma.SortOrder
+  defaultSafetyBuffer?: Prisma.SortOrder
+  defaultExpiryReminderDays?: Prisma.SortOrder
 }
 
 export type CategoryMaxOrderByAggregateInput = {
@@ -362,6 +522,11 @@ export type CategoryMaxOrderByAggregateInput = {
   shoppingSection?: Prisma.SortOrder
   defaultTrackingMode?: Prisma.SortOrder
   defaultPrimaryUnit?: Prisma.SortOrder
+  defaultLowStockThreshold?: Prisma.SortOrder
+  defaultBuyThreshold?: Prisma.SortOrder
+  defaultTargetStock?: Prisma.SortOrder
+  defaultSafetyBuffer?: Prisma.SortOrder
+  defaultExpiryReminderDays?: Prisma.SortOrder
 }
 
 export type CategoryMinOrderByAggregateInput = {
@@ -372,6 +537,19 @@ export type CategoryMinOrderByAggregateInput = {
   shoppingSection?: Prisma.SortOrder
   defaultTrackingMode?: Prisma.SortOrder
   defaultPrimaryUnit?: Prisma.SortOrder
+  defaultLowStockThreshold?: Prisma.SortOrder
+  defaultBuyThreshold?: Prisma.SortOrder
+  defaultTargetStock?: Prisma.SortOrder
+  defaultSafetyBuffer?: Prisma.SortOrder
+  defaultExpiryReminderDays?: Prisma.SortOrder
+}
+
+export type CategorySumOrderByAggregateInput = {
+  defaultLowStockThreshold?: Prisma.SortOrder
+  defaultBuyThreshold?: Prisma.SortOrder
+  defaultTargetStock?: Prisma.SortOrder
+  defaultSafetyBuffer?: Prisma.SortOrder
+  defaultExpiryReminderDays?: Prisma.SortOrder
 }
 
 export type CategoryNullableScalarRelationFilter = {
@@ -425,8 +603,12 @@ export type NullableEnumShoppingSectionFieldUpdateOperationsInput = {
   set?: $Enums.ShoppingSection | null
 }
 
-export type NullableEnumTrackingModeFieldUpdateOperationsInput = {
-  set?: $Enums.TrackingMode | null
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type CategoryCreateNestedOneWithoutItemsInput = {
@@ -452,6 +634,11 @@ export type CategoryCreateWithoutHouseholdInput = {
   shoppingSection?: $Enums.ShoppingSection | null
   defaultTrackingMode?: $Enums.TrackingMode | null
   defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: number | null
   items?: Prisma.InventoryItemCreateNestedManyWithoutCategoryInput
 }
 
@@ -462,6 +649,11 @@ export type CategoryUncheckedCreateWithoutHouseholdInput = {
   shoppingSection?: $Enums.ShoppingSection | null
   defaultTrackingMode?: $Enums.TrackingMode | null
   defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: number | null
   items?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutCategoryInput
 }
 
@@ -502,6 +694,11 @@ export type CategoryScalarWhereInput = {
   shoppingSection?: Prisma.EnumShoppingSectionNullableFilter<"Category"> | $Enums.ShoppingSection | null
   defaultTrackingMode?: Prisma.EnumTrackingModeNullableFilter<"Category"> | $Enums.TrackingMode | null
   defaultPrimaryUnit?: Prisma.StringNullableFilter<"Category"> | string | null
+  defaultLowStockThreshold?: Prisma.DecimalNullableFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.DecimalNullableFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.DecimalNullableFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.DecimalNullableFilter<"Category"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: Prisma.IntNullableFilter<"Category"> | number | null
 }
 
 export type CategoryCreateWithoutItemsInput = {
@@ -511,6 +708,11 @@ export type CategoryCreateWithoutItemsInput = {
   shoppingSection?: $Enums.ShoppingSection | null
   defaultTrackingMode?: $Enums.TrackingMode | null
   defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: number | null
   household: Prisma.HouseholdCreateNestedOneWithoutCategoriesInput
 }
 
@@ -522,6 +724,11 @@ export type CategoryUncheckedCreateWithoutItemsInput = {
   shoppingSection?: $Enums.ShoppingSection | null
   defaultTrackingMode?: $Enums.TrackingMode | null
   defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: number | null
 }
 
 export type CategoryCreateOrConnectWithoutItemsInput = {
@@ -547,6 +754,11 @@ export type CategoryUpdateWithoutItemsInput = {
   shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
   defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
   defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   household?: Prisma.HouseholdUpdateOneRequiredWithoutCategoriesNestedInput
 }
 
@@ -558,6 +770,11 @@ export type CategoryUncheckedUpdateWithoutItemsInput = {
   shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
   defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
   defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type CategoryCreateManyHouseholdInput = {
@@ -567,6 +784,11 @@ export type CategoryCreateManyHouseholdInput = {
   shoppingSection?: $Enums.ShoppingSection | null
   defaultTrackingMode?: $Enums.TrackingMode | null
   defaultPrimaryUnit?: string | null
+  defaultLowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: number | null
 }
 
 export type CategoryUpdateWithoutHouseholdInput = {
@@ -576,6 +798,11 @@ export type CategoryUpdateWithoutHouseholdInput = {
   shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
   defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
   defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   items?: Prisma.InventoryItemUpdateManyWithoutCategoryNestedInput
 }
 
@@ -586,6 +813,11 @@ export type CategoryUncheckedUpdateWithoutHouseholdInput = {
   shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
   defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
   defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   items?: Prisma.InventoryItemUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
@@ -596,6 +828,11 @@ export type CategoryUncheckedUpdateManyWithoutHouseholdInput = {
   shoppingSection?: Prisma.NullableEnumShoppingSectionFieldUpdateOperationsInput | $Enums.ShoppingSection | null
   defaultTrackingMode?: Prisma.NullableEnumTrackingModeFieldUpdateOperationsInput | $Enums.TrackingMode | null
   defaultPrimaryUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultLowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultBuyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultTargetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultSafetyBuffer?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultExpiryReminderDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 
@@ -637,6 +874,11 @@ export type CategorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   shoppingSection?: boolean
   defaultTrackingMode?: boolean
   defaultPrimaryUnit?: boolean
+  defaultLowStockThreshold?: boolean
+  defaultBuyThreshold?: boolean
+  defaultTargetStock?: boolean
+  defaultSafetyBuffer?: boolean
+  defaultExpiryReminderDays?: boolean
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Category$itemsArgs<ExtArgs>
   _count?: boolean | Prisma.CategoryCountOutputTypeDefaultArgs<ExtArgs>
@@ -650,6 +892,11 @@ export type CategorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   shoppingSection?: boolean
   defaultTrackingMode?: boolean
   defaultPrimaryUnit?: boolean
+  defaultLowStockThreshold?: boolean
+  defaultBuyThreshold?: boolean
+  defaultTargetStock?: boolean
+  defaultSafetyBuffer?: boolean
+  defaultExpiryReminderDays?: boolean
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["category"]>
 
@@ -661,6 +908,11 @@ export type CategorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   shoppingSection?: boolean
   defaultTrackingMode?: boolean
   defaultPrimaryUnit?: boolean
+  defaultLowStockThreshold?: boolean
+  defaultBuyThreshold?: boolean
+  defaultTargetStock?: boolean
+  defaultSafetyBuffer?: boolean
+  defaultExpiryReminderDays?: boolean
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["category"]>
 
@@ -672,9 +924,14 @@ export type CategorySelectScalar = {
   shoppingSection?: boolean
   defaultTrackingMode?: boolean
   defaultPrimaryUnit?: boolean
+  defaultLowStockThreshold?: boolean
+  defaultBuyThreshold?: boolean
+  defaultTargetStock?: boolean
+  defaultSafetyBuffer?: boolean
+  defaultExpiryReminderDays?: boolean
 }
 
-export type CategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "householdId" | "name" | "nameKey" | "shoppingSection" | "defaultTrackingMode" | "defaultPrimaryUnit", ExtArgs["result"]["category"]>
+export type CategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "householdId" | "name" | "nameKey" | "shoppingSection" | "defaultTrackingMode" | "defaultPrimaryUnit" | "defaultLowStockThreshold" | "defaultBuyThreshold" | "defaultTargetStock" | "defaultSafetyBuffer" | "defaultExpiryReminderDays", ExtArgs["result"]["category"]>
 export type CategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Category$itemsArgs<ExtArgs>
@@ -701,6 +958,11 @@ export type $CategoryPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     shoppingSection: $Enums.ShoppingSection | null
     defaultTrackingMode: $Enums.TrackingMode | null
     defaultPrimaryUnit: string | null
+    defaultLowStockThreshold: runtime.Decimal | null
+    defaultBuyThreshold: runtime.Decimal | null
+    defaultTargetStock: runtime.Decimal | null
+    defaultSafetyBuffer: runtime.Decimal | null
+    defaultExpiryReminderDays: number | null
   }, ExtArgs["result"]["category"]>
   composites: {}
 }
@@ -1133,6 +1395,11 @@ export interface CategoryFieldRefs {
   readonly shoppingSection: Prisma.FieldRef<"Category", 'ShoppingSection'>
   readonly defaultTrackingMode: Prisma.FieldRef<"Category", 'TrackingMode'>
   readonly defaultPrimaryUnit: Prisma.FieldRef<"Category", 'String'>
+  readonly defaultLowStockThreshold: Prisma.FieldRef<"Category", 'Decimal'>
+  readonly defaultBuyThreshold: Prisma.FieldRef<"Category", 'Decimal'>
+  readonly defaultTargetStock: Prisma.FieldRef<"Category", 'Decimal'>
+  readonly defaultSafetyBuffer: Prisma.FieldRef<"Category", 'Decimal'>
+  readonly defaultExpiryReminderDays: Prisma.FieldRef<"Category", 'Int'>
 }
     
 

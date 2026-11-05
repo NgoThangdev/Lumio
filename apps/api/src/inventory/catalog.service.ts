@@ -11,6 +11,12 @@ import {
   checkActiveHousehold,
   requireActiveHousehold,
 } from '../households/active-household.js';
+import {
+  hasNumericDefaults,
+  parseDefaultUpdate,
+  resolveQuantityDefaults,
+  validateThresholdOrder,
+} from './inventory-defaults.js';
 
 export type CatalogKind = 'categories' | 'locations' | 'tags';
 
@@ -23,8 +29,6 @@ const shoppingSections = [
   'HOUSEHOLD',
   'PERSONAL_CARE',
 ] as const;
-
-const trackingModes = ['QUANTITY', 'FIVE_LEVEL', 'PRESENCE_BACKUP'] as const;
 
 function sectionUpdate(input: unknown) {
   if (!input || typeof input !== 'object' || Array.isArray(input))
@@ -41,52 +45,17 @@ function sectionUpdate(input: unknown) {
   return section as (typeof shoppingSections)[number] | null;
 }
 
-function inventoryDefaultsUpdate(input: unknown) {
-  if (!input || typeof input !== 'object' || Array.isArray(input))
-    throw new BadRequestException('INVALID_INVENTORY_DEFAULTS');
-  const body = input as Record<string, unknown>;
-  const keys = Object.keys(body);
-  if (
-    keys.length === 0 ||
-    keys.some(
-      (key) => key !== 'defaultTrackingMode' && key !== 'defaultPrimaryUnit',
-    )
-  )
-    throw new BadRequestException('INVALID_INVENTORY_DEFAULTS');
-
-  const data: {
-    defaultTrackingMode?: (typeof trackingModes)[number] | null;
-    defaultPrimaryUnit?: string | null;
-  } = {};
-  if ('defaultTrackingMode' in body) {
-    const mode = body.defaultTrackingMode;
-    if (
-      mode !== null &&
-      !trackingModes.includes(mode as (typeof trackingModes)[number])
-    )
-      throw new BadRequestException('INVALID_DEFAULT_TRACKING_MODE');
-    data.defaultTrackingMode = mode as (typeof trackingModes)[number] | null;
-  }
-  if ('defaultPrimaryUnit' in body) {
-    const unit = body.defaultPrimaryUnit;
-    if (unit === null) data.defaultPrimaryUnit = null;
-    else if (
-      typeof unit !== 'string' ||
-      !unit.trim() ||
-      unit.trim().length > 40
-    )
-      throw new BadRequestException('INVALID_DEFAULT_PRIMARY_UNIT');
-    else data.defaultPrimaryUnit = unit.trim();
-  }
-  return data;
-}
-
 const categorySelect = {
   id: true,
   name: true,
   shoppingSection: true,
   defaultTrackingMode: true,
   defaultPrimaryUnit: true,
+  defaultLowStockThreshold: true,
+  defaultBuyThreshold: true,
+  defaultTargetStock: true,
+  defaultSafetyBuffer: true,
+  defaultExpiryReminderDays: true,
 } as const;
 
 function catalogName(value: unknown) {
@@ -254,15 +223,48 @@ export class CatalogService {
     input: unknown,
   ) {
     await this.requireMembership(actorId, householdId, true);
-    const data = inventoryDefaultsUpdate(input);
+    const data = parseDefaultUpdate(input);
     try {
-      return await this.withActive(actorId, householdId, (tx) =>
-        tx.category.update({
+      return await this.withActive(actorId, householdId, async (tx) => {
+        const current = await tx.category.findFirst({
+          where: { id: categoryId, householdId },
+          select: categorySelect,
+        });
+        if (!current) throw new NotFoundException('CATEGORY_NOT_FOUND');
+        const next = { ...current, ...data };
+        validateThresholdOrder(next);
+        if (
+          hasNumericDefaults(current) &&
+          hasNumericDefaults(next) &&
+          (next.defaultTrackingMode !== current.defaultTrackingMode ||
+            next.defaultPrimaryUnit !== current.defaultPrimaryUnit)
+        )
+          throw new BadRequestException('DEFAULT_THRESHOLDS_REQUIRE_REVIEW');
+        const household = await tx.household.findUniqueOrThrow({
+          where: { id: householdId },
+          select: {
+            defaultTrackingMode: true,
+            defaultPrimaryUnit: true,
+            defaultLowStockThreshold: true,
+            defaultBuyThreshold: true,
+            defaultTargetStock: true,
+            defaultSafetyBuffer: true,
+            defaultExpiryReminderDays: true,
+          },
+        });
+        const mode = next.defaultTrackingMode ?? household.defaultTrackingMode;
+        const unit = next.defaultPrimaryUnit ?? household.defaultPrimaryUnit;
+        if (hasNumericDefaults(next) && (mode !== 'QUANTITY' || !unit))
+          throw new BadRequestException(
+            'DEFAULT_THRESHOLDS_REQUIRE_QUANTITY_UNIT',
+          );
+        if (mode && unit) resolveQuantityDefaults(mode, unit, household, next);
+        return tx.category.update({
           where: { id: categoryId, householdId },
           data,
           select: categorySelect,
-        }),
-      );
+        });
+      });
     } catch (error) {
       if (isPrismaError(error, 'P2025'))
         throw new NotFoundException('CATEGORY_NOT_FOUND');

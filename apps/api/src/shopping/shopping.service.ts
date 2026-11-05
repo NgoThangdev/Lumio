@@ -574,6 +574,8 @@ export class ShoppingService {
     expiryDateInput: unknown,
     locationIdInput?: unknown,
     destinationTripIdInput?: unknown,
+    purchaseDateInput?: unknown,
+    freezeDateInput?: unknown,
   ) {
     if (
       typeof status !== 'string' ||
@@ -619,6 +621,8 @@ export class ShoppingService {
           id: true,
           itemId: true,
           locationId: true,
+          purchaseDate: true,
+          freezeDate: true,
           item: { select: { trackingMode: true } },
         },
       });
@@ -635,6 +639,12 @@ export class ShoppingService {
         );
       let quantity: Prisma.Decimal | null = null;
       let expiryDate: Date | null = null;
+      let purchaseDate: Date | null = purchased
+        ? (entry.purchaseDate ?? null)
+        : null;
+      let freezeDate: Date | null = purchased
+        ? (entry.freezeDate ?? null)
+        : null;
       let locationId: string | null = null;
       if (purchased) {
         if (entry.item.trackingMode === 'QUANTITY') {
@@ -649,6 +659,16 @@ export class ShoppingService {
             expiryDateInput !== ''
           )
             expiryDate = calendarDate(expiryDateInput, 'Expiry date');
+          if (purchaseDateInput !== undefined)
+            purchaseDate =
+              purchaseDateInput == null || purchaseDateInput === ''
+                ? null
+                : calendarDate(purchaseDateInput, 'Purchase date');
+          if (freezeDateInput !== undefined)
+            freezeDate =
+              freezeDateInput == null || freezeDateInput === ''
+                ? null
+                : calendarDate(freezeDateInput, 'Freeze date');
           if (locationIdInput === undefined) {
             locationId = entry.locationId;
           } else if (locationIdInput === null || locationIdInput === '') {
@@ -697,8 +717,16 @@ export class ShoppingService {
             throw new BadRequestException(
               'Expiry date is not supported for backup purchases.',
             );
+          if (purchaseDateInput != null || freezeDateInput != null)
+            throw new BadRequestException(
+              'Batch dates are only supported for quantity purchases.',
+            );
           quantity = new Prisma.Decimal(count);
         }
+      } else if (purchaseDateInput != null || freezeDateInput != null) {
+        throw new BadRequestException(
+          'Batch dates require a purchased quantity entry.',
+        );
       }
       await tx.shoppingEntry.update({
         where: { id: entryId },
@@ -706,6 +734,8 @@ export class ShoppingService {
           status: status as 'PENDING' | 'PURCHASED' | 'SKIPPED' | 'MOVED',
           actualQuantity: quantity,
           expiryDate,
+          purchaseDate,
+          freezeDate,
           locationId,
           moveToTripId:
             status === 'MOVED' ? (destinationTripIdInput as string) : null,
@@ -759,6 +789,10 @@ export class ShoppingService {
         const purchased = entries
           .filter((entry) => entry.status === 'PURCHASED')
           .sort((left, right) => left.itemId.localeCompare(right.itemId));
+        const purchaseDateToday = calendarDate(
+          localCalendarDate(new Date()),
+          'Purchase date',
+        );
         for (const entry of purchased) {
           if (!entry.actualQuantity)
             throw new BadRequestException(
@@ -783,8 +817,15 @@ export class ShoppingService {
               itemId: entry.itemId,
               quantity: entry.actualQuantity!.toString(),
               expiryDate: entry.expiryDate,
+              purchaseDate: entry.purchaseDate ?? purchaseDateToday,
+              freezeDate: entry.freezeDate,
               locationId: entry.locationId,
             });
+            if (!entry.purchaseDate)
+              await tx.shoppingEntry.update({
+                where: { id: entry.id },
+                data: { purchaseDate: purchaseDateToday },
+              });
           } else {
             await this.state.transitionInTransaction(
               tx,

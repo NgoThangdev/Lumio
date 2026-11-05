@@ -4,7 +4,6 @@ import type { AssessmentExplanation } from './assessment-explanation.js';
 
 type Decimal = InstanceType<typeof Prisma.Decimal>;
 const ZERO = new Prisma.Decimal(0);
-const BUFFER = new Prisma.Decimal('1.2');
 
 export interface IntelligenceItem {
   id: string;
@@ -14,6 +13,8 @@ export interface IntelligenceItem {
   lowStockThreshold: Decimal | null;
   buyThreshold: Decimal | null;
   targetStock: Decimal | null;
+  safetyBuffer?: Decimal;
+  expiryReminderDays?: number;
   openedTrackingEnabled: boolean;
   neverRunOut: boolean;
   predictionEnabled: boolean;
@@ -47,7 +48,7 @@ export function assessItem(
   shoppingDate: string,
 ) {
   const today = localCalendarDate(at);
-  const useSoonThrough = addCalendarDays(today, 3);
+  const useSoonThrough = addCalendarDays(today, item.expiryReminderDays ?? 3);
   let physical = ZERO;
   let eligible = ZERO;
   let expiring = ZERO;
@@ -105,10 +106,12 @@ export function assessItem(
   const dailyRate = hasHistory
     ? usedIn14Days.div(14).toDecimalPlaces(6, Prisma.Decimal.ROUND_UP)
     : null;
+  const buffer = item.safetyBuffer ?? new Prisma.Decimal('1.2');
+  const bufferPercent = buffer.minus(1).mul(100).toNumber();
   const projectedNeed = hasHistory
     ? usedIn14Days
         .mul(shoppingDays)
-        .mul(BUFFER)
+        .mul(buffer)
         .div(14)
         .toDecimalPlaces(6, Prisma.Decimal.ROUND_UP)
     : null;
@@ -164,14 +167,14 @@ export function assessItem(
     );
   if (forecastShortage)
     addReason(
-      `Projected need through ${shoppingDate} is ${projectedNeed?.toString()} with a 20% buffer.`,
+      `Projected need through ${shoppingDate} is ${projectedNeed?.toString()} with a ${bufferPercent}% buffer.`,
       {
         code: 'QUANTITY_PROJECTED_NEED',
         params: {
           shoppingDate,
           projectedNeed: projectedNeed!.toString(),
           unit: item.primaryUnit,
-          bufferPercent: 20,
+          bufferPercent,
         },
       },
     );

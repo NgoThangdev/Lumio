@@ -15,6 +15,22 @@ import {
   requireActiveInvitationHousehold,
 } from './active-household.js';
 import { HouseholdPurgeService } from './household-purge.service.js';
+import {
+  hasNumericDefaults,
+  parseDefaultUpdate,
+  resolveQuantityDefaults,
+  validateThresholdOrder,
+} from '../inventory/inventory-defaults.js';
+
+const inventoryDefaultSelect = {
+  defaultTrackingMode: true,
+  defaultPrimaryUnit: true,
+  defaultLowStockThreshold: true,
+  defaultBuyThreshold: true,
+  defaultTargetStock: true,
+  defaultSafetyBuffer: true,
+  defaultExpiryReminderDays: true,
+} as const;
 
 const invitationAgeMs = 7 * 24 * 60 * 60 * 1000;
 const householdDeletionDelayMs = 7 * 24 * 60 * 60 * 1000;
@@ -501,6 +517,77 @@ export class HouseholdsService {
     });
   }
 
+  async inventoryDefaults(actorId: string, householdId: string) {
+    return this.prisma.$transaction(async (tx) => {
+      await this.lockHousehold(tx, householdId);
+      await this.requireMember(tx, actorId, householdId);
+      await this.assertActive(tx, householdId);
+      return tx.household.findUniqueOrThrow({
+        where: { id: householdId },
+        select: inventoryDefaultSelect,
+      });
+    });
+  }
+
+  async updateInventoryDefaults(
+    actorId: string,
+    householdId: string,
+    input: unknown,
+  ) {
+    const data = parseDefaultUpdate(input, true);
+    return this.prisma.$transaction(async (tx) => {
+      await this.lockHousehold(tx, householdId);
+      await this.requireAdmin(tx, actorId, householdId);
+      await this.assertActive(tx, householdId);
+      const current = await tx.household.findUniqueOrThrow({
+        where: { id: householdId },
+        select: inventoryDefaultSelect,
+      });
+      const next = { ...current, ...data };
+      validateThresholdOrder(next);
+      if (
+        hasNumericDefaults(current) &&
+        hasNumericDefaults(next) &&
+        (next.defaultTrackingMode !== current.defaultTrackingMode ||
+          next.defaultPrimaryUnit !== current.defaultPrimaryUnit)
+      )
+        throw new BadRequestException('DEFAULT_THRESHOLDS_REQUIRE_REVIEW');
+      if (
+        hasNumericDefaults(next) &&
+        (next.defaultTrackingMode !== 'QUANTITY' || !next.defaultPrimaryUnit)
+      )
+        throw new BadRequestException(
+          'DEFAULT_THRESHOLDS_REQUIRE_QUANTITY_UNIT',
+        );
+      const categories = await tx.category.findMany({
+        where: { householdId },
+        select: {
+          defaultTrackingMode: true,
+          defaultPrimaryUnit: true,
+          defaultLowStockThreshold: true,
+          defaultBuyThreshold: true,
+          defaultTargetStock: true,
+          defaultSafetyBuffer: true,
+          defaultExpiryReminderDays: true,
+        },
+      });
+      for (const category of categories) {
+        const mode = category.defaultTrackingMode ?? next.defaultTrackingMode;
+        const unit = category.defaultPrimaryUnit ?? next.defaultPrimaryUnit;
+        if (hasNumericDefaults(category) && (mode !== 'QUANTITY' || !unit))
+          throw new BadRequestException(
+            'DEFAULT_THRESHOLDS_REQUIRE_QUANTITY_UNIT',
+          );
+        if (mode && unit) resolveQuantityDefaults(mode, unit, next, category);
+      }
+      return tx.household.update({
+        where: { id: householdId },
+        data,
+        select: inventoryDefaultSelect,
+      });
+    });
+  }
+
   async create(actorId: string, name: unknown) {
     if (typeof name !== 'string' || !name.trim()) {
       throw new BadRequestException('Household name is required.');
@@ -511,6 +598,30 @@ export class HouseholdsService {
         memberships: { create: { userId: actorId, role: 'ADMIN' } },
       },
       select: { id: true, name: true },
+    });
+  }
+
+  async rename(actorId: string, householdId: string, input: unknown) {
+    if (!input || typeof input !== 'object' || Array.isArray(input))
+      throw new BadRequestException('INVALID_HOUSEHOLD_NAME');
+    const body = input as Record<string, unknown>;
+    if (
+      Object.keys(body).length !== 1 ||
+      typeof body.name !== 'string' ||
+      !body.name.trim() ||
+      body.name.trim().length > 120
+    )
+      throw new BadRequestException('INVALID_HOUSEHOLD_NAME');
+    const name = body.name.trim();
+    return this.prisma.$transaction(async (tx) => {
+      await this.lockHousehold(tx, householdId);
+      await this.requireAdmin(tx, actorId, householdId);
+      await this.assertActive(tx, householdId);
+      return tx.household.update({
+        where: { id: householdId },
+        data: { name },
+        select: { id: true, name: true },
+      });
     });
   }
 
