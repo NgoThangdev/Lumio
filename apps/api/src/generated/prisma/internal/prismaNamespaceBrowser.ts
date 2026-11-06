@@ -178,8 +178,18 @@ export type NotificationDeliveryScalarFieldEnum = (typeof NotificationDeliverySc
 export const HouseholdScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  deletionRequestId: 'deletionRequestId',
+  deletionRequestedAt: 'deletionRequestedAt',
+  deletionDueAt: 'deletionDueAt',
   defaultShoppingCycleDays: 'defaultShoppingCycleDays',
-  defaultStore: 'defaultStore'
+  defaultStore: 'defaultStore',
+  defaultTrackingMode: 'defaultTrackingMode',
+  defaultPrimaryUnit: 'defaultPrimaryUnit',
+  defaultLowStockThreshold: 'defaultLowStockThreshold',
+  defaultBuyThreshold: 'defaultBuyThreshold',
+  defaultTargetStock: 'defaultTargetStock',
+  defaultSafetyBuffer: 'defaultSafetyBuffer',
+  defaultExpiryReminderDays: 'defaultExpiryReminderDays'
 } as const
 
 export type HouseholdScalarFieldEnum = (typeof HouseholdScalarFieldEnum)[keyof typeof HouseholdScalarFieldEnum]
@@ -192,7 +202,12 @@ export const CategoryScalarFieldEnum = {
   nameKey: 'nameKey',
   shoppingSection: 'shoppingSection',
   defaultTrackingMode: 'defaultTrackingMode',
-  defaultPrimaryUnit: 'defaultPrimaryUnit'
+  defaultPrimaryUnit: 'defaultPrimaryUnit',
+  defaultLowStockThreshold: 'defaultLowStockThreshold',
+  defaultBuyThreshold: 'defaultBuyThreshold',
+  defaultTargetStock: 'defaultTargetStock',
+  defaultSafetyBuffer: 'defaultSafetyBuffer',
+  defaultExpiryReminderDays: 'defaultExpiryReminderDays'
 } as const
 
 export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
@@ -261,6 +276,8 @@ export const InventoryItemScalarFieldEnum = {
   lowStockThreshold: 'lowStockThreshold',
   buyThreshold: 'buyThreshold',
   targetStock: 'targetStock',
+  safetyBuffer: 'safetyBuffer',
+  expiryReminderDays: 'expiryReminderDays',
   neverRunOut: 'neverRunOut',
   predictionEnabled: 'predictionEnabled',
   stockRevision: 'stockRevision',
@@ -323,7 +340,9 @@ export const ShoppingTripScalarFieldEnum = {
   status: 'status',
   createdAt: 'createdAt',
   completedAt: 'completedAt',
-  suggestionsImportedAt: 'suggestionsImportedAt'
+  suggestionsImportedAt: 'suggestionsImportedAt',
+  archivedAt: 'archivedAt',
+  archivedByUserId: 'archivedByUserId'
 } as const
 
 export type ShoppingTripScalarFieldEnum = (typeof ShoppingTripScalarFieldEnum)[keyof typeof ShoppingTripScalarFieldEnum]
@@ -340,6 +359,8 @@ export const ShoppingEntryScalarFieldEnum = {
   suggestedReason: 'suggestedReason',
   actualQuantity: 'actualQuantity',
   expiryDate: 'expiryDate',
+  purchaseDate: 'purchaseDate',
+  freezeDate: 'freezeDate',
   locationId: 'locationId',
   moveToTripId: 'moveToTripId'
 } as const
@@ -384,6 +405,8 @@ export const StockBatchScalarFieldEnum = {
   locationId: 'locationId',
   quantity: 'quantity',
   expiryDate: 'expiryDate',
+  purchaseDate: 'purchaseDate',
+  freezeDate: 'freezeDate',
   openedAt: 'openedAt',
   openedUseByDate: 'openedUseByDate',
   createdAt: 'createdAt'

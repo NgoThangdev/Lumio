@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '../generated/prisma/browser.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { requireActiveHousehold } from '../households/active-household.js';
 import { UNDO_WINDOW_MS } from './undo-eligibility.js';
 
 type ActionKind = 'INVENTORY' | 'STATE';
@@ -51,6 +52,7 @@ export class InventoryUndoService {
     const actionId = body.actionId;
     return this.prisma.$transaction(
       async (tx) => {
+        await requireActiveHousehold(tx, actorId, householdId);
         const member = await tx.membership.findUnique({
           where: { userId_householdId: { userId: actorId, householdId } },
           select: { userId: true },

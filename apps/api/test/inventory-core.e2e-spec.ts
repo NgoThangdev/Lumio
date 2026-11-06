@@ -232,7 +232,7 @@ describe('InventoryService core path (database)', () => {
         name: 'Rice',
         primaryUnit: 'kg',
       }),
-    ).rejects.toThrow('Household membership is required');
+    ).rejects.toThrow('HOUSEHOLD_MEMBERSHIP_REQUIRED');
     const item = await inventory.createItem({
       ...scope,
       name: 'Rice',
@@ -240,7 +240,7 @@ describe('InventoryService core path (database)', () => {
     });
     await expect(
       inventory.readItem({ ...scope, actorId: outsiderId, itemId: item.id }),
-    ).rejects.toThrow('Household membership is required');
+    ).rejects.toThrow('HOUSEHOLD_MEMBERSHIP_REQUIRED');
 
     const otherHouseholdId = randomUUID();
     householdIds.push(otherHouseholdId);

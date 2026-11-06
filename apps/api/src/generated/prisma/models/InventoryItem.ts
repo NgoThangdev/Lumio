@@ -32,6 +32,8 @@ export type InventoryItemAvgAggregateOutputType = {
   lowStockThreshold: runtime.Decimal | null
   buyThreshold: runtime.Decimal | null
   targetStock: runtime.Decimal | null
+  safetyBuffer: runtime.Decimal | null
+  expiryReminderDays: number | null
   stockRevision: number | null
   recommendedDaysAfterOpening: number | null
 }
@@ -42,6 +44,8 @@ export type InventoryItemSumAggregateOutputType = {
   lowStockThreshold: runtime.Decimal | null
   buyThreshold: runtime.Decimal | null
   targetStock: runtime.Decimal | null
+  safetyBuffer: runtime.Decimal | null
+  expiryReminderDays: number | null
   stockRevision: number | null
   recommendedDaysAfterOpening: number | null
 }
@@ -65,6 +69,8 @@ export type InventoryItemMinAggregateOutputType = {
   lowStockThreshold: runtime.Decimal | null
   buyThreshold: runtime.Decimal | null
   targetStock: runtime.Decimal | null
+  safetyBuffer: runtime.Decimal | null
+  expiryReminderDays: number | null
   neverRunOut: boolean | null
   predictionEnabled: boolean | null
   stockRevision: number | null
@@ -92,6 +98,8 @@ export type InventoryItemMaxAggregateOutputType = {
   lowStockThreshold: runtime.Decimal | null
   buyThreshold: runtime.Decimal | null
   targetStock: runtime.Decimal | null
+  safetyBuffer: runtime.Decimal | null
+  expiryReminderDays: number | null
   neverRunOut: boolean | null
   predictionEnabled: boolean | null
   stockRevision: number | null
@@ -119,6 +127,8 @@ export type InventoryItemCountAggregateOutputType = {
   lowStockThreshold: number
   buyThreshold: number
   targetStock: number
+  safetyBuffer: number
+  expiryReminderDays: number
   neverRunOut: number
   predictionEnabled: number
   stockRevision: number
@@ -135,6 +145,8 @@ export type InventoryItemAvgAggregateInputType = {
   lowStockThreshold?: true
   buyThreshold?: true
   targetStock?: true
+  safetyBuffer?: true
+  expiryReminderDays?: true
   stockRevision?: true
   recommendedDaysAfterOpening?: true
 }
@@ -145,6 +157,8 @@ export type InventoryItemSumAggregateInputType = {
   lowStockThreshold?: true
   buyThreshold?: true
   targetStock?: true
+  safetyBuffer?: true
+  expiryReminderDays?: true
   stockRevision?: true
   recommendedDaysAfterOpening?: true
 }
@@ -168,6 +182,8 @@ export type InventoryItemMinAggregateInputType = {
   lowStockThreshold?: true
   buyThreshold?: true
   targetStock?: true
+  safetyBuffer?: true
+  expiryReminderDays?: true
   neverRunOut?: true
   predictionEnabled?: true
   stockRevision?: true
@@ -195,6 +211,8 @@ export type InventoryItemMaxAggregateInputType = {
   lowStockThreshold?: true
   buyThreshold?: true
   targetStock?: true
+  safetyBuffer?: true
+  expiryReminderDays?: true
   neverRunOut?: true
   predictionEnabled?: true
   stockRevision?: true
@@ -222,6 +240,8 @@ export type InventoryItemCountAggregateInputType = {
   lowStockThreshold?: true
   buyThreshold?: true
   targetStock?: true
+  safetyBuffer?: true
+  expiryReminderDays?: true
   neverRunOut?: true
   predictionEnabled?: true
   stockRevision?: true
@@ -336,6 +356,8 @@ export type InventoryItemGroupByOutputType = {
   lowStockThreshold: runtime.Decimal | null
   buyThreshold: runtime.Decimal | null
   targetStock: runtime.Decimal | null
+  safetyBuffer: runtime.Decimal
+  expiryReminderDays: number
   neverRunOut: boolean
   predictionEnabled: boolean
   stockRevision: number
@@ -386,6 +408,8 @@ export type InventoryItemWhereInput = {
   lowStockThreshold?: Prisma.DecimalNullableFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.DecimalNullableFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.DecimalNullableFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFilter<"InventoryItem"> | number
   neverRunOut?: Prisma.BoolFilter<"InventoryItem"> | boolean
   predictionEnabled?: Prisma.BoolFilter<"InventoryItem"> | boolean
   stockRevision?: Prisma.IntFilter<"InventoryItem"> | number
@@ -427,6 +451,8 @@ export type InventoryItemOrderByWithRelationInput = {
   lowStockThreshold?: Prisma.SortOrderInput | Prisma.SortOrder
   buyThreshold?: Prisma.SortOrderInput | Prisma.SortOrder
   targetStock?: Prisma.SortOrderInput | Prisma.SortOrder
+  safetyBuffer?: Prisma.SortOrder
+  expiryReminderDays?: Prisma.SortOrder
   neverRunOut?: Prisma.SortOrder
   predictionEnabled?: Prisma.SortOrder
   stockRevision?: Prisma.SortOrder
@@ -471,6 +497,8 @@ export type InventoryItemWhereUniqueInput = Prisma.AtLeast<{
   lowStockThreshold?: Prisma.DecimalNullableFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.DecimalNullableFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.DecimalNullableFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFilter<"InventoryItem"> | number
   neverRunOut?: Prisma.BoolFilter<"InventoryItem"> | boolean
   predictionEnabled?: Prisma.BoolFilter<"InventoryItem"> | boolean
   stockRevision?: Prisma.IntFilter<"InventoryItem"> | number
@@ -512,6 +540,8 @@ export type InventoryItemOrderByWithAggregationInput = {
   lowStockThreshold?: Prisma.SortOrderInput | Prisma.SortOrder
   buyThreshold?: Prisma.SortOrderInput | Prisma.SortOrder
   targetStock?: Prisma.SortOrderInput | Prisma.SortOrder
+  safetyBuffer?: Prisma.SortOrder
+  expiryReminderDays?: Prisma.SortOrder
   neverRunOut?: Prisma.SortOrder
   predictionEnabled?: Prisma.SortOrder
   stockRevision?: Prisma.SortOrder
@@ -547,6 +577,8 @@ export type InventoryItemScalarWhereWithAggregatesInput = {
   lowStockThreshold?: Prisma.DecimalNullableWithAggregatesFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.DecimalNullableWithAggregatesFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.DecimalNullableWithAggregatesFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalWithAggregatesFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntWithAggregatesFilter<"InventoryItem"> | number
   neverRunOut?: Prisma.BoolWithAggregatesFilter<"InventoryItem"> | boolean
   predictionEnabled?: Prisma.BoolWithAggregatesFilter<"InventoryItem"> | boolean
   stockRevision?: Prisma.IntWithAggregatesFilter<"InventoryItem"> | number
@@ -569,6 +601,8 @@ export type InventoryItemCreateInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -610,6 +644,8 @@ export type InventoryItemUncheckedCreateInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -641,6 +677,8 @@ export type InventoryItemUpdateInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -682,6 +720,8 @@ export type InventoryItemUncheckedUpdateInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -718,6 +758,8 @@ export type InventoryItemCreateManyInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -740,6 +782,8 @@ export type InventoryItemUpdateManyMutationInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -767,6 +811,8 @@ export type InventoryItemUncheckedUpdateManyInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -804,6 +850,8 @@ export type InventoryItemCountOrderByAggregateInput = {
   lowStockThreshold?: Prisma.SortOrder
   buyThreshold?: Prisma.SortOrder
   targetStock?: Prisma.SortOrder
+  safetyBuffer?: Prisma.SortOrder
+  expiryReminderDays?: Prisma.SortOrder
   neverRunOut?: Prisma.SortOrder
   predictionEnabled?: Prisma.SortOrder
   stockRevision?: Prisma.SortOrder
@@ -818,6 +866,8 @@ export type InventoryItemAvgOrderByAggregateInput = {
   lowStockThreshold?: Prisma.SortOrder
   buyThreshold?: Prisma.SortOrder
   targetStock?: Prisma.SortOrder
+  safetyBuffer?: Prisma.SortOrder
+  expiryReminderDays?: Prisma.SortOrder
   stockRevision?: Prisma.SortOrder
   recommendedDaysAfterOpening?: Prisma.SortOrder
 }
@@ -841,6 +891,8 @@ export type InventoryItemMaxOrderByAggregateInput = {
   lowStockThreshold?: Prisma.SortOrder
   buyThreshold?: Prisma.SortOrder
   targetStock?: Prisma.SortOrder
+  safetyBuffer?: Prisma.SortOrder
+  expiryReminderDays?: Prisma.SortOrder
   neverRunOut?: Prisma.SortOrder
   predictionEnabled?: Prisma.SortOrder
   stockRevision?: Prisma.SortOrder
@@ -868,6 +920,8 @@ export type InventoryItemMinOrderByAggregateInput = {
   lowStockThreshold?: Prisma.SortOrder
   buyThreshold?: Prisma.SortOrder
   targetStock?: Prisma.SortOrder
+  safetyBuffer?: Prisma.SortOrder
+  expiryReminderDays?: Prisma.SortOrder
   neverRunOut?: Prisma.SortOrder
   predictionEnabled?: Prisma.SortOrder
   stockRevision?: Prisma.SortOrder
@@ -882,6 +936,8 @@ export type InventoryItemSumOrderByAggregateInput = {
   lowStockThreshold?: Prisma.SortOrder
   buyThreshold?: Prisma.SortOrder
   targetStock?: Prisma.SortOrder
+  safetyBuffer?: Prisma.SortOrder
+  expiryReminderDays?: Prisma.SortOrder
   stockRevision?: Prisma.SortOrder
   recommendedDaysAfterOpening?: Prisma.SortOrder
 }
@@ -1117,22 +1173,6 @@ export type EnumStockLevelFieldUpdateOperationsInput = {
   set?: $Enums.StockLevel
 }
 
-export type NullableDecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type InventoryItemCreateNestedOneWithoutChangesInput = {
   create?: Prisma.XOR<Prisma.InventoryItemCreateWithoutChangesInput, Prisma.InventoryItemUncheckedCreateWithoutChangesInput>
   connectOrCreate?: Prisma.InventoryItemCreateOrConnectWithoutChangesInput
@@ -1273,6 +1313,8 @@ export type InventoryItemCreateWithoutHouseholdInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -1312,6 +1354,8 @@ export type InventoryItemUncheckedCreateWithoutHouseholdInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -1377,6 +1421,8 @@ export type InventoryItemScalarWhereInput = {
   lowStockThreshold?: Prisma.DecimalNullableFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.DecimalNullableFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.DecimalNullableFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFilter<"InventoryItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFilter<"InventoryItem"> | number
   neverRunOut?: Prisma.BoolFilter<"InventoryItem"> | boolean
   predictionEnabled?: Prisma.BoolFilter<"InventoryItem"> | boolean
   stockRevision?: Prisma.IntFilter<"InventoryItem"> | number
@@ -1399,6 +1445,8 @@ export type InventoryItemCreateWithoutCategoryInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -1438,6 +1486,8 @@ export type InventoryItemUncheckedCreateWithoutCategoryInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -1495,6 +1545,8 @@ export type InventoryItemCreateWithoutCurrentLocationInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -1534,6 +1586,8 @@ export type InventoryItemUncheckedCreateWithoutCurrentLocationInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -1575,6 +1629,8 @@ export type InventoryItemCreateWithoutBackupLocationInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -1614,6 +1670,8 @@ export type InventoryItemUncheckedCreateWithoutBackupLocationInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -1655,6 +1713,8 @@ export type InventoryItemCreateWithoutPreferredRestockLocationInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -1694,6 +1754,8 @@ export type InventoryItemUncheckedCreateWithoutPreferredRestockLocationInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -1783,6 +1845,8 @@ export type InventoryItemCreateWithoutChangesInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -1823,6 +1887,8 @@ export type InventoryItemUncheckedCreateWithoutChangesInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -1869,6 +1935,8 @@ export type InventoryItemUpdateWithoutChangesInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1909,6 +1977,8 @@ export type InventoryItemUncheckedUpdateWithoutChangesInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1939,6 +2009,8 @@ export type InventoryItemCreateWithoutTagLinksInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -1979,6 +2051,8 @@ export type InventoryItemUncheckedCreateWithoutTagLinksInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -2025,6 +2099,8 @@ export type InventoryItemUpdateWithoutTagLinksInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2065,6 +2141,8 @@ export type InventoryItemUncheckedUpdateWithoutTagLinksInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2095,6 +2173,8 @@ export type InventoryItemCreateWithoutStateActionsInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -2135,6 +2215,8 @@ export type InventoryItemUncheckedCreateWithoutStateActionsInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -2181,6 +2263,8 @@ export type InventoryItemUpdateWithoutStateActionsInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2221,6 +2305,8 @@ export type InventoryItemUncheckedUpdateWithoutStateActionsInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2251,6 +2337,8 @@ export type InventoryItemCreateWithoutShoppingEntriesInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -2291,6 +2379,8 @@ export type InventoryItemUncheckedCreateWithoutShoppingEntriesInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -2337,6 +2427,8 @@ export type InventoryItemUpdateWithoutShoppingEntriesInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2377,6 +2469,8 @@ export type InventoryItemUncheckedUpdateWithoutShoppingEntriesInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2407,6 +2501,8 @@ export type InventoryItemCreateWithoutStockChecksInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -2447,6 +2543,8 @@ export type InventoryItemUncheckedCreateWithoutStockChecksInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -2493,6 +2591,8 @@ export type InventoryItemUpdateWithoutStockChecksInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2533,6 +2633,8 @@ export type InventoryItemUncheckedUpdateWithoutStockChecksInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2563,6 +2665,8 @@ export type InventoryItemCreateWithoutLocationStockChecksInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -2603,6 +2707,8 @@ export type InventoryItemUncheckedCreateWithoutLocationStockChecksInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -2649,6 +2755,8 @@ export type InventoryItemUpdateWithoutLocationStockChecksInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2689,6 +2797,8 @@ export type InventoryItemUncheckedUpdateWithoutLocationStockChecksInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2719,6 +2829,8 @@ export type InventoryItemCreateWithoutBatchesInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -2759,6 +2871,8 @@ export type InventoryItemUncheckedCreateWithoutBatchesInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -2805,6 +2919,8 @@ export type InventoryItemUpdateWithoutBatchesInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2845,6 +2961,8 @@ export type InventoryItemUncheckedUpdateWithoutBatchesInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2875,6 +2993,8 @@ export type InventoryItemCreateWithoutActionsInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -2915,6 +3035,8 @@ export type InventoryItemUncheckedCreateWithoutActionsInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -2961,6 +3083,8 @@ export type InventoryItemUpdateWithoutActionsInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3001,6 +3125,8 @@ export type InventoryItemUncheckedUpdateWithoutActionsInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3031,6 +3157,8 @@ export type InventoryItemCreateWithoutUndosInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -3071,6 +3199,8 @@ export type InventoryItemUncheckedCreateWithoutUndosInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -3117,6 +3247,8 @@ export type InventoryItemUpdateWithoutUndosInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3157,6 +3289,8 @@ export type InventoryItemUncheckedUpdateWithoutUndosInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3191,6 +3325,8 @@ export type InventoryItemCreateManyHouseholdInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -3213,6 +3349,8 @@ export type InventoryItemUpdateWithoutHouseholdInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3252,6 +3390,8 @@ export type InventoryItemUncheckedUpdateWithoutHouseholdInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3287,6 +3427,8 @@ export type InventoryItemUncheckedUpdateManyWithoutHouseholdInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3313,6 +3455,8 @@ export type InventoryItemCreateManyCategoryInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -3335,6 +3479,8 @@ export type InventoryItemUpdateWithoutCategoryInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3374,6 +3520,8 @@ export type InventoryItemUncheckedUpdateWithoutCategoryInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3409,6 +3557,8 @@ export type InventoryItemUncheckedUpdateManyWithoutCategoryInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3435,6 +3585,8 @@ export type InventoryItemCreateManyCurrentLocationInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -3461,6 +3613,8 @@ export type InventoryItemCreateManyBackupLocationInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -3487,6 +3641,8 @@ export type InventoryItemCreateManyPreferredRestockLocationInput = {
   lowStockThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: number
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: number
@@ -3509,6 +3665,8 @@ export type InventoryItemUpdateWithoutCurrentLocationInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3548,6 +3706,8 @@ export type InventoryItemUncheckedUpdateWithoutCurrentLocationInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3583,6 +3743,8 @@ export type InventoryItemUncheckedUpdateManyWithoutCurrentLocationInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3605,6 +3767,8 @@ export type InventoryItemUpdateWithoutBackupLocationInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3644,6 +3808,8 @@ export type InventoryItemUncheckedUpdateWithoutBackupLocationInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3679,6 +3845,8 @@ export type InventoryItemUncheckedUpdateManyWithoutBackupLocationInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3701,6 +3869,8 @@ export type InventoryItemUpdateWithoutPreferredRestockLocationInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3740,6 +3910,8 @@ export type InventoryItemUncheckedUpdateWithoutPreferredRestockLocationInput = {
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3775,6 +3947,8 @@ export type InventoryItemUncheckedUpdateManyWithoutPreferredRestockLocationInput
   lowStockThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   buyThreshold?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   targetStock?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  safetyBuffer?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  expiryReminderDays?: Prisma.IntFieldUpdateOperationsInput | number
   neverRunOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   predictionEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stockRevision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3905,6 +4079,8 @@ export type InventoryItemSelect<ExtArgs extends runtime.Types.Extensions.Interna
   lowStockThreshold?: boolean
   buyThreshold?: boolean
   targetStock?: boolean
+  safetyBuffer?: boolean
+  expiryReminderDays?: boolean
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: boolean
@@ -3947,6 +4123,8 @@ export type InventoryItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   lowStockThreshold?: boolean
   buyThreshold?: boolean
   targetStock?: boolean
+  safetyBuffer?: boolean
+  expiryReminderDays?: boolean
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: boolean
@@ -3979,6 +4157,8 @@ export type InventoryItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   lowStockThreshold?: boolean
   buyThreshold?: boolean
   targetStock?: boolean
+  safetyBuffer?: boolean
+  expiryReminderDays?: boolean
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: boolean
@@ -4011,6 +4191,8 @@ export type InventoryItemSelectScalar = {
   lowStockThreshold?: boolean
   buyThreshold?: boolean
   targetStock?: boolean
+  safetyBuffer?: boolean
+  expiryReminderDays?: boolean
   neverRunOut?: boolean
   predictionEnabled?: boolean
   stockRevision?: boolean
@@ -4019,7 +4201,7 @@ export type InventoryItemSelectScalar = {
   recommendedDaysAfterOpening?: boolean
 }
 
-export type InventoryItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "householdId" | "name" | "primaryUnit" | "categoryId" | "currentLocationId" | "backupLocationId" | "preferredRestockLocationId" | "trackingMode" | "currentLevel" | "isPresent" | "backupCount" | "lowAtLevel" | "buyAtLevel" | "minimumStock" | "lowStockThreshold" | "buyThreshold" | "targetStock" | "neverRunOut" | "predictionEnabled" | "stockRevision" | "archivedAt" | "openedTrackingEnabled" | "recommendedDaysAfterOpening", ExtArgs["result"]["inventoryItem"]>
+export type InventoryItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "householdId" | "name" | "primaryUnit" | "categoryId" | "currentLocationId" | "backupLocationId" | "preferredRestockLocationId" | "trackingMode" | "currentLevel" | "isPresent" | "backupCount" | "lowAtLevel" | "buyAtLevel" | "minimumStock" | "lowStockThreshold" | "buyThreshold" | "targetStock" | "safetyBuffer" | "expiryReminderDays" | "neverRunOut" | "predictionEnabled" | "stockRevision" | "archivedAt" | "openedTrackingEnabled" | "recommendedDaysAfterOpening", ExtArgs["result"]["inventoryItem"]>
 export type InventoryItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   household?: boolean | Prisma.HouseholdDefaultArgs<ExtArgs>
   category?: boolean | Prisma.InventoryItem$categoryArgs<ExtArgs>
@@ -4089,6 +4271,8 @@ export type $InventoryItemPayload<ExtArgs extends runtime.Types.Extensions.Inter
     lowStockThreshold: runtime.Decimal | null
     buyThreshold: runtime.Decimal | null
     targetStock: runtime.Decimal | null
+    safetyBuffer: runtime.Decimal
+    expiryReminderDays: number
     neverRunOut: boolean
     predictionEnabled: boolean
     stockRevision: number
@@ -4550,6 +4734,8 @@ export interface InventoryItemFieldRefs {
   readonly lowStockThreshold: Prisma.FieldRef<"InventoryItem", 'Decimal'>
   readonly buyThreshold: Prisma.FieldRef<"InventoryItem", 'Decimal'>
   readonly targetStock: Prisma.FieldRef<"InventoryItem", 'Decimal'>
+  readonly safetyBuffer: Prisma.FieldRef<"InventoryItem", 'Decimal'>
+  readonly expiryReminderDays: Prisma.FieldRef<"InventoryItem", 'Int'>
   readonly neverRunOut: Prisma.FieldRef<"InventoryItem", 'Boolean'>
   readonly predictionEnabled: Prisma.FieldRef<"InventoryItem", 'Boolean'>
   readonly stockRevision: Prisma.FieldRef<"InventoryItem", 'Int'>

@@ -4,7 +4,11 @@ export const keys = {
     ['user', userId, 'notification-preferences'] as const,
   attention: (userId: string) => ['user', userId, 'attention'] as const,
   households: ['households'] as const,
+  pendingDeletions: (userId: string) =>
+    ['user', userId, 'pending-deletions'] as const,
   household: (householdId: string) => ['household', householdId] as const,
+  householdDeletionImpact: (householdId: string) =>
+    ['household', householdId, 'deletion-impact'] as const,
   shoppingSettings: (householdId: string) =>
     ['household', householdId, 'shopping-settings'] as const,
   members: (householdId: string) =>
@@ -22,11 +26,21 @@ export const keys = {
     ['household', householdId, 'recent-activity'] as const,
   item: (householdId: string, itemId: string) =>
     ['household', householdId, 'item', itemId] as const,
+  intelligencePrefix: (householdId: string) =>
+    ['household', householdId, 'intelligence'] as const,
   intelligence: (householdId: string, date: string) =>
     ['household', householdId, 'intelligence', date] as const,
+  archivedItems: (householdId: string) =>
+    ['household', householdId, 'archived-items'] as const,
+  tripDetailsPrefix: (householdId: string) =>
+    ['household', householdId, 'trip'] as const,
+  locationStockCheckPrefix: (householdId: string) =>
+    ['household', householdId, 'location-stock-check'] as const,
   locationStockCheck: (householdId: string, locationId: string) =>
     ['household', householdId, 'location-stock-check', locationId] as const,
   trips: (householdId: string) => ['household', householdId, 'trips'] as const,
+  archivedTrips: (householdId: string) =>
+    ['household', householdId, 'archived-trips'] as const,
   trip: (householdId: string, tripId: string) =>
     ['household', householdId, 'trip', tripId] as const,
 };

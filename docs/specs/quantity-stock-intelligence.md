@@ -1,6 +1,6 @@
 # Quantity stock intelligence: first slice
 
-This file records implementation choices for the current quantity-only slice. The [master prompt](master-prompt.md) remains authoritative. These exact fallback and presentation rules are technical defaults, not additional master-prompt requirements.
+This file records technical choices from the first quantity slice, not the full current assessment contract. The [master prompt](master-prompt.md) remains authoritative; use `apps/api/INVENTORY_READ_CONTRACT.md` and current code for all tracking modes and response fields.
 
 ## Stock and expiry
 

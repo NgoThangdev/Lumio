@@ -2,7 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Patch,
   Param,
   Query,
@@ -26,17 +28,17 @@ function requiredString(value: unknown, label: string): string {
   return value;
 }
 
-function expiryDate(value: unknown): Date | null {
+function optionalDate(value: unknown, label: string): Date | null {
   if (value === undefined || value === null || value === '') return null;
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    throw new BadRequestException('Expiry date must be YYYY-MM-DD.');
+    throw new BadRequestException(`${label} must be YYYY-MM-DD.`);
   }
   const date = new Date(`${value}T00:00:00.000Z`);
   if (
     !Number.isFinite(date.getTime()) ||
     date.toISOString().slice(0, 10) !== value
   ) {
-    throw new BadRequestException('Expiry date must be a valid calendar date.');
+    throw new BadRequestException(`${label} must be a valid calendar date.`);
   }
   return date;
 }
@@ -86,8 +88,25 @@ export class InventoryController {
             ...stock,
             ...(Object.hasOwn(stock, 'expiryDate')
               ? {
-                  expiryDate: expiryDate(
+                  expiryDate: optionalDate(
                     (stock as Record<string, unknown>).expiryDate,
+                    'Expiry date',
+                  ),
+                }
+              : {}),
+            ...(Object.hasOwn(stock, 'purchaseDate')
+              ? {
+                  purchaseDate: optionalDate(
+                    (stock as Record<string, unknown>).purchaseDate,
+                    'Purchase date',
+                  ),
+                }
+              : {}),
+            ...(Object.hasOwn(stock, 'freezeDate')
+              ? {
+                  freezeDate: optionalDate(
+                    (stock as Record<string, unknown>).freezeDate,
+                    'Freeze date',
                   ),
                 }
               : {}),
@@ -104,6 +123,11 @@ export class InventoryController {
       locationId: body?.locationId,
       tagIds: body?.tagIds,
       initialStock,
+      lowStockThreshold: body?.lowStockThreshold,
+      buyThreshold: body?.buyThreshold,
+      targetStock: body?.targetStock,
+      safetyBuffer: body?.safetyBuffer,
+      expiryReminderDays: body?.expiryReminderDays,
     });
   }
 
@@ -153,6 +177,22 @@ export class InventoryController {
     return this.lifecycle.restore(request.actorId, householdId, itemId);
   }
 
+  @Delete(':itemId')
+  @HttpCode(204)
+  permanentlyDelete(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Param('itemId') itemId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.lifecycle.permanentlyDelete(
+      request.actorId,
+      householdId,
+      itemId,
+      body,
+    );
+  }
+
   @Put(':itemId/config')
   configure(
     @Req() request: AuthenticatedRequest,
@@ -170,6 +210,8 @@ export class InventoryController {
       targetStock: body?.targetStock,
       neverRunOut: body?.neverRunOut,
       predictionEnabled: body?.predictionEnabled,
+      safetyBuffer: body?.safetyBuffer,
+      expiryReminderDays: body?.expiryReminderDays,
     });
   }
 
@@ -179,14 +221,22 @@ export class InventoryController {
     @Param('householdId') householdId: string,
     @Param('itemId') itemId: string,
     @Body()
-    body: { quantity?: unknown; expiryDate?: unknown; locationId?: unknown },
+    body: {
+      quantity?: unknown;
+      expiryDate?: unknown;
+      purchaseDate?: unknown;
+      freezeDate?: unknown;
+      locationId?: unknown;
+    },
   ) {
     return this.inventory.restockQuantity({
       actorId: request.actorId,
       householdId,
       itemId,
       quantity: requiredString(body?.quantity, 'Quantity'),
-      expiryDate: expiryDate(body?.expiryDate),
+      expiryDate: optionalDate(body?.expiryDate, 'Expiry date'),
+      purchaseDate: optionalDate(body?.purchaseDate, 'Purchase date'),
+      freezeDate: optionalDate(body?.freezeDate, 'Freeze date'),
       locationId: body?.locationId,
     });
   }

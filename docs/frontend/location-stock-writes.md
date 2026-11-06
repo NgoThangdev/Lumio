@@ -16,7 +16,9 @@ Quantity correction uses the selected-location total. If the API returns `BATCH_
 
 After a saved check, the page refreshes household-scoped queries so Inventory, Item Detail, Home, stock intelligence, Shopping stock checks, and this location checklist see API results. The server remains responsible for validation, totals, revision changes, and batch writes.
 
-## Local browser verification status — 2026-10-14
+## Historical local browser verification — 2026-10-14
+
+The notes below describe a past disposable local fixture, not the current database or deployment. Use the active API contracts and fresh environment-specific checks for current status.
 
 The local database was `127.0.0.1:55432/lumio_local`; Prisma reported all 14 migrations up to date. Initially, the API process was serving an older build and returned 404 for Check Location. After restarting that local process from the existing `apps/api/dist` (no source build or migration change), an unauthenticated request reached the session guard (401), and the signed-in browser could use the route. Browser mutations used the disposable `STOCK CHECK FOLLOWUP 2026-10-13` household (`6ca6979e-cf9e-41d4-b835-e2e3f78c9717`), not Lumio Demo.
 

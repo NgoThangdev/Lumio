@@ -176,6 +176,7 @@ export type UserWhereInput = {
   sessions?: Prisma.UserSessionListRelationFilter
   createdShoppingTrips?: Prisma.ShoppingTripListRelationFilter
   completedShoppingTrips?: Prisma.ShoppingTripListRelationFilter
+  archivedShoppingTrips?: Prisma.ShoppingTripListRelationFilter
   stockChecks?: Prisma.TripStockCheckListRelationFilter
   locationStockChecks?: Prisma.LocationStockCheckListRelationFilter
   notificationPreference?: Prisma.XOR<Prisma.NotificationPreferenceNullableScalarRelationFilter, Prisma.NotificationPreferenceWhereInput> | null
@@ -196,6 +197,7 @@ export type UserOrderByWithRelationInput = {
   sessions?: Prisma.UserSessionOrderByRelationAggregateInput
   createdShoppingTrips?: Prisma.ShoppingTripOrderByRelationAggregateInput
   completedShoppingTrips?: Prisma.ShoppingTripOrderByRelationAggregateInput
+  archivedShoppingTrips?: Prisma.ShoppingTripOrderByRelationAggregateInput
   stockChecks?: Prisma.TripStockCheckOrderByRelationAggregateInput
   locationStockChecks?: Prisma.LocationStockCheckOrderByRelationAggregateInput
   notificationPreference?: Prisma.NotificationPreferenceOrderByWithRelationInput
@@ -219,6 +221,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   sessions?: Prisma.UserSessionListRelationFilter
   createdShoppingTrips?: Prisma.ShoppingTripListRelationFilter
   completedShoppingTrips?: Prisma.ShoppingTripListRelationFilter
+  archivedShoppingTrips?: Prisma.ShoppingTripListRelationFilter
   stockChecks?: Prisma.TripStockCheckListRelationFilter
   locationStockChecks?: Prisma.LocationStockCheckListRelationFilter
   notificationPreference?: Prisma.XOR<Prisma.NotificationPreferenceNullableScalarRelationFilter, Prisma.NotificationPreferenceWhereInput> | null
@@ -257,6 +260,7 @@ export type UserCreateInput = {
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
@@ -277,6 +281,7 @@ export type UserUncheckedCreateInput = {
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
@@ -297,6 +302,7 @@ export type UserUpdateInput = {
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
@@ -317,6 +323,7 @@ export type UserUncheckedUpdateInput = {
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
@@ -499,6 +506,12 @@ export type UserCreateNestedOneWithoutCompletedShoppingTripsInput = {
   connect?: Prisma.UserWhereUniqueInput
 }
 
+export type UserCreateNestedOneWithoutArchivedShoppingTripsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutArchivedShoppingTripsInput, Prisma.UserUncheckedCreateWithoutArchivedShoppingTripsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutArchivedShoppingTripsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
 export type UserUpdateOneRequiredWithoutCreatedShoppingTripsNestedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedShoppingTripsInput, Prisma.UserUncheckedCreateWithoutCreatedShoppingTripsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedShoppingTripsInput
@@ -515,6 +528,16 @@ export type UserUpdateOneWithoutCompletedShoppingTripsNestedInput = {
   delete?: Prisma.UserWhereInput | boolean
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCompletedShoppingTripsInput, Prisma.UserUpdateWithoutCompletedShoppingTripsInput>, Prisma.UserUncheckedUpdateWithoutCompletedShoppingTripsInput>
+}
+
+export type UserUpdateOneWithoutArchivedShoppingTripsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutArchivedShoppingTripsInput, Prisma.UserUncheckedCreateWithoutArchivedShoppingTripsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutArchivedShoppingTripsInput
+  upsert?: Prisma.UserUpsertWithoutArchivedShoppingTripsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutArchivedShoppingTripsInput, Prisma.UserUpdateWithoutArchivedShoppingTripsInput>, Prisma.UserUncheckedUpdateWithoutArchivedShoppingTripsInput>
 }
 
 export type UserCreateNestedOneWithoutStockChecksInput = {
@@ -590,6 +613,7 @@ export type UserCreateWithoutSessionsInput = {
   itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutActorInput
   createdShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
@@ -609,6 +633,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutActorInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
@@ -644,6 +669,7 @@ export type UserUpdateWithoutSessionsInput = {
   itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutActorNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
@@ -663,6 +689,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutActorNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
@@ -683,6 +710,7 @@ export type UserCreateWithoutNotificationPreferenceInput = {
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutUserInput
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutUserInput
@@ -702,6 +730,7 @@ export type UserUncheckedCreateWithoutNotificationPreferenceInput = {
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutUserInput
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutUserInput
@@ -737,6 +766,7 @@ export type UserUpdateWithoutNotificationPreferenceInput = {
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutUserNestedInput
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutUserNestedInput
@@ -756,6 +786,7 @@ export type UserUncheckedUpdateWithoutNotificationPreferenceInput = {
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutUserNestedInput
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutUserNestedInput
@@ -775,6 +806,7 @@ export type UserCreateWithoutNotificationIntentsInput = {
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
@@ -794,6 +826,7 @@ export type UserUncheckedCreateWithoutNotificationIntentsInput = {
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
@@ -829,6 +862,7 @@ export type UserUpdateWithoutNotificationIntentsInput = {
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
@@ -848,6 +882,7 @@ export type UserUncheckedUpdateWithoutNotificationIntentsInput = {
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
@@ -866,6 +901,7 @@ export type UserCreateWithoutMembershipsInput = {
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
@@ -885,6 +921,7 @@ export type UserUncheckedCreateWithoutMembershipsInput = {
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
@@ -920,6 +957,7 @@ export type UserUpdateWithoutMembershipsInput = {
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
@@ -939,6 +977,7 @@ export type UserUncheckedUpdateWithoutMembershipsInput = {
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
@@ -958,6 +997,7 @@ export type UserCreateWithoutCreatedInvitationsInput = {
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
@@ -977,6 +1017,7 @@ export type UserUncheckedCreateWithoutCreatedInvitationsInput = {
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
@@ -1001,6 +1042,7 @@ export type UserCreateWithoutAcceptedInvitationsInput = {
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
@@ -1020,6 +1062,7 @@ export type UserUncheckedCreateWithoutAcceptedInvitationsInput = {
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
@@ -1055,6 +1098,7 @@ export type UserUpdateWithoutCreatedInvitationsInput = {
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
@@ -1074,6 +1118,7 @@ export type UserUncheckedUpdateWithoutCreatedInvitationsInput = {
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
@@ -1104,6 +1149,7 @@ export type UserUpdateWithoutAcceptedInvitationsInput = {
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
@@ -1123,6 +1169,7 @@ export type UserUncheckedUpdateWithoutAcceptedInvitationsInput = {
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
@@ -1142,6 +1189,7 @@ export type UserCreateWithoutItemChangesInput = {
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
@@ -1161,6 +1209,7 @@ export type UserUncheckedCreateWithoutItemChangesInput = {
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
@@ -1196,6 +1245,7 @@ export type UserUpdateWithoutItemChangesInput = {
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
@@ -1215,6 +1265,7 @@ export type UserUncheckedUpdateWithoutItemChangesInput = {
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
@@ -1234,6 +1285,7 @@ export type UserCreateWithoutInventoryStateActionsInput = {
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
@@ -1253,6 +1305,7 @@ export type UserUncheckedCreateWithoutInventoryStateActionsInput = {
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
@@ -1288,6 +1341,7 @@ export type UserUpdateWithoutInventoryStateActionsInput = {
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
@@ -1307,6 +1361,7 @@ export type UserUncheckedUpdateWithoutInventoryStateActionsInput = {
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
@@ -1326,6 +1381,7 @@ export type UserCreateWithoutCreatedShoppingTripsInput = {
   itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutActorInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   completedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
@@ -1345,6 +1401,7 @@ export type UserUncheckedCreateWithoutCreatedShoppingTripsInput = {
   itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutActorInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
@@ -1369,6 +1426,7 @@ export type UserCreateWithoutCompletedShoppingTripsInput = {
   itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutActorInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCreatedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
@@ -1388,6 +1446,7 @@ export type UserUncheckedCreateWithoutCompletedShoppingTripsInput = {
   itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutActorInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
@@ -1397,6 +1456,51 @@ export type UserUncheckedCreateWithoutCompletedShoppingTripsInput = {
 export type UserCreateOrConnectWithoutCompletedShoppingTripsInput = {
   where: Prisma.UserWhereUniqueInput
   create: Prisma.XOR<Prisma.UserCreateWithoutCompletedShoppingTripsInput, Prisma.UserUncheckedCreateWithoutCompletedShoppingTripsInput>
+}
+
+export type UserCreateWithoutArchivedShoppingTripsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  memberships?: Prisma.MembershipCreateNestedManyWithoutUserInput
+  createdInvitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutCreatedByInput
+  acceptedInvitations?: Prisma.HouseholdInvitationCreateNestedManyWithoutAcceptedByInput
+  inventoryActions?: Prisma.InventoryActionCreateNestedManyWithoutUserInput
+  inventoryStateActions?: Prisma.InventoryStateActionCreateNestedManyWithoutUserInput
+  inventoryUndos?: Prisma.InventoryUndoCreateNestedManyWithoutUserInput
+  itemChanges?: Prisma.InventoryItemChangeCreateNestedManyWithoutActorInput
+  sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
+  createdShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCreatedByInput
+  completedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCompletedByInput
+  stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutUserInput
+  locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutArchivedShoppingTripsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutUserInput
+  createdInvitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutCreatedByInput
+  acceptedInvitations?: Prisma.HouseholdInvitationUncheckedCreateNestedManyWithoutAcceptedByInput
+  inventoryActions?: Prisma.InventoryActionUncheckedCreateNestedManyWithoutUserInput
+  inventoryStateActions?: Prisma.InventoryStateActionUncheckedCreateNestedManyWithoutUserInput
+  inventoryUndos?: Prisma.InventoryUndoUncheckedCreateNestedManyWithoutUserInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedCreateNestedManyWithoutActorInput
+  sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
+  createdShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput
+  completedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput
+  stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutUserInput
+  locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutArchivedShoppingTripsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutArchivedShoppingTripsInput, Prisma.UserUncheckedCreateWithoutArchivedShoppingTripsInput>
 }
 
 export type UserUpsertWithoutCreatedShoppingTripsInput = {
@@ -1423,6 +1527,7 @@ export type UserUpdateWithoutCreatedShoppingTripsInput = {
   itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutActorNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
@@ -1442,6 +1547,7 @@ export type UserUncheckedUpdateWithoutCreatedShoppingTripsInput = {
   itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutActorNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
@@ -1472,6 +1578,7 @@ export type UserUpdateWithoutCompletedShoppingTripsInput = {
   itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutActorNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCreatedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
@@ -1491,6 +1598,58 @@ export type UserUncheckedUpdateWithoutCompletedShoppingTripsInput = {
   itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutActorNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput
+  stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutUserNestedInput
+  locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutArchivedShoppingTripsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutArchivedShoppingTripsInput, Prisma.UserUncheckedUpdateWithoutArchivedShoppingTripsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutArchivedShoppingTripsInput, Prisma.UserUncheckedCreateWithoutArchivedShoppingTripsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutArchivedShoppingTripsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutArchivedShoppingTripsInput, Prisma.UserUncheckedUpdateWithoutArchivedShoppingTripsInput>
+}
+
+export type UserUpdateWithoutArchivedShoppingTripsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  memberships?: Prisma.MembershipUpdateManyWithoutUserNestedInput
+  createdInvitations?: Prisma.HouseholdInvitationUpdateManyWithoutCreatedByNestedInput
+  acceptedInvitations?: Prisma.HouseholdInvitationUpdateManyWithoutAcceptedByNestedInput
+  inventoryActions?: Prisma.InventoryActionUpdateManyWithoutUserNestedInput
+  inventoryStateActions?: Prisma.InventoryStateActionUpdateManyWithoutUserNestedInput
+  inventoryUndos?: Prisma.InventoryUndoUpdateManyWithoutUserNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUpdateManyWithoutActorNestedInput
+  sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
+  createdShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCreatedByNestedInput
+  completedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCompletedByNestedInput
+  stockChecks?: Prisma.TripStockCheckUpdateManyWithoutUserNestedInput
+  locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutArchivedShoppingTripsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  memberships?: Prisma.MembershipUncheckedUpdateManyWithoutUserNestedInput
+  createdInvitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutCreatedByNestedInput
+  acceptedInvitations?: Prisma.HouseholdInvitationUncheckedUpdateManyWithoutAcceptedByNestedInput
+  inventoryActions?: Prisma.InventoryActionUncheckedUpdateManyWithoutUserNestedInput
+  inventoryStateActions?: Prisma.InventoryStateActionUncheckedUpdateManyWithoutUserNestedInput
+  inventoryUndos?: Prisma.InventoryUndoUncheckedUpdateManyWithoutUserNestedInput
+  itemChanges?: Prisma.InventoryItemChangeUncheckedUpdateManyWithoutActorNestedInput
+  sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
+  createdShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput
+  completedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
@@ -1511,6 +1670,7 @@ export type UserCreateWithoutStockChecksInput = {
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutArchivedByInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutUserInput
@@ -1530,6 +1690,7 @@ export type UserUncheckedCreateWithoutStockChecksInput = {
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutUserInput
@@ -1565,6 +1726,7 @@ export type UserUpdateWithoutStockChecksInput = {
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutArchivedByNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutUserNestedInput
@@ -1584,6 +1746,7 @@ export type UserUncheckedUpdateWithoutStockChecksInput = {
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutUserNestedInput
@@ -1603,6 +1766,7 @@ export type UserCreateWithoutLocationStockChecksInput = {
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutUserInput
@@ -1622,6 +1786,7 @@ export type UserUncheckedCreateWithoutLocationStockChecksInput = {
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutUserInput
@@ -1657,6 +1822,7 @@ export type UserUpdateWithoutLocationStockChecksInput = {
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutUserNestedInput
@@ -1676,6 +1842,7 @@ export type UserUncheckedUpdateWithoutLocationStockChecksInput = {
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutUserNestedInput
@@ -1694,6 +1861,7 @@ export type UserCreateWithoutInventoryActionsInput = {
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
@@ -1713,6 +1881,7 @@ export type UserUncheckedCreateWithoutInventoryActionsInput = {
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
@@ -1748,6 +1917,7 @@ export type UserUpdateWithoutInventoryActionsInput = {
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
@@ -1767,6 +1937,7 @@ export type UserUncheckedUpdateWithoutInventoryActionsInput = {
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
@@ -1786,6 +1957,7 @@ export type UserCreateWithoutInventoryUndosInput = {
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
@@ -1805,6 +1977,7 @@ export type UserUncheckedCreateWithoutInventoryUndosInput = {
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCreatedByInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutCompletedByInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedCreateNestedManyWithoutArchivedByInput
   stockChecks?: Prisma.TripStockCheckUncheckedCreateNestedManyWithoutUserInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
@@ -1840,6 +2013,7 @@ export type UserUpdateWithoutInventoryUndosInput = {
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
@@ -1859,6 +2033,7 @@ export type UserUncheckedUpdateWithoutInventoryUndosInput = {
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   createdShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCreatedByNestedInput
   completedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutCompletedByNestedInput
+  archivedShoppingTrips?: Prisma.ShoppingTripUncheckedUpdateManyWithoutArchivedByNestedInput
   stockChecks?: Prisma.TripStockCheckUncheckedUpdateManyWithoutUserNestedInput
   locationStockChecks?: Prisma.LocationStockCheckUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
@@ -1881,6 +2056,7 @@ export type UserCountOutputType = {
   sessions: number
   createdShoppingTrips: number
   completedShoppingTrips: number
+  archivedShoppingTrips: number
   stockChecks: number
   locationStockChecks: number
   notificationIntents: number
@@ -1897,6 +2073,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   createdShoppingTrips?: boolean | UserCountOutputTypeCountCreatedShoppingTripsArgs
   completedShoppingTrips?: boolean | UserCountOutputTypeCountCompletedShoppingTripsArgs
+  archivedShoppingTrips?: boolean | UserCountOutputTypeCountArchivedShoppingTripsArgs
   stockChecks?: boolean | UserCountOutputTypeCountStockChecksArgs
   locationStockChecks?: boolean | UserCountOutputTypeCountLocationStockChecksArgs
   notificationIntents?: boolean | UserCountOutputTypeCountNotificationIntentsArgs
@@ -1985,6 +2162,13 @@ export type UserCountOutputTypeCountCompletedShoppingTripsArgs<ExtArgs extends r
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountArchivedShoppingTripsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ShoppingTripWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountStockChecksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.TripStockCheckWhereInput
 }
@@ -2018,6 +2202,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   createdShoppingTrips?: boolean | Prisma.User$createdShoppingTripsArgs<ExtArgs>
   completedShoppingTrips?: boolean | Prisma.User$completedShoppingTripsArgs<ExtArgs>
+  archivedShoppingTrips?: boolean | Prisma.User$archivedShoppingTripsArgs<ExtArgs>
   stockChecks?: boolean | Prisma.User$stockChecksArgs<ExtArgs>
   locationStockChecks?: boolean | Prisma.User$locationStockChecksArgs<ExtArgs>
   notificationPreference?: boolean | Prisma.User$notificationPreferenceArgs<ExtArgs>
@@ -2055,6 +2240,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   createdShoppingTrips?: boolean | Prisma.User$createdShoppingTripsArgs<ExtArgs>
   completedShoppingTrips?: boolean | Prisma.User$completedShoppingTripsArgs<ExtArgs>
+  archivedShoppingTrips?: boolean | Prisma.User$archivedShoppingTripsArgs<ExtArgs>
   stockChecks?: boolean | Prisma.User$stockChecksArgs<ExtArgs>
   locationStockChecks?: boolean | Prisma.User$locationStockChecksArgs<ExtArgs>
   notificationPreference?: boolean | Prisma.User$notificationPreferenceArgs<ExtArgs>
@@ -2077,6 +2263,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     sessions: Prisma.$UserSessionPayload<ExtArgs>[]
     createdShoppingTrips: Prisma.$ShoppingTripPayload<ExtArgs>[]
     completedShoppingTrips: Prisma.$ShoppingTripPayload<ExtArgs>[]
+    archivedShoppingTrips: Prisma.$ShoppingTripPayload<ExtArgs>[]
     stockChecks: Prisma.$TripStockCheckPayload<ExtArgs>[]
     locationStockChecks: Prisma.$LocationStockCheckPayload<ExtArgs>[]
     notificationPreference: Prisma.$NotificationPreferencePayload<ExtArgs> | null
@@ -2490,6 +2677,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdShoppingTrips<T extends Prisma.User$createdShoppingTripsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdShoppingTripsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShoppingTripPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   completedShoppingTrips<T extends Prisma.User$completedShoppingTripsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$completedShoppingTripsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShoppingTripPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  archivedShoppingTrips<T extends Prisma.User$archivedShoppingTripsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$archivedShoppingTripsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShoppingTripPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   stockChecks<T extends Prisma.User$stockChecksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$stockChecksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TripStockCheckPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   locationStockChecks<T extends Prisma.User$locationStockChecksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$locationStockChecksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LocationStockCheckPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notificationPreference<T extends Prisma.User$notificationPreferenceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationPreferenceArgs<ExtArgs>>): Prisma.Prisma__NotificationPreferenceClient<runtime.Types.Result.GetResult<Prisma.$NotificationPreferencePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -3138,6 +3326,30 @@ export type User$createdShoppingTripsArgs<ExtArgs extends runtime.Types.Extensio
  * User.completedShoppingTrips
  */
 export type User$completedShoppingTripsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ShoppingTrip
+   */
+  select?: Prisma.ShoppingTripSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ShoppingTrip
+   */
+  omit?: Prisma.ShoppingTripOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ShoppingTripInclude<ExtArgs> | null
+  where?: Prisma.ShoppingTripWhereInput
+  orderBy?: Prisma.ShoppingTripOrderByWithRelationInput | Prisma.ShoppingTripOrderByWithRelationInput[]
+  cursor?: Prisma.ShoppingTripWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ShoppingTripScalarFieldEnum | Prisma.ShoppingTripScalarFieldEnum[]
+}
+
+/**
+ * User.archivedShoppingTrips
+ */
+export type User$archivedShoppingTripsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the ShoppingTrip
    */

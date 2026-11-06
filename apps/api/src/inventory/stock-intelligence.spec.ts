@@ -24,6 +24,33 @@ function item(overrides: Partial<IntelligenceItem> = {}): IntelligenceItem {
 }
 
 describe('quantity stock intelligence', () => {
+  it('uses the item reminder window and safety buffer for new assessments', () => {
+    const result = assessItem(
+      item({
+        safetyBuffer: d('1.5'),
+        expiryReminderDays: 5,
+        predictionEnabled: true,
+        batches: [{ quantity: d('1'), expiryDate: date('2026-10-14') }],
+        actions: [
+          { quantity: d('7'), createdAt: date('2026-10-01'), type: 'USE' },
+          { quantity: d('7'), createdAt: date('2026-10-09'), type: 'USE' },
+        ],
+      }),
+      at,
+      '2026-10-16',
+    );
+    expect(result.useSoonQuantity).toBe('1');
+    expect(result.prediction.projectedNeed).toBe('10.5');
+    expect(result.reasonExplanations).toContainEqual({
+      code: 'QUANTITY_PROJECTED_NEED',
+      params: {
+        shoppingDate: '2026-10-16',
+        projectedNeed: '10.5',
+        unit: 'egg',
+        bufferPercent: 50,
+      },
+    });
+  });
   it('counts only usable stock with effective expiry today for immediate attention', () => {
     const result = assessItem(
       item({

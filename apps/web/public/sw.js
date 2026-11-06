@@ -112,8 +112,15 @@ self.addEventListener('notificationclick', (event) => {
       .then(async (windows) => {
         for (const client of windows) {
           if (new URL(client.url).origin !== self.location.origin) continue;
-          if (client.navigate) await client.navigate(target);
-          return client.focus();
+          if (client.navigate) {
+            try {
+              const navigated = await client.navigate(target);
+              if (navigated) return navigated.focus();
+            } catch {
+              // Open a new tab if this client can no longer navigate.
+            }
+          }
+          break;
         }
         return self.clients.openWindow(target);
       }),

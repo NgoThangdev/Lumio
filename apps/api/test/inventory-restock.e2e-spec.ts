@@ -286,7 +286,7 @@ describe('InventoryService Restock (database)', () => {
         actorId: outsiderId,
         quantity: '1',
       }),
-    ).rejects.toThrow('Household membership is required');
+    ).rejects.toThrow('HOUSEHOLD_MEMBERSHIP_REQUIRED');
     expect(await stockAndActivity(input.itemId)).toEqual({
       batches: [],
       actions: [],

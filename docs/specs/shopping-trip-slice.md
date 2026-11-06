@@ -1,5 +1,7 @@
 # First quantity-based Shopping Trip slice
 
+This describes an early quantity-only implementation. Shopping now supports additional modes and flows; use `apps/api/SHOPPING_CONTRACT.md` and current source for the full contract. Its “deferred” statements are historical.
+
 This slice implements the core Stock → Use → Predict → Plan → Buy → Restock loop for existing quantity-based inventory items. The [master prompt](master-prompt.md) remains authoritative. The shortened lifecycle and validation details here are implementation choices for this first slice.
 
 ## State transitions

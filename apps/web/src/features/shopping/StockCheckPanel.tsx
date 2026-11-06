@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, api } from '../../shared/api/client';
 import { keys } from '../../shared/api/keys';
-import type { StockLevel } from '../../shared/api/types';
+import { STOCK_LEVELS, type StockLevel } from '../../shared/api/types';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
 
 import { tr } from '../../shared/i18n';
@@ -59,14 +59,6 @@ type CheckBody = {
   backupCount?: number;
   isPresent?: boolean;
 };
-
-const levels: { value: StockLevel; label: string }[] = [
-  { value: 'FULL', label: 'Full' },
-  { value: 'THREE_QUARTERS', label: '¾' },
-  { value: 'HALF', label: '½' },
-  { value: 'QUARTER', label: '¼' },
-  { value: 'EMPTY', label: 'Empty' },
-];
 
 function StockCheckEntry({
   entry,
@@ -363,9 +355,9 @@ function StockCheckEntry({
                   required
                 >
                   <option value="">{tr('shopping:chooseLevel2')}</option>
-                  {levels.map((level) => (
-                    <option value={level.value} key={level.value}>
-                      {localizedEnum(level.value)}
+                  {STOCK_LEVELS.map((level) => (
+                    <option value={level} key={level}>
+                      {localizedEnum(level)}
                     </option>
                   ))}
                 </select>

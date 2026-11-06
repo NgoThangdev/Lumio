@@ -1,10 +1,17 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
+import { Prisma } from '../generated/prisma/client.js';
 import { StockIntelligenceService } from '../inventory/stock-intelligence.service.js';
 import { localCalendarDate } from '../inventory/plan-use.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { requireActiveHousehold } from '../households/active-household.js';
 import {
   localQuietEnd,
   notificationCandidates,
+  type Candidate,
   type HouseholdAssessments,
 } from './notification-rules.js';
 
@@ -20,30 +27,44 @@ export class NotificationEvaluatorService {
   ) {}
 
   private async assessedHouseholds(userId: string, at: Date) {
-    const memberships = await this.prisma.membership.findMany({
-      where: { userId },
-      select: { householdId: true, household: { select: { name: true } } },
-      orderBy: { householdId: 'asc' },
-    });
-    const households: (HouseholdAssessments & { name: string })[] = [];
-    for (const membership of memberships) {
-      try {
-        const assessed = await this.intelligence.assessHousehold(
-          userId,
-          membership.householdId,
-          undefined,
-          at,
-        );
-        households.push({
-          householdId: membership.householdId,
-          name: membership.household.name,
-          assessments: assessed.assessments,
-        });
-      } catch (error) {
-        if (!(error instanceof ForbiddenException)) throw error;
+    return this.prisma.$transaction(async (tx) => {
+      const memberships = await tx.membership.findMany({
+        where: { userId },
+        select: { householdId: true },
+        orderBy: { householdId: 'asc' },
+      });
+      const households: (HouseholdAssessments & { name: string })[] = [];
+      for (const membership of memberships) {
+        try {
+          await requireActiveHousehold(tx, userId, membership.householdId);
+          const [household, assessed] = await Promise.all([
+            tx.household.findUniqueOrThrow({
+              where: { id: membership.householdId },
+              select: { name: true },
+            }),
+            this.intelligence.assessInTransaction(
+              tx,
+              userId,
+              membership.householdId,
+              undefined,
+              at,
+            ),
+          ]);
+          households.push({
+            householdId: membership.householdId,
+            name: household.name,
+            assessments: assessed.assessments,
+          });
+        } catch (error) {
+          if (!(
+            error instanceof ForbiddenException ||
+            error instanceof ConflictException
+          ))
+            throw error;
+        }
       }
-    }
-    return households;
+      return households;
+    });
   }
 
   private async currentCandidates(
@@ -65,6 +86,76 @@ export class NotificationEvaluatorService {
       candidates: notificationCandidates(households, preference),
       preference,
     };
+  }
+
+  // Serialize candidate insertion with item deletion. Assessments are computed
+  // before this transaction, so a deleted/archived item must be pruned here.
+  private async lockAndPruneCandidates(
+    tx: Prisma.TransactionClient,
+    candidates: Candidate[],
+  ): Promise<Candidate[]> {
+    const householdIds = [
+      ...new Set(
+        candidates.flatMap((candidate) =>
+          candidate.kind === 'IMMEDIATE_ITEM'
+            ? [candidate.householdId!]
+            : 'households' in candidate.content
+              ? candidate.content.households.map((group) => group.householdId)
+              : [],
+        ),
+      ),
+    ].sort();
+    if (!householdIds.length) return [];
+    const activeHouseholds = await tx.$queryRaw<Array<{ id: string }>>`
+      SELECT "id" FROM "Household"
+      WHERE "id" IN (${Prisma.join(householdIds)})
+        AND "deletionRequestId" IS NULL
+      ORDER BY "id" FOR SHARE
+    `;
+    const active = new Set(activeHouseholds.map((row) => row.id));
+    if (!active.size) return [];
+    const ids = [
+      ...new Set(
+        candidates.flatMap((candidate) =>
+          candidate.kind === 'IMMEDIATE_ITEM'
+            ? [candidate.itemId!]
+            : candidate.content && 'households' in candidate.content
+              ? candidate.content.households.flatMap((group) =>
+                  group.items.map((item) => item.itemId),
+                )
+              : [],
+        ),
+      ),
+    ].sort();
+    if (!ids.length) return [];
+    const rows = await tx.$queryRaw<Array<{ id: string; householdId: string }>>`
+      SELECT "id", "householdId" FROM "InventoryItem"
+      WHERE "id" IN (${Prisma.join(ids)}) AND "archivedAt" IS NULL
+        AND "householdId" IN (${Prisma.join([...active])})
+      ORDER BY "id" FOR SHARE
+    `;
+    const valid = new Set(rows.map((row) => `${row.householdId}:${row.id}`));
+    return candidates.flatMap((candidate) => {
+      if (candidate.kind === 'IMMEDIATE_ITEM')
+        return active.has(candidate.householdId!) &&
+          valid.has(`${candidate.householdId}:${candidate.itemId}`)
+          ? [candidate]
+          : [];
+      if (!('households' in candidate.content)) return [];
+      const households = candidate.content.households
+        .map((group) => ({
+          ...group,
+          items: group.items.filter(
+            (item) =>
+              active.has(group.householdId) &&
+              valid.has(`${group.householdId}:${item.itemId}`),
+          ),
+        }))
+        .filter((group) => group.items.length > 0);
+      return households.length
+        ? [{ ...candidate, content: { households } }]
+        : [];
+    });
   }
 
   async attention(userId: string, at = new Date()) {
@@ -127,21 +218,25 @@ export class NotificationEvaluatorService {
       : candidates;
     if (!preference || !selected.length) return { created: 0 };
     const quietEnd = localQuietEnd(at, preference);
-    const result = await this.prisma.notificationIntent.createMany({
-      data: selected.map((candidate) => ({
-        userId,
-        kind: candidate.kind,
-        status: quietEnd ? ('DEFERRED' as const) : ('PENDING' as const),
-        localDay: localCalendarDate(at),
-        subjectKey: candidate.subjectKey,
-        householdId: candidate.householdId,
-        itemId: candidate.itemId,
-        content: candidate.content,
-        dueAt: quietEnd ?? at,
-      })),
-      skipDuplicates: true,
+    return this.prisma.$transaction(async (tx) => {
+      const current = await this.lockAndPruneCandidates(tx, selected);
+      if (!current.length) return { created: 0 };
+      const result = await tx.notificationIntent.createMany({
+        data: current.map((candidate) => ({
+          userId,
+          kind: candidate.kind,
+          status: quietEnd ? ('DEFERRED' as const) : ('PENDING' as const),
+          localDay: localCalendarDate(at),
+          subjectKey: candidate.subjectKey,
+          householdId: candidate.householdId,
+          itemId: candidate.itemId,
+          content: candidate.content,
+          dueAt: quietEnd ?? at,
+        })),
+        skipDuplicates: true,
+      });
+      return { created: result.count };
     });
-    return { created: result.count };
   }
 
   async evaluateEligibleUsers(
@@ -228,24 +323,26 @@ export class NotificationEvaluatorService {
     );
     if (!candidate) return { ready: false, reason: 'STALE_CANDIDATE' as const };
     if (overnightDigest) {
-      await this.prisma.notificationIntent.createMany({
-        data: [
-          {
-            userId: intent.userId,
-            kind: 'DAILY_DIGEST',
-            status: 'PENDING',
-            localDay: today,
-            subjectKey: 'all',
-            householdId: null,
-            itemId: null,
-            content: candidate.content,
-            dueAt: at,
-          },
-        ],
-        skipDuplicates: true,
-      });
-      const replacement =
-        await this.prisma.notificationIntent.findUniqueOrThrow({
+      const replacement = await this.prisma.$transaction(async (tx) => {
+        const current = await this.lockAndPruneCandidates(tx, [candidate]);
+        if (!current.length) return null;
+        await tx.notificationIntent.createMany({
+          data: [
+            {
+              userId: intent.userId,
+              kind: 'DAILY_DIGEST',
+              status: 'PENDING',
+              localDay: today,
+              subjectKey: 'all',
+              householdId: null,
+              itemId: null,
+              content: current[0].content,
+              dueAt: at,
+            },
+          ],
+          skipDuplicates: true,
+        });
+        return tx.notificationIntent.findUniqueOrThrow({
           where: {
             userId_kind_localDay_subjectKey: {
               userId: intent.userId,
@@ -256,6 +353,9 @@ export class NotificationEvaluatorService {
           },
           select: { id: true },
         });
+      });
+      if (!replacement)
+        return { ready: false, reason: 'STALE_CANDIDATE' as const };
       return {
         ready: false,
         reason: 'ROLLED_OVER' as const,

@@ -40,6 +40,8 @@ export type StockBatchMinAggregateOutputType = {
   locationId: string | null
   quantity: runtime.Decimal | null
   expiryDate: Date | null
+  purchaseDate: Date | null
+  freezeDate: Date | null
   openedAt: Date | null
   openedUseByDate: Date | null
   createdAt: Date | null
@@ -51,6 +53,8 @@ export type StockBatchMaxAggregateOutputType = {
   locationId: string | null
   quantity: runtime.Decimal | null
   expiryDate: Date | null
+  purchaseDate: Date | null
+  freezeDate: Date | null
   openedAt: Date | null
   openedUseByDate: Date | null
   createdAt: Date | null
@@ -62,6 +66,8 @@ export type StockBatchCountAggregateOutputType = {
   locationId: number
   quantity: number
   expiryDate: number
+  purchaseDate: number
+  freezeDate: number
   openedAt: number
   openedUseByDate: number
   createdAt: number
@@ -83,6 +89,8 @@ export type StockBatchMinAggregateInputType = {
   locationId?: true
   quantity?: true
   expiryDate?: true
+  purchaseDate?: true
+  freezeDate?: true
   openedAt?: true
   openedUseByDate?: true
   createdAt?: true
@@ -94,6 +102,8 @@ export type StockBatchMaxAggregateInputType = {
   locationId?: true
   quantity?: true
   expiryDate?: true
+  purchaseDate?: true
+  freezeDate?: true
   openedAt?: true
   openedUseByDate?: true
   createdAt?: true
@@ -105,6 +115,8 @@ export type StockBatchCountAggregateInputType = {
   locationId?: true
   quantity?: true
   expiryDate?: true
+  purchaseDate?: true
+  freezeDate?: true
   openedAt?: true
   openedUseByDate?: true
   createdAt?: true
@@ -203,6 +215,8 @@ export type StockBatchGroupByOutputType = {
   locationId: string | null
   quantity: runtime.Decimal
   expiryDate: Date | null
+  purchaseDate: Date | null
+  freezeDate: Date | null
   openedAt: Date | null
   openedUseByDate: Date | null
   createdAt: Date
@@ -237,6 +251,8 @@ export type StockBatchWhereInput = {
   locationId?: Prisma.StringNullableFilter<"StockBatch"> | string | null
   quantity?: Prisma.DecimalFilter<"StockBatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.DateTimeNullableFilter<"StockBatch"> | Date | string | null
+  purchaseDate?: Prisma.DateTimeNullableFilter<"StockBatch"> | Date | string | null
+  freezeDate?: Prisma.DateTimeNullableFilter<"StockBatch"> | Date | string | null
   openedAt?: Prisma.DateTimeNullableFilter<"StockBatch"> | Date | string | null
   openedUseByDate?: Prisma.DateTimeNullableFilter<"StockBatch"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"StockBatch"> | Date | string
@@ -253,6 +269,8 @@ export type StockBatchOrderByWithRelationInput = {
   locationId?: Prisma.SortOrderInput | Prisma.SortOrder
   quantity?: Prisma.SortOrder
   expiryDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  purchaseDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  freezeDate?: Prisma.SortOrderInput | Prisma.SortOrder
   openedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   openedUseByDate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -272,6 +290,8 @@ export type StockBatchWhereUniqueInput = Prisma.AtLeast<{
   locationId?: Prisma.StringNullableFilter<"StockBatch"> | string | null
   quantity?: Prisma.DecimalFilter<"StockBatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.DateTimeNullableFilter<"StockBatch"> | Date | string | null
+  purchaseDate?: Prisma.DateTimeNullableFilter<"StockBatch"> | Date | string | null
+  freezeDate?: Prisma.DateTimeNullableFilter<"StockBatch"> | Date | string | null
   openedAt?: Prisma.DateTimeNullableFilter<"StockBatch"> | Date | string | null
   openedUseByDate?: Prisma.DateTimeNullableFilter<"StockBatch"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"StockBatch"> | Date | string
@@ -288,6 +308,8 @@ export type StockBatchOrderByWithAggregationInput = {
   locationId?: Prisma.SortOrderInput | Prisma.SortOrder
   quantity?: Prisma.SortOrder
   expiryDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  purchaseDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  freezeDate?: Prisma.SortOrderInput | Prisma.SortOrder
   openedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   openedUseByDate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -307,6 +329,8 @@ export type StockBatchScalarWhereWithAggregatesInput = {
   locationId?: Prisma.StringNullableWithAggregatesFilter<"StockBatch"> | string | null
   quantity?: Prisma.DecimalWithAggregatesFilter<"StockBatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.DateTimeNullableWithAggregatesFilter<"StockBatch"> | Date | string | null
+  purchaseDate?: Prisma.DateTimeNullableWithAggregatesFilter<"StockBatch"> | Date | string | null
+  freezeDate?: Prisma.DateTimeNullableWithAggregatesFilter<"StockBatch"> | Date | string | null
   openedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"StockBatch"> | Date | string | null
   openedUseByDate?: Prisma.DateTimeNullableWithAggregatesFilter<"StockBatch"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"StockBatch"> | Date | string
@@ -316,6 +340,8 @@ export type StockBatchCreateInput = {
   id?: string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   openedAt?: Date | string | null
   openedUseByDate?: Date | string | null
   createdAt?: Date | string
@@ -332,6 +358,8 @@ export type StockBatchUncheckedCreateInput = {
   locationId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   openedAt?: Date | string | null
   openedUseByDate?: Date | string | null
   createdAt?: Date | string
@@ -344,6 +372,8 @@ export type StockBatchUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -360,6 +390,8 @@ export type StockBatchUncheckedUpdateInput = {
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -374,6 +406,8 @@ export type StockBatchCreateManyInput = {
   locationId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   openedAt?: Date | string | null
   openedUseByDate?: Date | string | null
   createdAt?: Date | string
@@ -383,6 +417,8 @@ export type StockBatchUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -394,6 +430,8 @@ export type StockBatchUncheckedUpdateManyInput = {
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -415,6 +453,8 @@ export type StockBatchCountOrderByAggregateInput = {
   locationId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   expiryDate?: Prisma.SortOrder
+  purchaseDate?: Prisma.SortOrder
+  freezeDate?: Prisma.SortOrder
   openedAt?: Prisma.SortOrder
   openedUseByDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -430,6 +470,8 @@ export type StockBatchMaxOrderByAggregateInput = {
   locationId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   expiryDate?: Prisma.SortOrder
+  purchaseDate?: Prisma.SortOrder
+  freezeDate?: Prisma.SortOrder
   openedAt?: Prisma.SortOrder
   openedUseByDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -441,6 +483,8 @@ export type StockBatchMinOrderByAggregateInput = {
   locationId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   expiryDate?: Prisma.SortOrder
+  purchaseDate?: Prisma.SortOrder
+  freezeDate?: Prisma.SortOrder
   openedAt?: Prisma.SortOrder
   openedUseByDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -539,14 +583,6 @@ export type StockBatchUncheckedUpdateManyWithoutItemNestedInput = {
   deleteMany?: Prisma.StockBatchScalarWhereInput | Prisma.StockBatchScalarWhereInput[]
 }
 
-export type DecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
 export type StockBatchCreateNestedOneWithoutOpenSourcesInput = {
   create?: Prisma.XOR<Prisma.StockBatchCreateWithoutOpenSourcesInput, Prisma.StockBatchUncheckedCreateWithoutOpenSourcesInput>
   connectOrCreate?: Prisma.StockBatchCreateOrConnectWithoutOpenSourcesInput
@@ -593,6 +629,8 @@ export type StockBatchCreateWithoutLocationInput = {
   id?: string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   openedAt?: Date | string | null
   openedUseByDate?: Date | string | null
   createdAt?: Date | string
@@ -607,6 +645,8 @@ export type StockBatchUncheckedCreateWithoutLocationInput = {
   itemId: string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   openedAt?: Date | string | null
   openedUseByDate?: Date | string | null
   createdAt?: Date | string
@@ -650,6 +690,8 @@ export type StockBatchScalarWhereInput = {
   locationId?: Prisma.StringNullableFilter<"StockBatch"> | string | null
   quantity?: Prisma.DecimalFilter<"StockBatch"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.DateTimeNullableFilter<"StockBatch"> | Date | string | null
+  purchaseDate?: Prisma.DateTimeNullableFilter<"StockBatch"> | Date | string | null
+  freezeDate?: Prisma.DateTimeNullableFilter<"StockBatch"> | Date | string | null
   openedAt?: Prisma.DateTimeNullableFilter<"StockBatch"> | Date | string | null
   openedUseByDate?: Prisma.DateTimeNullableFilter<"StockBatch"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"StockBatch"> | Date | string
@@ -659,6 +701,8 @@ export type StockBatchCreateWithoutItemInput = {
   id?: string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   openedAt?: Date | string | null
   openedUseByDate?: Date | string | null
   createdAt?: Date | string
@@ -673,6 +717,8 @@ export type StockBatchUncheckedCreateWithoutItemInput = {
   locationId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   openedAt?: Date | string | null
   openedUseByDate?: Date | string | null
   createdAt?: Date | string
@@ -711,6 +757,8 @@ export type StockBatchCreateWithoutOpenSourcesInput = {
   id?: string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   openedAt?: Date | string | null
   openedUseByDate?: Date | string | null
   createdAt?: Date | string
@@ -726,6 +774,8 @@ export type StockBatchUncheckedCreateWithoutOpenSourcesInput = {
   locationId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   openedAt?: Date | string | null
   openedUseByDate?: Date | string | null
   createdAt?: Date | string
@@ -742,6 +792,8 @@ export type StockBatchCreateWithoutOpenTargetsInput = {
   id?: string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   openedAt?: Date | string | null
   openedUseByDate?: Date | string | null
   createdAt?: Date | string
@@ -757,6 +809,8 @@ export type StockBatchUncheckedCreateWithoutOpenTargetsInput = {
   locationId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   openedAt?: Date | string | null
   openedUseByDate?: Date | string | null
   createdAt?: Date | string
@@ -784,6 +838,8 @@ export type StockBatchUpdateWithoutOpenSourcesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -799,6 +855,8 @@ export type StockBatchUncheckedUpdateWithoutOpenSourcesInput = {
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -821,6 +879,8 @@ export type StockBatchUpdateWithoutOpenTargetsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -836,6 +896,8 @@ export type StockBatchUncheckedUpdateWithoutOpenTargetsInput = {
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -847,6 +909,8 @@ export type StockBatchCreateWithoutAllocationsInput = {
   id?: string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   openedAt?: Date | string | null
   openedUseByDate?: Date | string | null
   createdAt?: Date | string
@@ -862,6 +926,8 @@ export type StockBatchUncheckedCreateWithoutAllocationsInput = {
   locationId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   openedAt?: Date | string | null
   openedUseByDate?: Date | string | null
   createdAt?: Date | string
@@ -889,6 +955,8 @@ export type StockBatchUpdateWithoutAllocationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -904,6 +972,8 @@ export type StockBatchUncheckedUpdateWithoutAllocationsInput = {
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -916,6 +986,8 @@ export type StockBatchCreateManyLocationInput = {
   itemId: string
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   openedAt?: Date | string | null
   openedUseByDate?: Date | string | null
   createdAt?: Date | string
@@ -925,6 +997,8 @@ export type StockBatchUpdateWithoutLocationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -939,6 +1013,8 @@ export type StockBatchUncheckedUpdateWithoutLocationInput = {
   itemId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -952,6 +1028,8 @@ export type StockBatchUncheckedUpdateManyWithoutLocationInput = {
   itemId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -962,6 +1040,8 @@ export type StockBatchCreateManyItemInput = {
   locationId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Date | string | null
+  purchaseDate?: Date | string | null
+  freezeDate?: Date | string | null
   openedAt?: Date | string | null
   openedUseByDate?: Date | string | null
   createdAt?: Date | string
@@ -971,6 +1051,8 @@ export type StockBatchUpdateWithoutItemInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -985,6 +1067,8 @@ export type StockBatchUncheckedUpdateWithoutItemInput = {
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -998,6 +1082,8 @@ export type StockBatchUncheckedUpdateManyWithoutItemInput = {
   locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   expiryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchaseDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  freezeDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   openedUseByDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1058,6 +1144,8 @@ export type StockBatchSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   locationId?: boolean
   quantity?: boolean
   expiryDate?: boolean
+  purchaseDate?: boolean
+  freezeDate?: boolean
   openedAt?: boolean
   openedUseByDate?: boolean
   createdAt?: boolean
@@ -1075,6 +1163,8 @@ export type StockBatchSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   locationId?: boolean
   quantity?: boolean
   expiryDate?: boolean
+  purchaseDate?: boolean
+  freezeDate?: boolean
   openedAt?: boolean
   openedUseByDate?: boolean
   createdAt?: boolean
@@ -1088,6 +1178,8 @@ export type StockBatchSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   locationId?: boolean
   quantity?: boolean
   expiryDate?: boolean
+  purchaseDate?: boolean
+  freezeDate?: boolean
   openedAt?: boolean
   openedUseByDate?: boolean
   createdAt?: boolean
@@ -1101,12 +1193,14 @@ export type StockBatchSelectScalar = {
   locationId?: boolean
   quantity?: boolean
   expiryDate?: boolean
+  purchaseDate?: boolean
+  freezeDate?: boolean
   openedAt?: boolean
   openedUseByDate?: boolean
   createdAt?: boolean
 }
 
-export type StockBatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "itemId" | "locationId" | "quantity" | "expiryDate" | "openedAt" | "openedUseByDate" | "createdAt", ExtArgs["result"]["stockBatch"]>
+export type StockBatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "itemId" | "locationId" | "quantity" | "expiryDate" | "purchaseDate" | "freezeDate" | "openedAt" | "openedUseByDate" | "createdAt", ExtArgs["result"]["stockBatch"]>
 export type StockBatchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   item?: boolean | Prisma.InventoryItemDefaultArgs<ExtArgs>
   location?: boolean | Prisma.StockBatch$locationArgs<ExtArgs>
@@ -1139,6 +1233,8 @@ export type $StockBatchPayload<ExtArgs extends runtime.Types.Extensions.Internal
     locationId: string | null
     quantity: runtime.Decimal
     expiryDate: Date | null
+    purchaseDate: Date | null
+    freezeDate: Date | null
     openedAt: Date | null
     openedUseByDate: Date | null
     createdAt: Date
@@ -1575,6 +1671,8 @@ export interface StockBatchFieldRefs {
   readonly locationId: Prisma.FieldRef<"StockBatch", 'String'>
   readonly quantity: Prisma.FieldRef<"StockBatch", 'Decimal'>
   readonly expiryDate: Prisma.FieldRef<"StockBatch", 'DateTime'>
+  readonly purchaseDate: Prisma.FieldRef<"StockBatch", 'DateTime'>
+  readonly freezeDate: Prisma.FieldRef<"StockBatch", 'DateTime'>
   readonly openedAt: Prisma.FieldRef<"StockBatch", 'DateTime'>
   readonly openedUseByDate: Prisma.FieldRef<"StockBatch", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"StockBatch", 'DateTime'>

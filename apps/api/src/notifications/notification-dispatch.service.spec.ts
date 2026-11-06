@@ -216,6 +216,11 @@ function setup(
       ),
     },
   };
+  Object.assign(prisma, {
+    $transaction: (
+      run: (tx: { $queryRaw: () => Promise<{ id: string }[]> }) => unknown,
+    ) => run({ $queryRaw: vi.fn().mockResolvedValue([{ id: 'home' }]) }),
+  });
   const evaluator = {
     revalidateIntent: vi.fn().mockResolvedValue({ ready: true, content }),
   };
@@ -232,6 +237,59 @@ function setup(
 }
 
 describe('Notification delivery lifecycle (fake transport)', () => {
+  it('removes a pending household from a multi-household digest at send time', async () => {
+    const { service, prisma, evaluator, transport } = setup([
+      'https://push.invalid/a',
+    ]);
+    evaluator.revalidateIntent.mockResolvedValue({
+      ready: true,
+      content: {
+        households: [
+          {
+            householdId: 'pending',
+            items: [{ itemId: 'one', signals: ['LOW_STOCK'] }],
+          },
+          {
+            householdId: 'home',
+            items: [{ itemId: 'two', signals: ['USE_SOON'] }],
+          },
+        ],
+      },
+    });
+    const lock = vi.fn().mockResolvedValue([{ id: 'home' }]);
+    Object.assign(prisma, {
+      $transaction: (run: (tx: { $queryRaw: typeof lock }) => unknown) =>
+        run({ $queryRaw: lock }),
+    });
+    const result = await service.dispatchDue(at);
+    expect(result.accepted).toBe(1);
+    expect(transport.send).toHaveBeenCalledWith(expect.anything(), {
+      households: [
+        {
+          householdId: 'home',
+          items: [{ itemId: 'two', signals: ['USE_SOON'] }],
+        },
+      ],
+    });
+  });
+  it('holds an item lock before immediate send and skips if deletion already won', async () => {
+    const { service, prisma, evaluator, transport } = setup([
+      'https://push.invalid/a',
+    ]);
+    evaluator.revalidateIntent.mockResolvedValue({
+      ready: true,
+      content: { signal: 'OUT', householdId: 'home', itemId: 'item' },
+    });
+    const lock = vi.fn().mockResolvedValue([]);
+    Object.assign(prisma, {
+      $transaction: (run: (tx: { $queryRaw: typeof lock }) => unknown) =>
+        run({ $queryRaw: lock }),
+    });
+    const result = await service.dispatchDue(at);
+    expect(result.skipped).toBe(1);
+    expect(lock).toHaveBeenCalledOnce();
+    expect(transport.send).not.toHaveBeenCalled();
+  });
   it('limits automated due scans and claim recovery to post-activation intents', async () => {
     const { service, prisma, evaluator, transport } = setup();
     const cutoff = new Date('2026-10-15T00:00:00.000Z');

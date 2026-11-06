@@ -3,6 +3,8 @@ import { Prisma } from '../generated/prisma/browser.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { StockIntelligenceService } from './stock-intelligence.service.js';
 import { withOpenedStock } from './inventory.service.js';
+import { requireActiveHousehold } from '../households/active-household.js';
+import type { Prisma as PrismaTypes } from '../generated/prisma/client.js';
 
 type Assessment = Awaited<
   ReturnType<StockIntelligenceService['assessHousehold']>
@@ -110,8 +112,8 @@ export class InventoryReadService {
     private readonly intelligence: StockIntelligenceService,
   ) {}
 
-  private loadItems(householdId: string) {
-    return this.prisma.inventoryItem.findMany({
+  private loadItems(tx: PrismaTypes.TransactionClient, householdId: string) {
+    return tx.inventoryItem.findMany({
       where: { householdId, archivedAt: null },
       include: {
         category: { select: { id: true, name: true } },
@@ -140,54 +142,61 @@ export class InventoryReadService {
     input: InventoryReadQuery,
   ) {
     const query = parseQuery(input);
-    const intelligence = await this.intelligence.assessHousehold(
-      actorId,
-      householdId,
-    );
-    const assessments = new Map(
-      intelligence.assessments.map((assessment) => [
-        assessment.itemId,
-        assessment,
-      ]),
-    );
-    const items = await this.loadItems(householdId);
-    const filtered = items.filter((item) => {
-      const assessment = assessments.get(item.id);
-      return (
-        assessment !== undefined &&
-        (!query.q || item.name.toLocaleLowerCase('en-US').includes(query.q)) &&
-        (!query.categoryId || item.categoryId === query.categoryId) &&
-        (!query.tagId ||
-          item.tagLinks.some((link) => link.tagId === query.tagId)) &&
-        (!query.locationId || hasLocation(item, query.locationId)) &&
-        (query.status !== 'OPENED' ||
-          item.batches.some(
-            (batch) => batch.openedAt !== null && batch.quantity.gt(0),
-          )) &&
-        statusMatches(assessment, query.status)
+    return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
+      const intelligence = await this.intelligence.assessInTransaction(
+        tx,
+        actorId,
+        householdId,
       );
+      const assessments = new Map(
+        intelligence.assessments.map((assessment) => [
+          assessment.itemId,
+          assessment,
+        ]),
+      );
+      const items = await this.loadItems(tx, householdId);
+      const filtered = items.filter((item) => {
+        const assessment = assessments.get(item.id);
+        return (
+          assessment !== undefined &&
+          (!query.q ||
+            item.name.toLocaleLowerCase('en-US').includes(query.q)) &&
+          (!query.categoryId || item.categoryId === query.categoryId) &&
+          (!query.tagId ||
+            item.tagLinks.some((link) => link.tagId === query.tagId)) &&
+          (!query.locationId || hasLocation(item, query.locationId)) &&
+          (query.status !== 'OPENED' ||
+            item.batches.some(
+              (batch) => batch.openedAt !== null && batch.quantity.gt(0),
+            )) &&
+          statusMatches(assessment, query.status)
+        );
+      });
+      const result = {
+        items: filtered.map((item) => ({
+          item: withOpenedStock(item),
+          assessment: assessments.get(item.id)!,
+        })),
+        ...(query.groupBy === 'none'
+          ? {}
+          : {
+              groups: await this.groups(
+                tx,
+                householdId,
+                filtered,
+                assessments,
+                query.groupBy,
+                query.locationId,
+              ),
+            }),
+      };
+      return result;
     });
-    const result = {
-      items: filtered.map((item) => ({
-        item: withOpenedStock(item),
-        assessment: assessments.get(item.id)!,
-      })),
-      ...(query.groupBy === 'none'
-        ? {}
-        : {
-            groups: await this.groups(
-              householdId,
-              filtered,
-              assessments,
-              query.groupBy,
-              query.locationId,
-            ),
-          }),
-    };
-    return result;
   }
 
   private async groups(
+    tx: PrismaTypes.TransactionClient,
     householdId: string,
     items: ItemRow[],
     assessments: Map<string, Assessment>,
@@ -198,7 +207,7 @@ export class InventoryReadService {
       groupBy === 'location'
         ? new Map(
             (
-              await this.prisma.location.findMany({
+              await tx.location.findMany({
                 where: { householdId },
                 select: { id: true, name: true },
               })

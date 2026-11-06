@@ -40,6 +40,21 @@ describe('Catalog rename and safe removal (database)', () => {
     await prisma.inventoryItemTag.deleteMany({
       where: { item: { householdId: { in: households } } },
     });
+    await prisma.inventoryUndo.deleteMany({
+      where: { householdId: { in: households } },
+    });
+    await prisma.openTransfer.deleteMany({
+      where: { action: { householdId: { in: households } } },
+    });
+    await prisma.actionBatchAllocation.deleteMany({
+      where: { action: { householdId: { in: households } } },
+    });
+    await prisma.inventoryAction.deleteMany({
+      where: { householdId: { in: households } },
+    });
+    await prisma.inventoryStateAction.deleteMany({
+      where: { householdId: { in: households } },
+    });
     await prisma.stockBatch.deleteMany({
       where: { item: { householdId: { in: households } } },
     });
@@ -53,6 +68,9 @@ describe('Catalog rename and safe removal (database)', () => {
       where: { householdId: { in: households } },
     });
     await prisma.tag.deleteMany({
+      where: { householdId: { in: households } },
+    });
+    await prisma.householdInvitation.deleteMany({
       where: { householdId: { in: households } },
     });
     await prisma.membership.deleteMany({

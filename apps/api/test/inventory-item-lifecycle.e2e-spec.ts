@@ -33,6 +33,30 @@ describe('Inventory item lifecycle HTTP (database)', () => {
       where: { itemId: { in: itemIds } },
       select: { id: true },
     });
+    const intentIds = (
+      await prisma.notificationIntent.findMany({
+        where: { householdId: { in: households } },
+        select: { id: true },
+      })
+    ).map((intent) => intent.id);
+    await prisma.notificationDelivery.deleteMany({
+      where: { intentId: { in: intentIds } },
+    });
+    await prisma.notificationIntent.deleteMany({
+      where: { id: { in: intentIds } },
+    });
+    await prisma.tripStockCheck.deleteMany({
+      where: { itemId: { in: itemIds } },
+    });
+    await prisma.locationStockCheck.deleteMany({
+      where: { itemId: { in: itemIds } },
+    });
+    await prisma.inventoryUndo.deleteMany({
+      where: { itemId: { in: itemIds } },
+    });
+    await prisma.inventoryStateAction.deleteMany({
+      where: { itemId: { in: itemIds } },
+    });
     await prisma.inventoryItemChange.deleteMany({
       where: { itemId: { in: itemIds } },
     });
@@ -43,6 +67,9 @@ describe('Inventory item lifecycle HTTP (database)', () => {
       where: { householdId: { in: households } },
     });
     await prisma.actionBatchAllocation.deleteMany({
+      where: { actionId: { in: actions.map((action) => action.id) } },
+    });
+    await prisma.openTransfer.deleteMany({
       where: { actionId: { in: actions.map((action) => action.id) } },
     });
     await prisma.inventoryAction.deleteMany({
@@ -124,6 +151,53 @@ describe('Inventory item lifecycle HTTP (database)', () => {
       })
       .expect(201);
     return response.body.id as string;
+  }
+
+  async function createdItem(
+    cookie: string,
+    householdId: string,
+    locationId: string,
+    trackingMode: 'QUANTITY' | 'FIVE_LEVEL' | 'PRESENCE_BACKUP',
+    initialStock: Record<string, unknown>,
+  ) {
+    const category = await prisma.category.create({
+      data: {
+        householdId,
+        name: `Category ${randomUUID()}`,
+        nameKey: randomUUID(),
+      },
+    });
+    const name = `Accidental ${randomUUID()}`;
+    const response = await request(app.getHttpServer())
+      .post(`/api/households/${householdId}/items`)
+      .set('Cookie', cookie)
+      .send({
+        name,
+        primaryUnit: 'box',
+        trackingMode,
+        categoryId: category.id,
+        locationId,
+        initialStock,
+      })
+      .expect(201);
+    return { id: response.body.id as string, name };
+  }
+
+  async function archiveAndDelete(
+    cookie: string,
+    householdId: string,
+    itemId: string,
+    name: string,
+  ) {
+    const path = `/api/households/${householdId}/items/${itemId}`;
+    await request(app.getHttpServer())
+      .post(`${path}/archive`)
+      .set('Cookie', cookie)
+      .expect(201);
+    return request(app.getHttpServer())
+      .delete(path)
+      .set('Cookie', cookie)
+      .send({ confirmName: name });
   }
 
   it('edits metadata, retains stock/history, and restores archived stock', async () => {
@@ -504,5 +578,435 @@ describe('Inventory item lifecycle HTTP (database)', () => {
       actualQuantity: '2',
     });
     expect(await prisma.stockBatch.count({ where: { itemId } })).toBe(1);
+  });
+
+  it('permanently deletes archived accidental stock in all modes while preserving catalog and other items', async () => {
+    const admin = await register();
+    const home = await household(admin.cookie);
+    const location = await prisma.location.create({
+      data: {
+        householdId: home,
+        name: 'Delete fixture shelf',
+        nameKey: randomUUID(),
+      },
+    });
+    const survivor = await createdItem(
+      admin.cookie,
+      home,
+      location.id,
+      'QUANTITY',
+      { quantity: '2' },
+    );
+    for (const [mode, stock] of [
+      ['QUANTITY', { quantity: '0' }],
+      ['QUANTITY', { quantity: '12' }],
+      ['FIVE_LEVEL', { level: 'HALF', backupCount: 2 }],
+      ['PRESENCE_BACKUP', { present: true, backupCount: 1 }],
+    ] as const) {
+      const created = await createdItem(
+        admin.cookie,
+        home,
+        location.id,
+        mode,
+        stock,
+      );
+      await request(app.getHttpServer())
+        .patch(`/api/households/${home}/items/${created.id}`)
+        .set('Cookie', admin.cookie)
+        .send({ name: `${created.name} edited` })
+        .expect(200);
+      const name = `${created.name} edited`;
+      const result = await archiveAndDelete(
+        admin.cookie,
+        home,
+        created.id,
+        name,
+      );
+      expect(result.status).toBe(204);
+      expect(
+        await prisma.inventoryItem.findUnique({ where: { id: created.id } }),
+      ).toBeNull();
+      expect(
+        await prisma.inventoryAction.count({ where: { itemId: created.id } }),
+      ).toBe(0);
+      expect(
+        await prisma.inventoryStateAction.count({
+          where: { itemId: created.id },
+        }),
+      ).toBe(0);
+      expect(
+        await prisma.stockBatch.count({ where: { itemId: created.id } }),
+      ).toBe(0);
+      expect(
+        await prisma.inventoryItemChange.count({
+          where: { itemId: created.id },
+        }),
+      ).toBe(0);
+    }
+    expect(
+      await prisma.inventoryItem.findUnique({ where: { id: survivor.id } }),
+    ).not.toBeNull();
+    expect(
+      await prisma.location.findUnique({ where: { id: location.id } }),
+    ).not.toBeNull();
+  });
+
+  it('requires own-household Admin and exact current name', async () => {
+    const admin = await register();
+    const member = await register();
+    const home = await household(admin.cookie);
+    const other = await household(member.cookie);
+    await prisma.membership.create({
+      data: { userId: member.id, householdId: home, role: 'MEMBER' },
+    });
+    const location = await prisma.location.create({
+      data: { householdId: home, name: 'Shelf', nameKey: randomUUID() },
+    });
+    const created = await createdItem(
+      admin.cookie,
+      home,
+      location.id,
+      'QUANTITY',
+      { quantity: '0' },
+    );
+    const path = `/api/households/${home}/items/${created.id}`;
+    await request(app.getHttpServer())
+      .delete(path)
+      .set('Cookie', admin.cookie)
+      .send({ confirmName: created.name })
+      .expect(409);
+    await request(app.getHttpServer())
+      .post(`${path}/archive`)
+      .set('Cookie', admin.cookie)
+      .expect(201);
+    await request(app.getHttpServer())
+      .delete(path)
+      .set('Cookie', member.cookie)
+      .send({ confirmName: created.name })
+      .expect(403);
+    await request(app.getHttpServer())
+      .delete(`/api/households/${other}/items/${created.id}`)
+      .set('Cookie', member.cookie)
+      .send({ confirmName: created.name })
+      .expect(404);
+    await request(app.getHttpServer())
+      .delete(path)
+      .set('Cookie', admin.cookie)
+      .send({ confirmName: created.name.toLowerCase() })
+      .expect(400);
+    await request(app.getHttpServer())
+      .delete(path)
+      .set('Cookie', admin.cookie)
+      .send({ confirmName: created.name, extra: true })
+      .expect(400);
+    expect(
+      await prisma.inventoryItem.findUnique({ where: { id: created.id } }),
+    ).not.toBeNull();
+  });
+
+  it('blocks later stock activity, every Shopping decision, and both stock-check references', async () => {
+    const admin = await register();
+    const home = await household(admin.cookie);
+    const location = await prisma.location.create({
+      data: { householdId: home, name: 'Shelf', nameKey: randomUUID() },
+    });
+    const used = await createdItem(
+      admin.cookie,
+      home,
+      location.id,
+      'QUANTITY',
+      { quantity: '5' },
+    );
+    await request(app.getHttpServer())
+      .post(`/api/households/${home}/items/${used.id}/use`)
+      .set('Cookie', admin.cookie)
+      .send({ quantity: '1' })
+      .expect(201);
+    expect(
+      (await archiveAndDelete(admin.cookie, home, used.id, used.name)).body
+        .message,
+    ).toBe('ITEM_HAS_STOCK_ACTION');
+    const restocked = await createdItem(
+      admin.cookie,
+      home,
+      location.id,
+      'QUANTITY',
+      { quantity: '0' },
+    );
+    await request(app.getHttpServer())
+      .post(`/api/households/${home}/items/${restocked.id}/restock`)
+      .set('Cookie', admin.cookie)
+      .send({ quantity: '1', locationId: location.id })
+      .expect(201);
+    expect(
+      (await archiveAndDelete(admin.cookie, home, restocked.id, restocked.name))
+        .body.message,
+    ).toBe('ITEM_HAS_STOCK_ACTION');
+    const leveled = await createdItem(
+      admin.cookie,
+      home,
+      location.id,
+      'FIVE_LEVEL',
+      { level: 'HALF', backupCount: 0 },
+    );
+    await request(app.getHttpServer())
+      .post(`/api/households/${home}/items/${leveled.id}/state/level`)
+      .set('Cookie', admin.cookie)
+      .send({ level: 'QUARTER' })
+      .expect(201);
+    expect(
+      (await archiveAndDelete(admin.cookie, home, leveled.id, leveled.name))
+        .body.message,
+    ).toBe('ITEM_HAS_STOCK_ACTION');
+    for (const status of [
+      'PENDING',
+      'PURCHASED',
+      'SKIPPED',
+      'MOVED',
+    ] as const) {
+      const created = await createdItem(
+        admin.cookie,
+        home,
+        location.id,
+        'QUANTITY',
+        { quantity: '0' },
+      );
+      await request(app.getHttpServer())
+        .post(`/api/households/${home}/items/${created.id}/archive`)
+        .set('Cookie', admin.cookie)
+        .expect(201);
+      const tripId = await trip(admin.cookie, home);
+      await prisma.shoppingEntry.create({
+        data: {
+          tripId,
+          itemId: created.id,
+          source: 'MANUAL',
+          priority: 'OPTIONAL',
+          status,
+        },
+      });
+      const result = await request(app.getHttpServer())
+        .delete(`/api/households/${home}/items/${created.id}`)
+        .set('Cookie', admin.cookie)
+        .send({ confirmName: created.name })
+        .expect(409);
+      expect(result.body.message).toBe('ITEM_HAS_SHOPPING_ENTRY');
+    }
+    const checked = await createdItem(
+      admin.cookie,
+      home,
+      location.id,
+      'QUANTITY',
+      { quantity: '0' },
+    );
+    await request(app.getHttpServer())
+      .post(`/api/households/${home}/items/${checked.id}/archive`)
+      .set('Cookie', admin.cookie)
+      .expect(201);
+    const tripId = await trip(admin.cookie, home);
+    await prisma.tripStockCheck.create({
+      data: { tripId, itemId: checked.id, revision: 0 },
+    });
+    let result = await request(app.getHttpServer())
+      .delete(`/api/households/${home}/items/${checked.id}`)
+      .set('Cookie', admin.cookie)
+      .send({ confirmName: checked.name })
+      .expect(409);
+    expect(result.body.message).toBe('ITEM_HAS_STOCK_CHECK');
+    await prisma.tripStockCheck.delete({
+      where: { tripId_itemId: { tripId, itemId: checked.id } },
+    });
+    await prisma.locationStockCheck.create({
+      data: {
+        householdId: home,
+        locationId: location.id,
+        itemId: checked.id,
+        revision: 0,
+      },
+    });
+    result = await request(app.getHttpServer())
+      .delete(`/api/households/${home}/items/${checked.id}`)
+      .set('Cookie', admin.cookie)
+      .send({ confirmName: checked.name })
+      .expect(409);
+    expect(result.body.message).toBe('ITEM_HAS_STOCK_CHECK');
+  });
+
+  it('removes only the deleted item from notification records and rolls back on an in-flight send', async () => {
+    const admin = await register();
+    const home = await household(admin.cookie);
+    const location = await prisma.location.create({
+      data: { householdId: home, name: 'Shelf', nameKey: randomUUID() },
+    });
+    const doomed = await createdItem(
+      admin.cookie,
+      home,
+      location.id,
+      'QUANTITY',
+      { quantity: '0' },
+    );
+    const survivor = await createdItem(
+      admin.cookie,
+      home,
+      location.id,
+      'QUANTITY',
+      { quantity: '0' },
+    );
+    const immediate = await prisma.notificationIntent.create({
+      data: {
+        userId: admin.id,
+        kind: 'IMMEDIATE_ITEM',
+        status: 'PENDING',
+        localDay: '2026-10-27',
+        subjectKey: `${home}:${doomed.id}`,
+        householdId: home,
+        itemId: doomed.id,
+        content: { signal: 'OUT', householdId: home, itemId: doomed.id },
+        dueAt: new Date(),
+      },
+    });
+    const digest = await prisma.notificationIntent.create({
+      data: {
+        userId: admin.id,
+        kind: 'DAILY_DIGEST',
+        status: 'PENDING',
+        localDay: '2026-10-27',
+        subjectKey: 'all',
+        content: {
+          households: [
+            {
+              householdId: home,
+              items: [
+                { itemId: doomed.id, signals: ['LOW_STOCK'] },
+                { itemId: survivor.id, signals: ['USE_SOON'] },
+              ],
+            },
+          ],
+        },
+        dueAt: new Date(),
+      },
+    });
+    await prisma.notificationDelivery.create({
+      data: {
+        intentId: immediate.id,
+        subscriptionKey: 'a'.repeat(64),
+        status: 'CLAIMED',
+      },
+    });
+    await request(app.getHttpServer())
+      .post(`/api/households/${home}/items/${doomed.id}/archive`)
+      .set('Cookie', admin.cookie)
+      .expect(201);
+    const path = `/api/households/${home}/items/${doomed.id}`;
+    const blocked = await request(app.getHttpServer())
+      .delete(path)
+      .set('Cookie', admin.cookie)
+      .send({ confirmName: doomed.name })
+      .expect(409);
+    expect(blocked.body.message).toBe('ITEM_NOTIFICATION_IN_FLIGHT');
+    expect(
+      await prisma.inventoryItem.findUnique({ where: { id: doomed.id } }),
+    ).not.toBeNull();
+    expect(
+      await prisma.notificationIntent.findUnique({
+        where: { id: immediate.id },
+      }),
+    ).not.toBeNull();
+    await prisma.notificationDelivery.updateMany({
+      where: { intentId: immediate.id },
+      data: { status: 'SKIPPED' },
+    });
+    await request(app.getHttpServer())
+      .delete(path)
+      .set('Cookie', admin.cookie)
+      .send({ confirmName: doomed.name })
+      .expect(204);
+    expect(
+      await prisma.notificationIntent.findUnique({
+        where: { id: immediate.id },
+      }),
+    ).toBeNull();
+    const currentDigest = await prisma.notificationIntent.findUniqueOrThrow({
+      where: { id: digest.id },
+    });
+    expect(JSON.stringify(currentDigest.content)).not.toContain(doomed.id);
+    expect(JSON.stringify(currentDigest.content)).toContain(survivor.id);
+    expect(
+      await prisma.inventoryItem.findUnique({ where: { id: survivor.id } }),
+    ).not.toBeNull();
+  });
+
+  it('serializes Restore and deletion without deleting a restored item', async () => {
+    const admin = await register();
+    const home = await household(admin.cookie);
+    const location = await prisma.location.create({
+      data: { householdId: home, name: 'Shelf', nameKey: randomUUID() },
+    });
+    const created = await createdItem(
+      admin.cookie,
+      home,
+      location.id,
+      'QUANTITY',
+      { quantity: '0' },
+    );
+    const path = `/api/households/${home}/items/${created.id}`;
+    await request(app.getHttpServer())
+      .post(`${path}/archive`)
+      .set('Cookie', admin.cookie)
+      .expect(201);
+    const [deletion, restore] = await Promise.all([
+      request(app.getHttpServer())
+        .delete(path)
+        .set('Cookie', admin.cookie)
+        .send({ confirmName: created.name }),
+      request(app.getHttpServer())
+        .post(`${path}/restore`)
+        .set('Cookie', admin.cookie),
+    ]);
+    expect([204, 409]).toContain(deletion.status);
+    expect([201, 404]).toContain(restore.status);
+    const row = await prisma.inventoryItem.findUnique({
+      where: { id: created.id },
+    });
+    if (deletion.status === 204) expect(row).toBeNull();
+    else expect(row?.archivedAt).toBeNull();
+  });
+
+  it('serializes a concurrent stock mutation and delete without leaving orphan stock', async () => {
+    const admin = await register();
+    const home = await household(admin.cookie);
+    const location = await prisma.location.create({
+      data: { householdId: home, name: 'Shelf', nameKey: randomUUID() },
+    });
+    const created = await createdItem(
+      admin.cookie,
+      home,
+      location.id,
+      'QUANTITY',
+      { quantity: '0' },
+    );
+    const path = `/api/households/${home}/items/${created.id}`;
+    await request(app.getHttpServer())
+      .post(`${path}/archive`)
+      .set('Cookie', admin.cookie)
+      .expect(201);
+    const [deletion, restock] = await Promise.all([
+      request(app.getHttpServer())
+        .delete(path)
+        .set('Cookie', admin.cookie)
+        .send({ confirmName: created.name }),
+      request(app.getHttpServer())
+        .post(`${path}/restock`)
+        .set('Cookie', admin.cookie)
+        .send({ quantity: '2', locationId: location.id }),
+    ]);
+    expect(deletion.status).toBe(204);
+    expect([404, 409]).toContain(restock.status);
+    expect(
+      await prisma.inventoryItem.findUnique({ where: { id: created.id } }),
+    ).toBeNull();
+    expect(
+      await prisma.stockBatch.count({ where: { itemId: created.id } }),
+    ).toBe(0);
   });
 });

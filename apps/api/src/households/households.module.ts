@@ -4,10 +4,11 @@ import { PrismaModule } from '../prisma/prisma.module.js';
 import { HouseholdsController } from './households.controller.js';
 import { InvitationsController } from './invitations.controller.js';
 import { HouseholdsService } from './households.service.js';
+import { HouseholdPurgeService } from './household-purge.service.js';
 
 @Module({
   imports: [AuthModule, PrismaModule],
   controllers: [HouseholdsController, InvitationsController],
-  providers: [HouseholdsService],
+  providers: [HouseholdsService, HouseholdPurgeService],
 })
 export class HouseholdsModule {}

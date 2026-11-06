@@ -98,6 +98,9 @@ function setup() {
       ),
     },
   };
+  Object.assign(prisma, {
+    $transaction: (fn: (client: typeof prisma) => unknown) => fn(prisma),
+  });
   return { service: new CatalogService(prisma as never), prisma, categories };
 }
 
@@ -169,3 +172,8 @@ describe('category shopping sections', () => {
     expect(categories.get('other-category')?.shoppingSection).toBeNull();
   });
 });
+// Access gating is covered by active-household tests; this suite isolates its existing rules.
+vi.mock('../households/active-household.js', () => ({
+  checkActiveHousehold: vi.fn(),
+  requireActiveHousehold: vi.fn(),
+}));

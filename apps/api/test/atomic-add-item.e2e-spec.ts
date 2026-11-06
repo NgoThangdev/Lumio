@@ -297,10 +297,10 @@ describe('Atomic Add Item and household catalog (database; run after migration)'
         primaryUnit: 'box',
         initialStock: { quantity: '1' },
       }),
-    ).rejects.toThrow('Household membership');
+    ).rejects.toThrow('HOUSEHOLD_MEMBERSHIP_REQUIRED');
     await expect(
       catalog.list(other.actorId, owner.householdId, 'categories'),
-    ).rejects.toThrow('Household membership');
+    ).rejects.toThrow('HOUSEHOLD_MEMBERSHIP_REQUIRED');
     const memberId = randomUUID();
     userIds.push(memberId);
     await prisma.user.create({
@@ -319,7 +319,7 @@ describe('Atomic Add Item and household catalog (database; run after migration)'
     });
     await expect(
       catalog.create(memberId, owner.householdId, 'locations', 'Bathroom'),
-    ).rejects.toThrow('Admin membership');
+    ).rejects.toThrow('HOUSEHOLD_ADMIN_REQUIRED');
     expect(
       await prisma.inventoryItem.count({
         where: { householdId: owner.householdId },
@@ -498,9 +498,9 @@ describe('Atomic Add Item and household catalog (database; run after migration)'
     expect(attention.items[2].lowStockRisk).toBe('OK');
     await expect(
       inventoryRead.inventory(randomUUID(), scope.householdId, { q: 'Milk' }),
-    ).rejects.toThrow('membership');
+    ).rejects.toThrow('HOUSEHOLD_MEMBERSHIP_REQUIRED');
     await expect(
       needsAttention.list(randomUUID(), scope.householdId),
-    ).rejects.toThrow('membership');
+    ).rejects.toThrow('HOUSEHOLD_MEMBERSHIP_REQUIRED');
   });
 });

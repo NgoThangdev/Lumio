@@ -64,3 +64,8 @@ describe('Stock check confirmation', () => {
     expect(update).not.toHaveBeenCalled();
   });
 });
+// Access gating is covered by active-household tests; this suite isolates its existing rules.
+vi.mock('../households/active-household.js', () => ({
+  checkActiveHousehold: vi.fn(),
+  requireActiveHousehold: vi.fn(),
+}));

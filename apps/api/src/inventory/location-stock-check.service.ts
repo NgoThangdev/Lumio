@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Prisma, type StockLevel } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { requireActiveHousehold } from '../households/active-household.js';
 import { LEVELS } from './inventory-state.service.js';
 import { MAX_QUANTITY } from './quantity-validation.js';
 
@@ -200,6 +201,7 @@ export class LocationStockCheckService {
 
   async list(actorId: string, householdId: string, locationId: string) {
     return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       const location = await this.requireAccess(
         tx,
         actorId,
@@ -272,6 +274,7 @@ export class LocationStockCheckService {
   ) {
     return this.prisma.$transaction(
       async (tx) => {
+        await requireActiveHousehold(tx, actorId, householdId);
         await this.requireAccess(tx, actorId, householdId, locationId);
         const locked = await tx.$queryRaw<
           Array<{ id: string; archivedAt: Date | null }>

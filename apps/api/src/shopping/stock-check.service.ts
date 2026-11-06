@@ -9,6 +9,7 @@ import { Prisma } from '../generated/prisma/client.js';
 import { parseQuantity } from '../inventory/quantity-validation.js';
 import { LEVELS } from '../inventory/inventory-state.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { requireActiveHousehold } from '../households/active-household.js';
 import { rankStockChecks } from './stock-check-ranking.js';
 
 type Client = Prisma.TransactionClient;
@@ -75,12 +76,18 @@ export class StockCheckService {
     tripId: string,
   ) {
     const rows = await client.$queryRaw<
-      Array<{ id: string; status: string; suggestionsImportedAt: Date | null }>
+      Array<{
+        id: string;
+        status: string;
+        suggestionsImportedAt: Date | null;
+        archivedAt: Date | null;
+      }>
     >`
-      SELECT "id", "status", "suggestionsImportedAt" FROM "ShoppingTrip"
+      SELECT "id", "status", "suggestionsImportedAt", "archivedAt" FROM "ShoppingTrip"
       WHERE "id" = ${tripId} AND "householdId" = ${householdId} FOR UPDATE
     `;
     if (!rows.length) throw new NotFoundException('TRIP_NOT_FOUND');
+    if (rows[0].archivedAt) throw new ConflictException('TRIP_ARCHIVED');
     if (rows[0].status !== 'DRAFT')
       throw new ConflictException('TRIP_NOT_DRAFT');
     if (rows[0].suggestionsImportedAt)
@@ -138,6 +145,7 @@ export class StockCheckService {
 
   async list(actorId: string, householdId: string, tripId: string) {
     return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       await this.requireMember(tx, actorId, householdId);
       await this.requireCheckableTrip(tx, householdId, tripId);
       if (!(await tx.tripStockCheck.count({ where: { tripId } }))) {
@@ -186,6 +194,7 @@ export class StockCheckService {
     body: Record<string, unknown>,
   ) {
     return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       await this.requireMember(tx, actorId, householdId);
       await this.requireCheckableTrip(tx, householdId, tripId);
       const check = await tx.tripStockCheck.findUnique({

@@ -1,7 +1,7 @@
 ﻿import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useHousehold } from '../../app/useHousehold';
+import { useHousehold } from '@/shared/household/HouseholdContext';
 import {
   ApiError,
   api,
@@ -39,6 +39,8 @@ export function QuickPurchasePage() {
   const [selectedId, setSelectedId] = useState('');
   const [amount, setAmount] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
+  const [purchaseDate, setPurchaseDate] = useState('');
+  const [freezeDate, setFreezeDate] = useState('');
   const [locationChoice, setLocationChoice] = useState<string | null>(null);
   const [failure, setFailure] = useState('');
   const [saved, setSaved] = useState('');
@@ -70,18 +72,24 @@ export function QuickPurchasePage() {
       trackingMode,
       quantity,
       expiry,
+      purchase,
+      freeze,
       locationId: selectedLocationId,
     }: {
       itemId: string;
       trackingMode: TrackingMode;
       quantity: string;
       expiry: string;
+      purchase: string;
+      freeze: string;
       locationId?: string;
     }) => {
       if (trackingMode === 'QUANTITY') {
         return api<unknown>(`${base}/items/${itemId}/restock`, 'POST', {
           quantity,
           expiryDate: expiry || null,
+          purchaseDate: purchase || null,
+          freezeDate: freeze || null,
           ...(selectedLocationId ? { locationId: selectedLocationId } : {}),
         });
       }
@@ -122,7 +130,7 @@ export function QuickPurchasePage() {
       ),
       queryClient.invalidateQueries(
         {
-          queryKey: ['household', household.id, 'intelligence'],
+          queryKey: keys.intelligencePrefix(household.id),
           refetchType: 'all',
         },
         { throwOnError: true },
@@ -148,11 +156,15 @@ export function QuickPurchasePage() {
         trackingMode: mode,
         quantity: amount,
         expiry: expiryDate,
+        purchase: purchaseDate,
+        freeze: freezeDate,
         ...(mode === 'QUANTITY' && locationId ? { locationId } : {}),
       });
       setSaved('Purchase saved.');
       setAmount('');
       setExpiryDate('');
+      setPurchaseDate('');
+      setFreezeDate('');
       if (!(await refreshAffectedData(item.id))) {
         setRefreshWarning(tr('shopping:purchaseSavedRefreshWarning'));
       }
@@ -186,11 +198,15 @@ export function QuickPurchasePage() {
         trackingMode: mode,
         quantity: amount,
         expiry: expiryDate,
+        purchase: purchaseDate,
+        freeze: freezeDate,
         locationId,
       });
       setSaved('Purchase saved.');
       setAmount('');
       setExpiryDate('');
+      setPurchaseDate('');
+      setFreezeDate('');
       setLocationChoice(null);
       if (!(await refreshAffectedData(item.id)))
         setRefreshWarning(tr('shopping:purchaseSavedRefreshWarning'));
@@ -246,6 +262,8 @@ export function QuickPurchasePage() {
               setSelectedId('');
               setAmount('');
               setExpiryDate('');
+              setPurchaseDate('');
+              setFreezeDate('');
               setSaved('');
               setFailure('');
             }}
@@ -283,6 +301,8 @@ export function QuickPurchasePage() {
                     setSelectedId(entry.id);
                     setAmount('');
                     setExpiryDate('');
+                    setPurchaseDate('');
+                    setFreezeDate('');
                     setLocationChoice(null);
                     setSaved('');
                     setFailure('');
@@ -425,6 +445,31 @@ export function QuickPurchasePage() {
                     disabled={mutation.isPending}
                   />
                 </label>
+              )}
+              {mode === 'QUANTITY' && (
+                <details>
+                  <summary>
+                    {tr('common:batchDates')} <em>{tr('common:optional2')}</em>
+                  </summary>
+                  <label>
+                    {tr('common:purchaseDate')}
+                    <input
+                      type="date"
+                      value={purchaseDate}
+                      onChange={(event) => setPurchaseDate(event.target.value)}
+                      disabled={mutation.isPending}
+                    />
+                  </label>
+                  <label>
+                    {tr('common:freezeDate')}
+                    <input
+                      type="date"
+                      value={freezeDate}
+                      onChange={(event) => setFreezeDate(event.target.value)}
+                      disabled={mutation.isPending}
+                    />
+                  </label>
+                </details>
               )}
               {mode === 'QUANTITY' && (
                 <>

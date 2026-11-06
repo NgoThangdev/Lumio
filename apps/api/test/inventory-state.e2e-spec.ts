@@ -245,7 +245,7 @@ describe('Five-level and presence stock (database)', () => {
         type: 'UPDATE_LEVEL',
         level: 'HALF',
       }),
-    ).rejects.toThrow('Household membership');
+    ).rejects.toThrow('HOUSEHOLD_MEMBERSHIP_REQUIRED');
     await expect(
       state.transition(other.actorId, other.householdId, item.id, {
         type: 'UPDATE_LEVEL',
@@ -254,7 +254,7 @@ describe('Five-level and presence stock (database)', () => {
     ).rejects.toThrow('Inventory item was not found');
     await expect(
       intelligence.assessHousehold(other.actorId, owner.householdId),
-    ).rejects.toThrow('Household membership');
+    ).rejects.toThrow('HOUSEHOLD_MEMBERSHIP_REQUIRED');
     expect(
       await prisma.inventoryStateAction.count({ where: { itemId: item.id } }),
     ).toBe(0);

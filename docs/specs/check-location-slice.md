@@ -1,4 +1,6 @@
-# Check Location — proposed Phase 1 slice
+# Check Location — original Phase 1 design
+
+This design predates implementation. For the current request/response contract use `apps/api/CHECK_LOCATION_CONTRACT.md`; verify behavior in source and tests. References below to a missing flow or future implementation are historical.
 
 ## Source and goal
 

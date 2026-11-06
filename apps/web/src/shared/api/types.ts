@@ -14,6 +14,15 @@ export type HouseholdShoppingSettings = {
   defaultShoppingCycleDays: number;
   defaultStore: string | null;
 };
+export type HouseholdInventoryDefaultSettings = {
+  defaultTrackingMode: TrackingMode | null;
+  defaultPrimaryUnit: string | null;
+  defaultLowStockThreshold: string | null;
+  defaultBuyThreshold: string | null;
+  defaultTargetStock: string | null;
+  defaultSafetyBuffer: string;
+  defaultExpiryReminderDays: number;
+};
 export type HouseholdMember = {
   id: string;
   email: string;
@@ -35,6 +44,11 @@ export type CatalogOption = { id: string; name: string };
 export type CategoryOption = CatalogOption & {
   defaultTrackingMode: TrackingMode | null;
   defaultPrimaryUnit: string | null;
+  defaultLowStockThreshold: string | null;
+  defaultBuyThreshold: string | null;
+  defaultTargetStock: string | null;
+  defaultSafetyBuffer: string | null;
+  defaultExpiryReminderDays: number | null;
 };
 export type LocationCheckReason =
   | 'STOCK_CHANGED'
@@ -74,10 +88,19 @@ export type LocationStockCheck = {
 export type TrackingMode = 'QUANTITY' | 'FIVE_LEVEL' | 'PRESENCE_BACKUP';
 export type StockLevel =
   'FULL' | 'THREE_QUARTERS' | 'HALF' | 'QUARTER' | 'EMPTY';
+export const STOCK_LEVELS = [
+  'FULL',
+  'THREE_QUARTERS',
+  'HALF',
+  'QUARTER',
+  'EMPTY',
+] as const satisfies readonly StockLevel[];
 export type Batch = {
   id: string;
   quantity: string;
   expiryDate: string | null;
+  purchaseDate?: string | null;
+  freezeDate?: string | null;
   openedAt?: string | null;
   openedUseByDate?: string | null;
   effectiveExpiryDate?: string | null;
@@ -132,6 +155,22 @@ export type ItemStockCheck = {
   checkedAt: string | null;
   history: StockCheckEvent[];
 };
+export type LocationStockSnapshot = {
+  quantity?: string;
+  currentLevel?: StockLevel | null;
+  isPresent?: boolean | null;
+  backupCount?: number;
+};
+export type ItemLocationStockCheck = {
+  locationId: string;
+  history: {
+    decision: 'CONFIRM' | 'CORRECT';
+    userId: string;
+    checkedAt: string;
+    before: LocationStockSnapshot;
+    after: LocationStockSnapshot;
+  }[];
+};
 export type Item = {
   id: string;
   name: string;
@@ -151,8 +190,10 @@ export type Item = {
   trackingMode: TrackingMode;
   preferredRestockLocationId?: string | null;
   preferredRestockLocation?: { id: string; name: string } | null;
-  currentLocation?: { name: string } | null;
-  backupLocation?: { name: string } | null;
+  currentLocationId?: string | null;
+  backupLocationId?: string | null;
+  currentLocation?: { id: string; name: string } | null;
+  backupLocation?: { id: string; name: string } | null;
   currentLevel: StockLevel | null;
   isPresent: boolean | null;
   backupCount: number;
@@ -163,6 +204,7 @@ export type Item = {
   batches: Batch[];
   actions?: Action[];
   stockChecks?: ItemStockCheck[];
+  locationStockChecks?: ItemLocationStockCheck[];
   stateActions?: {
     id: string;
     type:
@@ -180,6 +222,8 @@ export type Item = {
   lowStockThreshold: string | null;
   buyThreshold: string | null;
   targetStock: string | null;
+  safetyBuffer: string;
+  expiryReminderDays: number;
   neverRunOut: boolean;
   predictionEnabled: boolean;
 };
@@ -324,6 +368,8 @@ export type Config = Pick<
   | 'lowStockThreshold'
   | 'buyThreshold'
   | 'targetStock'
+  | 'safetyBuffer'
+  | 'expiryReminderDays'
   | 'neverRunOut'
   | 'predictionEnabled'
 >;

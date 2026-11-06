@@ -28,7 +28,12 @@ describe('Shopping suggestion import', () => {
       }),
       shoppingEntry: { createMany, findFirst: vi.fn().mockResolvedValue(null) },
       shoppingTrip: {
-        findFirst: vi.fn().mockResolvedValue(null),
+        findFirst: vi
+          .fn()
+          .mockImplementation(
+            async ({ where }: { where: { status?: string } }) =>
+              where.status === 'RESTOCKED' ? null : { id: 'trip', entries: [] },
+          ),
         updateMany: vi.fn(),
       },
       inventoryItem: { findMany: vi.fn() },
@@ -98,20 +103,27 @@ describe('Shopping suggestion import', () => {
       ]),
       shoppingEntry: { findFirst: vi.fn().mockResolvedValue(null), createMany },
       shoppingTrip: {
-        findFirst: vi.fn().mockResolvedValue({
-          entries: [
-            { itemId: 'normal' },
-            { itemId: 'optional' },
-            { itemId: 'recovered' },
-            { itemId: 'expiring' },
-            { itemId: 'untargeted' },
-            { itemId: 'packageOptional' },
-            { itemId: 'wholePackageOptional' },
-            { itemId: 'fractionalOptional' },
-            { itemId: 'five' },
-            { itemId: 'presence' },
-          ],
-        }),
+        findFirst: vi
+          .fn()
+          .mockImplementation(
+            async ({ where }: { where: { status?: string } }) =>
+              where.status === 'RESTOCKED'
+                ? {
+                    entries: [
+                      { itemId: 'normal' },
+                      { itemId: 'optional' },
+                      { itemId: 'recovered' },
+                      { itemId: 'expiring' },
+                      { itemId: 'untargeted' },
+                      { itemId: 'packageOptional' },
+                      { itemId: 'wholePackageOptional' },
+                      { itemId: 'fractionalOptional' },
+                      { itemId: 'five' },
+                      { itemId: 'presence' },
+                    ],
+                  }
+                : { id: 'trip', entries: [] },
+          ),
         updateMany: vi.fn(),
       },
       inventoryItem: {
@@ -345,7 +357,7 @@ describe('Shopping suggestion import', () => {
       ]),
       shoppingEntry: { findFirst: vi.fn().mockResolvedValue(null), createMany },
       shoppingTrip: {
-        findFirst: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({ id: 'trip', entries: [] }),
         update: vi.fn(),
         updateMany: vi.fn(),
       },
@@ -385,3 +397,8 @@ describe('Shopping suggestion import', () => {
     expect(createMany).not.toHaveBeenCalled();
   });
 });
+// Access gating is covered by active-household tests; this suite isolates its existing rules.
+vi.mock('../households/active-household.js', () => ({
+  checkActiveHousehold: vi.fn(),
+  requireActiveHousehold: vi.fn(),
+}));

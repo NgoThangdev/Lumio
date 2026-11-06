@@ -1,5 +1,6 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { requireActiveHousehold } from '../households/active-household.js';
 
 const LIMIT = 20;
 
@@ -99,12 +100,6 @@ export class RecentActivityService {
   constructor(private readonly prisma: PrismaService) {}
 
   async list(actorId: string, householdId: string) {
-    const member = await this.prisma.membership.findUnique({
-      where: { userId_householdId: { userId: actorId, householdId } },
-      select: { userId: true },
-    });
-    if (!member) throw new ForbiddenException('HOUSEHOLD_MEMBERSHIP_REQUIRED');
-
     const [
       quantityActions,
       stateActions,
@@ -112,80 +107,89 @@ export class RecentActivityService {
       trips,
       tripChecks,
       locationChecks,
-    ] = await Promise.all([
-      this.prisma.inventoryAction.findMany({
-        where: { householdId },
-        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-        take: LIMIT,
-        include: {
-          item: { select: { id: true, name: true, primaryUnit: true } },
-          undo: { select: { createdAt: true } },
-        },
-      }),
-      this.prisma.inventoryStateAction.findMany({
-        where: { householdId },
-        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-        take: LIMIT,
-        include: {
-          item: { select: { id: true, name: true, primaryUnit: true } },
-          undo: { select: { createdAt: true } },
-        },
-      }),
-      this.prisma.inventoryUndo.findMany({
-        where: { householdId },
-        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-        take: LIMIT,
-        include: {
-          item: { select: { id: true, name: true, primaryUnit: true } },
-          inventoryAction: { select: { id: true, type: true, quantity: true } },
-          stateAction: {
-            select: {
-              id: true,
-              type: true,
-              beforeLevel: true,
-              afterLevel: true,
-              beforePresent: true,
-              afterPresent: true,
-              beforeBackupCount: true,
-              afterBackupCount: true,
+    ] = await this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
+      return Promise.all([
+        tx.inventoryAction.findMany({
+          where: { householdId },
+          orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+          take: LIMIT,
+          include: {
+            item: { select: { id: true, name: true, primaryUnit: true } },
+            undo: { select: { createdAt: true } },
+          },
+        }),
+        tx.inventoryStateAction.findMany({
+          where: { householdId },
+          orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+          take: LIMIT,
+          include: {
+            item: { select: { id: true, name: true, primaryUnit: true } },
+            undo: { select: { createdAt: true } },
+          },
+        }),
+        tx.inventoryUndo.findMany({
+          where: { householdId },
+          orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+          take: LIMIT,
+          include: {
+            item: { select: { id: true, name: true, primaryUnit: true } },
+            inventoryAction: {
+              select: { id: true, type: true, quantity: true },
+            },
+            stateAction: {
+              select: {
+                id: true,
+                type: true,
+                beforeLevel: true,
+                afterLevel: true,
+                beforePresent: true,
+                afterPresent: true,
+                beforeBackupCount: true,
+                afterBackupCount: true,
+              },
             },
           },
-        },
-      }),
-      this.prisma.shoppingTrip.findMany({
-        where: { householdId, status: 'RESTOCKED', completedAt: { not: null } },
-        orderBy: [{ completedAt: 'desc' }, { id: 'desc' }],
-        take: LIMIT,
-        select: {
-          id: true,
-          store: true,
-          completedAt: true,
-          completedByUserId: true,
-        },
-      }),
-      this.prisma.tripStockCheck.findMany({
-        where: { trip: { householdId }, checkedAt: { not: null } },
-        orderBy: [{ checkedAt: 'desc' }, { itemId: 'desc' }],
-        take: LIMIT,
-        select: {
-          itemId: true,
-          history: true,
-          item: { select: { id: true, name: true, primaryUnit: true } },
-          trip: { select: { id: true, store: true } },
-        },
-      }),
-      this.prisma.locationStockCheck.findMany({
-        where: { householdId, checkedAt: { not: null } },
-        orderBy: [{ checkedAt: 'desc' }, { itemId: 'desc' }],
-        take: LIMIT,
-        select: {
-          itemId: true,
-          history: true,
-          item: { select: { id: true, name: true, primaryUnit: true } },
-          location: { select: { id: true, name: true } },
-        },
-      }),
-    ]);
+        }),
+        tx.shoppingTrip.findMany({
+          where: {
+            householdId,
+            status: 'RESTOCKED',
+            completedAt: { not: null },
+          },
+          orderBy: [{ completedAt: 'desc' }, { id: 'desc' }],
+          take: LIMIT,
+          select: {
+            id: true,
+            store: true,
+            completedAt: true,
+            completedByUserId: true,
+          },
+        }),
+        tx.tripStockCheck.findMany({
+          where: { trip: { householdId }, checkedAt: { not: null } },
+          orderBy: [{ checkedAt: 'desc' }, { itemId: 'desc' }],
+          take: LIMIT,
+          select: {
+            itemId: true,
+            history: true,
+            item: { select: { id: true, name: true, primaryUnit: true } },
+            trip: { select: { id: true, store: true } },
+          },
+        }),
+        tx.locationStockCheck.findMany({
+          where: { householdId, checkedAt: { not: null } },
+          orderBy: [{ checkedAt: 'desc' }, { itemId: 'desc' }],
+          take: LIMIT,
+          select: {
+            itemId: true,
+            history: true,
+            item: { select: { id: true, name: true, primaryUnit: true } },
+            location: { select: { id: true, name: true } },
+          },
+        }),
+      ]);
+    });
 
     const events: RecentActivityEvent[] = [];
     for (const action of quantityActions) {

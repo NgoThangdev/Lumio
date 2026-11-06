@@ -13,10 +13,15 @@ import type {
 } from '../../shared/api/types';
 import { localizedEnum, localizedError, tr } from '../../shared/i18n';
 import { Button, Card, Notice } from '../../shared/ui/primitives';
+import {
+  InventoryDefaultNumberFields,
+  type InventoryDefaultNumbers,
+} from './InventoryDefaultNumberFields';
 
 type DefaultChange =
   | { defaultTrackingMode: TrackingMode | null }
-  | { defaultPrimaryUnit: string | null };
+  | { defaultPrimaryUnit: string | null }
+  | InventoryDefaultNumbers;
 
 function DefaultRow({
   category,
@@ -98,17 +103,34 @@ function DefaultRow({
               )}
             </div>
           </form>
+          <InventoryDefaultNumberFields
+            key={`${category.id}-${category.defaultLowStockThreshold}-${category.defaultBuyThreshold}-${category.defaultTargetStock}-${category.defaultSafetyBuffer}-${category.defaultExpiryReminderDays}`}
+            values={category}
+            canEdit={canEdit}
+            busy={busy}
+            household={false}
+            onSave={onSave}
+          />
         </>
       ) : (
-        <p className="muted">
-          {tr('settings:defaultTrackingMode')}:{' '}
-          {category.defaultTrackingMode
-            ? localizedEnum(category.defaultTrackingMode)
-            : tr('settings:noneSet')}
-          <br />
-          {tr('settings:defaultPrimaryUnit')}:{' '}
-          {category.defaultPrimaryUnit ?? tr('settings:noneSet')}
-        </p>
+        <>
+          <p className="muted">
+            {tr('settings:defaultTrackingMode')}:{' '}
+            {category.defaultTrackingMode
+              ? localizedEnum(category.defaultTrackingMode)
+              : tr('settings:noneSet')}
+            <br />
+            {tr('settings:defaultPrimaryUnit')}:{' '}
+            {category.defaultPrimaryUnit ?? tr('settings:noneSet')}
+          </p>
+          <InventoryDefaultNumberFields
+            values={category}
+            canEdit={false}
+            busy={busy}
+            household={false}
+            onSave={onSave}
+          />
+        </>
       )}
     </div>
   );

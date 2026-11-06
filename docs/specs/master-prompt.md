@@ -978,6 +978,8 @@ Do NOT force users to configure every advanced property immediately.
 
 The app should remember item configuration for future purchases.
 
+If the starting stock was entered incorrectly, the user must be able to correct the item's **current stock** afterward without deleting and recreating the item. This applies to quantity, five-level, and presence/backup tracking. Offer a clear correction path from Item Detail; ask for batch or location detail only when it is needed to avoid guessing which physical stock changed. A correction is not a Use or a purchase/Restock. Preserve the original Add Item record and record the correction with actor, time, and before/after stock so the history remains explainable.
+
 Future enhancement:
 
 - barcode scanning;
@@ -1801,6 +1803,8 @@ This helps support:
 - debugging.
 
 Do not rely solely on directly modifying a single quantity field without preserving an audit trail.
+
+An entered stock value may be wrong. Correct the **current** batch/state data and append an attributable correction; do not rewrite the original stock action or fabricate consumption/purchase history. A correction must not inflate the usage rate used for shopping prediction. For items with multiple batches or locations, preserve their physical meaning rather than silently reallocating a total.
 
 ---
 

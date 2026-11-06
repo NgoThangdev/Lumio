@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
+import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { localCalendarDate } from '../inventory/plan-use.js';
 import { NotificationEvaluatorService } from './notification-evaluator.service.js';
@@ -300,17 +301,62 @@ export class NotificationDispatchService {
           continue;
         }
         let sendOutcome:
-          'ACCEPTED' | 'RETRY' | 'FAILED' | 'INVALID_SUBSCRIPTION' | 'UNKNOWN' =
-          'ACCEPTED';
+          | 'ACCEPTED'
+          | 'RETRY'
+          | 'FAILED'
+          | 'INVALID_SUBSCRIPTION'
+          | 'UNKNOWN'
+          | 'SKIPPED' = 'ACCEPTED';
         try {
-          await this.transport.send(
-            {
-              endpoint: current.endpoint,
-              p256dh: current.p256dh,
-              auth: current.auth,
+          const subscription = {
+            endpoint: current.endpoint,
+            p256dh: current.p256dh,
+            auth: current.auth,
+          };
+          const content = fresh.content!;
+          const sent = await this.prisma.$transaction(
+            async (tx) => {
+              if ('itemId' in content) {
+                const active = await tx.$queryRaw<Array<{ id: string }>>`
+                  SELECT "id" FROM "Household"
+                  WHERE "id" = ${content.householdId}
+                    AND "deletionRequestId" IS NULL FOR SHARE
+                `;
+                if (!active.length) return false;
+                const rows = await tx.$queryRaw<Array<{ id: string }>>`
+                SELECT "id" FROM "InventoryItem"
+                WHERE "id" = ${content.itemId}
+                  AND "householdId" = ${content.householdId}
+                  AND "archivedAt" IS NULL
+                FOR SHARE
+              `;
+                if (!rows.length) return false;
+                await this.transport.send(subscription, content);
+                return true;
+              }
+              const ids = [
+                ...new Set(
+                  content.households.map((group) => group.householdId),
+                ),
+              ].sort();
+              if (!ids.length) return false;
+              const rows = await tx.$queryRaw<Array<{ id: string }>>`
+                SELECT "id" FROM "Household"
+                WHERE "id" IN (${Prisma.join(ids)})
+                  AND "deletionRequestId" IS NULL
+                ORDER BY "id" FOR SHARE
+              `;
+              const active = new Set(rows.map((row) => row.id));
+              const households = content.households.filter((group) =>
+                active.has(group.householdId),
+              );
+              if (!households.length) return false;
+              await this.transport.send(subscription, { households });
+              return true;
             },
-            fresh.content,
+            { timeout: 30_000 },
           );
+          if (!sent) sendOutcome = 'SKIPPED';
         } catch (error) {
           if (error instanceof InvalidPushSubscriptionError)
             sendOutcome = 'INVALID_SUBSCRIPTION';
@@ -320,6 +366,16 @@ export class NotificationDispatchService {
         }
         if (sendOutcome === 'UNKNOWN') {
           result.unknown++;
+          continue;
+        }
+        if (sendOutcome === 'SKIPPED') {
+          await this.prisma.notificationDelivery.update({
+            where: {
+              intentId_subscriptionKey: { intentId, subscriptionKey: key },
+            },
+            data: { status: 'SKIPPED', lastErrorCode: 'NO_LONGER_ELIGIBLE' },
+          });
+          result.skipped++;
           continue;
         }
         if (sendOutcome === 'ACCEPTED') {

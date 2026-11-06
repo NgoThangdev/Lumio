@@ -15,6 +15,7 @@ function setup(role: 'ADMIN' | 'MEMBER' = 'ADMIN') {
     $queryRaw: vi.fn().mockResolvedValue([{ id: 'item' }]),
     inventoryItem: {
       findUniqueOrThrow: vi.fn(async () => item),
+      delete: vi.fn(),
       update: vi.fn(async ({ data }: { data: Record<string, unknown> }) => {
         Object.assign(item, data);
         return item;
@@ -28,8 +29,39 @@ function setup(role: 'ADMIN' | 'MEMBER' = 'ADMIN') {
       deleteMany: vi.fn(),
       createMany: vi.fn(),
     },
-    inventoryItemChange: { create: vi.fn() },
-    shoppingEntry: { findMany: vi.fn().mockResolvedValue([]) },
+    inventoryItemChange: { create: vi.fn(), deleteMany: vi.fn() },
+    shoppingEntry: {
+      findMany: vi.fn().mockResolvedValue([]),
+      count: vi.fn().mockResolvedValue(0),
+    },
+    tripStockCheck: { count: vi.fn().mockResolvedValue(0) },
+    locationStockCheck: { count: vi.fn().mockResolvedValue(0) },
+    inventoryUndo: { count: vi.fn().mockResolvedValue(0) },
+    inventoryAction: {
+      count: vi.fn().mockResolvedValue(0),
+      findMany: vi.fn().mockResolvedValue([]),
+      deleteMany: vi.fn(),
+    },
+    inventoryStateAction: {
+      count: vi.fn().mockResolvedValue(0),
+      findMany: vi.fn().mockResolvedValue([]),
+      deleteMany: vi.fn(),
+    },
+    stockBatch: {
+      findMany: vi.fn().mockResolvedValue([]),
+      deleteMany: vi.fn(),
+    },
+    actionBatchAllocation: {
+      count: vi.fn().mockResolvedValue(0),
+      deleteMany: vi.fn(),
+    },
+    openTransfer: { count: vi.fn().mockResolvedValue(0) },
+    notificationIntent: {
+      findMany: vi.fn().mockResolvedValue([]),
+      delete: vi.fn(),
+      update: vi.fn(),
+    },
+    notificationDelivery: { count: vi.fn().mockResolvedValue(0) },
   };
   const prisma = {
     $transaction: vi.fn((fn: (tx: typeof tx) => unknown) => fn(tx)),
@@ -135,5 +167,60 @@ describe('Inventory item metadata and lifecycle', () => {
         data: expect.objectContaining({ kind: 'RESTORE' }),
       }),
     );
+  });
+
+  it('deletes only an archived item after exact-name confirmation', async () => {
+    const { service, tx, item } = setup();
+    item.archivedAt = new Date();
+    await service.permanentlyDelete('admin', 'home', 'item', {
+      confirmName: 'Milk',
+    });
+    expect(tx.inventoryItem.delete).toHaveBeenCalledWith({
+      where: { id: 'item' },
+    });
+    expect(tx.inventoryItemChange.deleteMany).toHaveBeenCalledWith({
+      where: { itemId: 'item' },
+    });
+    expect(tx.stockBatch.deleteMany).toHaveBeenCalledWith({
+      where: { itemId: 'item' },
+    });
+  });
+
+  it('rejects a Member, unarchived item, wrong name, and each history blocker', async () => {
+    const member = setup('MEMBER');
+    member.item.archivedAt = new Date();
+    await expect(
+      member.service.permanentlyDelete('member', 'home', 'item', {
+        confirmName: 'Milk',
+      }),
+    ).rejects.toMatchObject({ status: 403 });
+    const { service, tx, item } = setup();
+    await expect(
+      service.permanentlyDelete('admin', 'home', 'item', {
+        confirmName: 'Milk',
+      }),
+    ).rejects.toMatchObject({ status: 409 });
+    item.archivedAt = new Date();
+    await expect(
+      service.permanentlyDelete('admin', 'home', 'item', {
+        confirmName: 'milk',
+      }),
+    ).rejects.toMatchObject({ status: 400 });
+    for (const [table, code] of [
+      ['shoppingEntry', 'ITEM_HAS_SHOPPING_ENTRY'],
+      ['tripStockCheck', 'ITEM_HAS_STOCK_CHECK'],
+      ['locationStockCheck', 'ITEM_HAS_STOCK_CHECK'],
+      ['inventoryUndo', 'ITEM_HAS_UNDO'],
+      ['inventoryAction', 'ITEM_HAS_STOCK_ACTION'],
+      ['inventoryStateAction', 'ITEM_HAS_STOCK_ACTION'],
+    ] as const) {
+      tx[table].count.mockResolvedValueOnce(1);
+      await expect(
+        service.permanentlyDelete('admin', 'home', 'item', {
+          confirmName: 'Milk',
+        }),
+      ).rejects.toMatchObject({ status: 409, response: { message: code } });
+    }
+    expect(tx.inventoryItem.delete).not.toHaveBeenCalled();
   });
 });

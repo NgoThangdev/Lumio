@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
-import { useHousehold } from '../../app/useHousehold';
+import { useHousehold } from '@/shared/household/HouseholdContext';
 import {
   api,
   ApiError,

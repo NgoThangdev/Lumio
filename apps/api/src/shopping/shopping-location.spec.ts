@@ -55,6 +55,7 @@ describe('Shopping Finish location resolution', () => {
       shoppingEntry: {
         findMany: vi.fn().mockResolvedValue(entries),
         updateMany: vi.fn(),
+        update: vi.fn(),
       },
       shoppingTrip: { update: tripUpdates },
       stockBatch: {
@@ -129,6 +130,9 @@ describe('Shopping Finish location resolution', () => {
         }),
         update,
       },
+      shoppingTrip: {
+        findFirst: vi.fn().mockResolvedValue({ id: 'trip', entries: [] }),
+      },
     };
     const prisma = {
       membership: { findUnique: vi.fn().mockResolvedValue({ userId: 'user' }) },
@@ -164,9 +168,16 @@ describe('Shopping Finish location resolution', () => {
         status: 'PURCHASED',
         actualQuantity: expect.anything(),
         expiryDate: null,
+        purchaseDate: null,
+        freezeDate: null,
         locationId: 'pantry',
         moveToTripId: null,
       },
     });
   });
 });
+// Access gating is covered by active-household tests; this suite isolates its existing rules.
+vi.mock('../households/active-household.js', () => ({
+  checkActiveHousehold: vi.fn(),
+  requireActiveHousehold: vi.fn(),
+}));

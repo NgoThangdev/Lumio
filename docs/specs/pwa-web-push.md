@@ -2,7 +2,7 @@
 
 ## Authority and status
 
-This design refines `master-prompt.md` §§2, 30–33, 41 and 47 and `phase-1-scope.md`. The product requirements are an installable PWA, a service worker, server-evaluated Web Push, per-user preferences and subscriptions, low-noise immediate/digest/passive notification levels, and actionable deep links. This document is an approved direction, **not** a claim that any part is implemented. Any rule marked **technical proposal** needs validation during its implementation slice.
+This design refines `master-prompt.md` §§2, 30–33, 41 and 47 and `phase-1-scope.md`. It records approved product direction and original implementation proposals, **not current implementation or live-delivery status**. The PWA, notification API, and FE Settings have since been developed; verify current source, `apps/api/NOTIFICATIONS_CONTRACT.md`, environment configuration, and browser evidence before claiming a specific push or scheduler behavior is live.
 
 Confirmed Phase 1 defaults:
 

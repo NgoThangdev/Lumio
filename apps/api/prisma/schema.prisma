@@ -110,6 +110,7 @@ model User {
   sessions            UserSession[]
   createdShoppingTrips ShoppingTrip[] @relation("ShoppingTripCreator")
   completedShoppingTrips ShoppingTrip[] @relation("ShoppingTripFinisher")
+  archivedShoppingTrips ShoppingTrip[] @relation("ShoppingTripArchiver")
   stockChecks TripStockCheck[]
   locationStockChecks LocationStockCheck[]
   notificationPreference NotificationPreference?
@@ -194,8 +195,18 @@ model NotificationDelivery {
 model Household {
   id               String                @id @default(uuid())
   name             String
+  deletionRequestId String?
+  deletionRequestedAt DateTime?
+  deletionDueAt DateTime?
   defaultShoppingCycleDays Int @default(7)
   defaultStore String? @db.VarChar(120)
+  defaultTrackingMode TrackingMode?
+  defaultPrimaryUnit String? @db.VarChar(40)
+  defaultLowStockThreshold Decimal? @db.Decimal(18, 6)
+  defaultBuyThreshold Decimal? @db.Decimal(18, 6)
+  defaultTargetStock Decimal? @db.Decimal(18, 6)
+  defaultSafetyBuffer Decimal @default(1.2) @db.Decimal(4, 2)
+  defaultExpiryReminderDays Int @default(3)
   memberships      Membership[]
   invitations      HouseholdInvitation[]
   inventoryItems   InventoryItem[]
@@ -208,6 +219,8 @@ model Household {
   locations Location[]
   locationStockChecks LocationStockCheck[]
   tags Tag[]
+
+  @@index([deletionDueAt])
 }
 
 model Category {
@@ -218,6 +231,11 @@ model Category {
   shoppingSection ShoppingSection?
   defaultTrackingMode TrackingMode?
   defaultPrimaryUnit String? @db.VarChar(40)
+  defaultLowStockThreshold Decimal? @db.Decimal(18, 6)
+  defaultBuyThreshold Decimal? @db.Decimal(18, 6)
+  defaultTargetStock Decimal? @db.Decimal(18, 6)
+  defaultSafetyBuffer Decimal? @db.Decimal(4, 2)
+  defaultExpiryReminderDays Int?
   household Household @relation(fields: [householdId], references: [id])
   items InventoryItem[]
 
@@ -295,6 +313,8 @@ model InventoryItem {
   lowStockThreshold Decimal? @db.Decimal(18, 6)
   buyThreshold      Decimal? @db.Decimal(18, 6)
   targetStock       Decimal? @db.Decimal(18, 6)
+  safetyBuffer Decimal @default(1.2) @db.Decimal(4, 2)
+  expiryReminderDays Int @default(3)
   neverRunOut       Boolean  @default(false)
   predictionEnabled Boolean  @default(false)
   stockRevision Int @default(0)
@@ -379,14 +399,18 @@ model ShoppingTrip {
   createdAt       DateTime           @default(now())
   completedAt     DateTime?
   suggestionsImportedAt DateTime?
+  archivedAt      DateTime?
+  archivedByUserId String?
   household       Household          @relation(fields: [householdId], references: [id])
   createdBy       User               @relation("ShoppingTripCreator", fields: [createdByUserId], references: [id])
   completedBy     User?              @relation("ShoppingTripFinisher", fields: [completedByUserId], references: [id])
+  archivedBy      User?              @relation("ShoppingTripArchiver", fields: [archivedByUserId], references: [id])
   entries         ShoppingEntry[]
   incomingMoves   ShoppingEntry[] @relation("MoveDestination")
   stockChecks     TripStockCheck[]
 
   @@index([householdId, createdAt])
+  @@index([householdId, archivedAt])
 }
 
 model ShoppingEntry {
@@ -400,6 +424,8 @@ model ShoppingEntry {
   suggestedReason   String?
   actualQuantity    Decimal?              @db.Decimal(18, 6)
   expiryDate        DateTime?             @db.Date
+  purchaseDate      DateTime?             @db.Date
+  freezeDate        DateTime?             @db.Date
   locationId        String?
   moveToTripId      String?
   trip              ShoppingTrip          @relation(fields: [tripId], references: [id])
@@ -457,6 +483,8 @@ model StockBatch {
   locationId String?
   quantity    Decimal                 @db.Decimal(18, 6)
   expiryDate  DateTime?               @db.Date
+  purchaseDate DateTime? @db.Date
+  freezeDate DateTime? @db.Date
   openedAt DateTime?
   openedUseByDate DateTime? @db.Date
   createdAt   DateTime                @default(now())

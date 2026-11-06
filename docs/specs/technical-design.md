@@ -4,9 +4,9 @@
 
 This document records a planning-level technical design for Lumio's first usable release. It is not an implementation, a Prisma schema, an API contract, or a detailed UI specification. The approved [Phase 1 scope](phase-1-scope.md) defines what belongs in the release; the [master prompt](master-prompt.md) is authoritative if the sources conflict. The [product overview](product-overview.md) summarizes the low-effort household workflow but adds no separate requirements. Technical proposals and assumptions below do not change product scope.
 
-## Current repository baseline
+## Original planning baseline (historical)
 
-At the time of this design, the only tracked files are the three source documents in `docs/specs/`: `master-prompt.md`, `phase-1-scope.md`, and `product-overview.md`. The working tree was clean before this document was created. The directories `apps/api`, `apps/web`, `packages/shared`, `docs/decisions`, `docs/runbooks`, `.codex/agents`, and `.codex/skills` exist but contain no application implementation or project configuration. There is no existing architecture to preserve beyond this folder structure.
+This document began before application code existed. Its proposed routes, milestones, and open decisions below record the original plan, **not the current repository or deployment status**. Use the API contracts, source, migrations, and tests to determine current behavior. Do not treat an old “proposed” or “not implemented” statement here as a current gap.
 
 ## Confirmed Phase 1 requirements
 
@@ -77,7 +77,7 @@ The route shapes are navigation examples for planning, not final URLs or endpoin
 
 Home, Inventory, Shopping, and More/Settings are the priority navigation areas. Inventory Actions owns transactional stock changes and FEFO allocation. Shopping invokes that boundary for trip completion and restock. Domain rules belong in services rather than HTTP controllers. These module boundaries are proposals, not additional product capabilities.
 
-## Dependency-ordered implementation milestones
+## Original dependency-ordered implementation milestones (historical plan)
 
 This order largely follows master prompt §43: Foundation, Inventory Core, Inventory UI, Shopping, Intelligence, Notifications, and Polish. It moves **Stock Intelligence before the completed Shopping feature** because prediction-driven shopping suggestions depend on stock-intelligence calculations. A basic quantity-to-target suggestion can use current stock and target stock directly, without consumption prediction. Inventory UI and a Home skeleton can still be built before those calculations; Home's full attention and trip summaries follow their dependencies. Business-rule tests are placed where the rules enter the system, rather than deferred to release polish.
 
@@ -95,7 +95,9 @@ Confirmed household multiplicity: a user may participate in, manage, or follow m
 
 Confirmed invitation mechanism (user decision): An Admin creates a one-time invite link and manually shares it; Lumio does not send invitation emails. The link is not bound to a recipient email: any authenticated account possessing it may explicitly accept it. It expires seven days after creation, and an Admin may revoke it before use. The invitee must sign in or register with email/password before accepting. Opening the link does not consume it. Only successful authenticated explicit acceptance adds the invitee to that household as a Member and consumes the link so it cannot be reused; the link cannot grant Admin.
 
-### Decisions needing human review before the affected schema or behavior is fixed
+### Decisions recorded as open in the original plan
+
+The Undo boundary and stock-calculation rules have since been refined in focused slice documents and API contracts. Check those current contracts before treating either row below as unresolved.
 
 | Decision | Planning assumption and reason for review |
 |---|---|
@@ -112,7 +114,7 @@ Confirmed invitation mechanism (user decision): An Admin creates a one-time invi
 - Use deterministic calculations and configurable-threshold fallback; do not add AI/ML or advanced habit learning.
 - Use the existing `apps/*` layout and select workspace tooling during foundation setup.
 
-There is **no genuine blocker** to this design or to starting the foundation. A secure origin and push credentials will be needed to verify Web Push in its milestone; they do not block earlier work.
+This was a planning document. Deployment and browser verification must be assessed separately against the current environment.
 
 ## Traceability
 

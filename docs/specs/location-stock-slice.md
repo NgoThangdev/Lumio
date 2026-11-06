@@ -1,4 +1,6 @@
-# Location-aware stock writes (proposed Phase 1 slice)
+# Location-aware stock writes — original slice design
+
+This document records the original design, not current implementation status. Use the current Inventory and Shopping API contracts, source, and tests for operational behavior. Statements below that a flow is missing or future work are historical.
 
 ## Source and problem
 

@@ -18,16 +18,27 @@ const out = {
 
 function setup() {
   const prisma = {
+    $queryRaw: vi
+      .fn()
+      .mockImplementation(async (sql: TemplateStringsArray) =>
+        sql[0].includes('"Household"')
+          ? [{ id: 'house' }]
+          : [{ id: 'item', householdId: 'house' }],
+      ),
     notificationPreference: {
       findUnique: vi.fn().mockResolvedValue(preference),
       findMany: vi.fn().mockResolvedValue([{ userId: 'user' }]),
     },
     membership: {
+      findUnique: vi.fn().mockResolvedValue({ role: 'MEMBER' }),
       findMany: vi
         .fn()
         .mockResolvedValue([
           { householdId: 'house', household: { name: 'Home' } },
         ]),
+    },
+    household: {
+      findUniqueOrThrow: vi.fn().mockResolvedValue({ name: 'Home' }),
     },
     notificationIntent: {
       createMany: vi.fn().mockResolvedValue({ count: 1 }),
@@ -43,8 +54,14 @@ function setup() {
       findUniqueOrThrow: vi.fn().mockResolvedValue({ id: 'today' }),
     },
   };
+  Object.assign(prisma, {
+    $transaction: (run: (client: typeof prisma) => unknown) => run(prisma),
+  });
   const intelligence = {
     assessHousehold: vi.fn().mockResolvedValue({ assessments: [out] }),
+    assessInTransaction: vi.fn((_tx, userId, householdId, shoppingDate, at) =>
+      intelligence.assessHousehold(userId, householdId, shoppingDate, at),
+    ),
   };
   const service = new NotificationEvaluatorService(
     prisma as never,
@@ -54,6 +71,12 @@ function setup() {
 }
 
 describe('Notification evaluator revalidation', () => {
+  it('does not persist a stale item candidate after deletion wins the item lock', async () => {
+    const { service, prisma } = setup();
+    prisma.$queryRaw.mockResolvedValue([]);
+    expect(await service.evaluateUser('user', at)).toEqual({ created: 0 });
+    expect(prisma.notificationIntent.createMany).not.toHaveBeenCalled();
+  });
   it('rechecks the digest time after due-user selection', async () => {
     const { service, prisma } = setup();
     prisma.notificationPreference.findMany.mockResolvedValue([
@@ -336,3 +359,7 @@ describe('Notification evaluator revalidation', () => {
     expect(prisma.notificationIntent.findUnique).not.toHaveBeenCalled();
   });
 });
+// The gate's lock behavior is covered by active-household and database race tests.
+vi.mock('../households/active-household.js', () => ({
+  requireActiveHousehold: vi.fn(),
+}));

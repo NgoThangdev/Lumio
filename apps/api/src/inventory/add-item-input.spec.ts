@@ -4,6 +4,28 @@ import { parseAddItem } from './add-item-input.js';
 const ids = { categoryId: 'category', locationId: 'location', tagIds: ['tag'] };
 
 describe('atomic Add Item input', () => {
+  it('keeps optional purchase and freeze dates only on a positive quantity batch', () => {
+    const purchaseDate = new Date('2026-11-01T00:00:00.000Z');
+    const freezeDate = new Date('2026-11-02T00:00:00.000Z');
+    expect(
+      parseAddItem('QUANTITY', {
+        ...ids,
+        initialStock: { quantity: '2', purchaseDate, freezeDate },
+      }).initialStock,
+    ).toMatchObject({ quantity: '2', purchaseDate, freezeDate });
+    expect(() =>
+      parseAddItem('QUANTITY', {
+        ...ids,
+        initialStock: { quantity: '0', purchaseDate },
+      }),
+    ).toThrow('cannot have batch dates');
+    expect(() =>
+      parseAddItem('FIVE_LEVEL', {
+        ...ids,
+        initialStock: { level: 'FULL', freezeDate },
+      }),
+    ).toThrow('only valid for quantity tracking');
+  });
   it('accepts zero quantity without a batch requirement', () => {
     expect(
       parseAddItem('QUANTITY', { ...ids, initialStock: { quantity: '0' } })

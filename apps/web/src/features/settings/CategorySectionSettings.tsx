@@ -66,7 +66,10 @@ export function CategorySectionSettings({
           { throwOnError: true },
         ),
         queryClient.invalidateQueries(
-          { queryKey: ['household', household.id, 'trip'], refetchType: 'all' },
+          {
+            queryKey: keys.tripDetailsPrefix(household.id),
+            refetchType: 'all',
+          },
           { throwOnError: true },
         ),
       ]);

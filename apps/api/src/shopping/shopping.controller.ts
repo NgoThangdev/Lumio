@@ -57,6 +57,14 @@ export class ShoppingController {
     return this.shopping.list(request.actorId, householdId);
   }
 
+  @Get('archived')
+  listArchived(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+  ) {
+    return this.shopping.listArchived(request.actorId, householdId);
+  }
+
   @Post()
   create(
     @Req() request: AuthenticatedRequest,
@@ -78,6 +86,24 @@ export class ShoppingController {
     @Param('tripId') tripId: string,
   ) {
     return this.shopping.read(request.actorId, householdId, tripId);
+  }
+
+  @Delete(':tripId')
+  archive(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Param('tripId') tripId: string,
+  ) {
+    return this.shopping.archive(request.actorId, householdId, tripId);
+  }
+
+  @Post(':tripId/restore')
+  restore(
+    @Req() request: AuthenticatedRequest,
+    @Param('householdId') householdId: string,
+    @Param('tripId') tripId: string,
+  ) {
+    return this.shopping.restore(request.actorId, householdId, tripId);
   }
 
   @Post(':tripId/suggestions')
@@ -128,6 +154,8 @@ export class ShoppingController {
       status?: unknown;
       actualQuantity?: unknown;
       expiryDate?: unknown;
+      purchaseDate?: unknown;
+      freezeDate?: unknown;
       locationId?: unknown;
       destinationTripId?: unknown;
     },
@@ -142,6 +170,8 @@ export class ShoppingController {
       body?.expiryDate,
       body?.locationId,
       body?.destinationTripId,
+      body?.purchaseDate,
+      body?.freezeDate,
     );
   }
 

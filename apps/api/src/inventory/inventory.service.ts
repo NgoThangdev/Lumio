@@ -8,6 +8,7 @@ import {
 import { Prisma } from '../generated/prisma/browser.js';
 import type { TrackingMode } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { requireActiveHousehold } from '../households/active-household.js';
 import {
   effectiveExpiryDate,
   eligibleBatches,
@@ -22,6 +23,10 @@ import { parseAddItem } from './add-item-input.js';
 import type { AddItemFields } from './add-item-input.js';
 import { undoEligibility } from './undo-eligibility.js';
 import { resolveRestockLocation } from './stock-location.js';
+import {
+  resolveQuantityDefaults,
+  validateThresholdOrder,
+} from './inventory-defaults.js';
 
 export { parseQuantity } from './quantity-validation.js';
 
@@ -65,6 +70,8 @@ export interface UseQuantityInput {
 
 export interface RestockQuantityInput extends UseQuantityInput {
   expiryDate?: Date | null;
+  purchaseDate?: Date | null;
+  freezeDate?: Date | null;
   locationId?: unknown;
 }
 
@@ -74,6 +81,11 @@ export interface CreateItemInput extends AddItemFields {
   name: string;
   primaryUnit: string;
   trackingMode?: TrackingMode;
+  lowStockThreshold?: unknown;
+  buyThreshold?: unknown;
+  targetStock?: unknown;
+  safetyBuffer?: unknown;
+  expiryReminderDays?: unknown;
 }
 
 export interface ReadItemInput {
@@ -89,6 +101,8 @@ export interface ItemConfigurationInput extends ReadItemInput {
   targetStock: unknown;
   neverRunOut: unknown;
   predictionEnabled: unknown;
+  safetyBuffer?: unknown;
+  expiryReminderDays?: unknown;
 }
 
 function settingDecimal(value: unknown, label: string) {
@@ -121,6 +135,11 @@ export class InventoryService {
     locationId,
     tagIds,
     initialStock,
+    lowStockThreshold,
+    buyThreshold,
+    targetStock,
+    safetyBuffer,
+    expiryReminderDays,
   }: CreateItemInput) {
     const itemName = name.trim();
     const unit = primaryUnit.trim();
@@ -143,6 +162,7 @@ export class InventoryService {
       : null;
 
     return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       const membership = await tx.membership.findUnique({
         where: { userId_householdId: { userId: actorId, householdId } },
         select: { userId: true },
@@ -153,11 +173,12 @@ export class InventoryService {
         );
       }
 
+      let categoryDefaults: Awaited<ReturnType<typeof tx.category.findFirst>> =
+        null;
       if (addItem) {
         const [category, location, tags] = await Promise.all([
           tx.category.findFirst({
             where: { id: addItem.categoryId, householdId },
-            select: { id: true },
           }),
           tx.location.findFirst({
             where: { id: addItem.locationId, householdId },
@@ -173,7 +194,74 @@ export class InventoryService {
             'Category, location, and tags must belong to this household.',
           );
         }
+        categoryDefaults = category;
       }
+
+      const householdDefaults = await tx.household.findUniqueOrThrow({
+        where: { id: householdId },
+        select: {
+          defaultTrackingMode: true,
+          defaultPrimaryUnit: true,
+          defaultLowStockThreshold: true,
+          defaultBuyThreshold: true,
+          defaultTargetStock: true,
+          defaultSafetyBuffer: true,
+          defaultExpiryReminderDays: true,
+        },
+      });
+      const defaults = resolveQuantityDefaults(
+        trackingMode,
+        unit,
+        householdDefaults,
+        categoryDefaults,
+      );
+      if (
+        trackingMode !== 'QUANTITY' &&
+        [
+          lowStockThreshold,
+          buyThreshold,
+          targetStock,
+          safetyBuffer,
+          expiryReminderDays,
+        ].some((value) => value !== undefined)
+      )
+        throw new BadRequestException(
+          'Quantity stock rules require QUANTITY tracking.',
+        );
+      const low =
+        lowStockThreshold === undefined
+          ? defaults.lowStockThreshold
+          : settingDecimal(lowStockThreshold, 'Low threshold');
+      const buy =
+        buyThreshold === undefined
+          ? defaults.buyThreshold
+          : settingDecimal(buyThreshold, 'Buy threshold');
+      const target =
+        targetStock === undefined
+          ? defaults.targetStock
+          : settingDecimal(targetStock, 'Target stock');
+      if (target?.isZero())
+        throw new BadRequestException(
+          'Target stock must be greater than zero.',
+        );
+      validateThresholdOrder({
+        defaultLowStockThreshold: low,
+        defaultBuyThreshold: buy,
+        defaultTargetStock: target,
+      });
+      if (
+        safetyBuffer !== undefined &&
+        (typeof safetyBuffer !== 'string' ||
+          !/^[1-2](?:\.\d{1,2})?$|^3(?:\.0{1,2})?$/.test(safetyBuffer))
+      )
+        throw new BadRequestException('INVALID_SAFETY_BUFFER');
+      if (
+        expiryReminderDays !== undefined &&
+        (!Number.isInteger(expiryReminderDays) ||
+          (expiryReminderDays as number) < 0 ||
+          (expiryReminderDays as number) > 30)
+      )
+        throw new BadRequestException('INVALID_EXPIRY_REMINDER_DAYS');
 
       const stock = addItem?.initialStock;
       const currentLevel =
@@ -197,6 +285,17 @@ export class InventoryService {
           name: itemName,
           primaryUnit: unit,
           trackingMode,
+          lowStockThreshold: low,
+          buyThreshold: buy,
+          targetStock: target,
+          safetyBuffer:
+            safetyBuffer === undefined
+              ? defaults.safetyBuffer
+              : new Prisma.Decimal(safetyBuffer as string),
+          expiryReminderDays:
+            expiryReminderDays === undefined
+              ? defaults.expiryReminderDays
+              : (expiryReminderDays as number),
           currentLevel,
           isPresent,
           backupCount,
@@ -221,6 +320,8 @@ export class InventoryService {
           itemId: item.id,
           quantity: stock.quantity,
           expiryDate: stock.expiryDate,
+          purchaseDate: stock.purchaseDate,
+          freezeDate: stock.freezeDate,
           locationId: addItem.locationId,
           type: 'INITIAL_STOCK',
         });
@@ -260,88 +361,77 @@ export class InventoryService {
   }
 
   async readItem({ actorId, householdId, itemId }: ReadItemInput) {
-    const membership = await this.prisma.membership.findUnique({
-      where: { userId_householdId: { userId: actorId, householdId } },
-      select: { role: true },
+    return this.prisma.$transaction(async (tx) => {
+      const membership = await requireActiveHousehold(tx, actorId, householdId);
+      const item = await tx.inventoryItem.findFirst({
+        where: { id: itemId, householdId },
+        include: {
+          category: true,
+          currentLocation: true,
+          backupLocation: true,
+          preferredRestockLocation: true,
+          tagLinks: { include: { tag: true } },
+          batches: {
+            orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+            include: { location: true },
+          },
+          stateActions: {
+            orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+            include: { undo: true },
+          },
+          undos: { orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] },
+          stockChecks: {
+            orderBy: { checkedAt: 'asc' },
+          },
+          locationStockChecks: {
+            orderBy: [{ checkedAt: 'asc' }, { locationId: 'asc' }],
+          },
+          actions: {
+            orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+            include: { allocations: true, openTransfer: true, undo: true },
+          },
+          changes: { orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] },
+        },
+      });
+      if (!item) {
+        throw new NotFoundException(
+          'Inventory item was not found in this household.',
+        );
+      }
+      if (item.archivedAt && membership.role !== 'ADMIN')
+        throw new ForbiddenException('HOUSEHOLD_ADMIN_REQUIRED');
+      return withOpenedStock(item);
     });
-    if (!membership) {
-      throw new ForbiddenException(
-        'Household membership is required to read this item.',
-      );
-    }
-
-    const item = await this.prisma.inventoryItem.findFirst({
-      where: { id: itemId, householdId },
-      include: {
-        category: true,
-        currentLocation: true,
-        backupLocation: true,
-        preferredRestockLocation: true,
-        tagLinks: { include: { tag: true } },
-        batches: {
-          orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
-          include: { location: true },
-        },
-        stateActions: {
-          orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
-          include: { undo: true },
-        },
-        undos: { orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] },
-        stockChecks: {
-          orderBy: { checkedAt: 'asc' },
-        },
-        locationStockChecks: {
-          orderBy: [{ checkedAt: 'asc' }, { locationId: 'asc' }],
-        },
-        actions: {
-          orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
-          include: { allocations: true, openTransfer: true, undo: true },
-        },
-        changes: { orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] },
-      },
-    });
-    if (!item) {
-      throw new NotFoundException(
-        'Inventory item was not found in this household.',
-      );
-    }
-    if (item.archivedAt && membership.role !== 'ADMIN')
-      throw new ForbiddenException('HOUSEHOLD_ADMIN_REQUIRED');
-    return withOpenedStock(item);
   }
 
   async listItems(actorId: string, householdId: string) {
-    const membership = await this.prisma.membership.findUnique({
-      where: { userId_householdId: { userId: actorId, householdId } },
-      select: { userId: true },
-    });
-    if (!membership) {
-      throw new ForbiddenException(
-        'Household membership is required to list items.',
-      );
-    }
-    const items = await this.prisma.inventoryItem.findMany({
-      where: { householdId, archivedAt: null },
-      include: {
-        category: true,
-        currentLocation: true,
-        backupLocation: true,
-        preferredRestockLocation: true,
-        tagLinks: { include: { tag: true } },
-        batches: {
-          select: {
-            id: true,
-            quantity: true,
-            expiryDate: true,
-            openedAt: true,
-            openedUseByDate: true,
-            locationId: true,
+    return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
+      const items = await tx.inventoryItem.findMany({
+        where: { householdId, archivedAt: null },
+        include: {
+          category: true,
+          currentLocation: true,
+          backupLocation: true,
+          preferredRestockLocation: true,
+          tagLinks: { include: { tag: true } },
+          batches: {
+            select: {
+              id: true,
+              quantity: true,
+              expiryDate: true,
+              purchaseDate: true,
+              freezeDate: true,
+              openedAt: true,
+              openedUseByDate: true,
+              locationId: true,
+            },
           },
         },
-      },
-      orderBy: [{ name: 'asc' }, { id: 'asc' }],
+        orderBy: [{ name: 'asc' }, { id: 'asc' }],
+      });
+      return items.map(withOpenedStock);
     });
-    return items.map(withOpenedStock);
   }
 
   async configureItem(input: ItemConfigurationInput) {
@@ -352,6 +442,21 @@ export class InventoryService {
     );
     const buyThreshold = settingDecimal(input.buyThreshold, 'Buy threshold');
     const targetStock = settingDecimal(input.targetStock, 'Target stock');
+    const safetyBuffer = input.safetyBuffer;
+    if (
+      safetyBuffer !== undefined &&
+      (typeof safetyBuffer !== 'string' ||
+        !/^[1-2](?:\.\d{1,2})?$|^3(?:\.0{1,2})?$/.test(safetyBuffer))
+    )
+      throw new BadRequestException('INVALID_SAFETY_BUFFER');
+    const expiryReminderDays = input.expiryReminderDays;
+    if (
+      expiryReminderDays !== undefined &&
+      (!Number.isInteger(expiryReminderDays) ||
+        (expiryReminderDays as number) < 0 ||
+        (expiryReminderDays as number) > 30)
+    )
+      throw new BadRequestException('INVALID_EXPIRY_REMINDER_DAYS');
     if (
       typeof input.neverRunOut !== 'boolean' ||
       typeof input.predictionEnabled !== 'boolean'
@@ -378,56 +483,70 @@ export class InventoryService {
         );
       }
     }
-    const membership = await this.prisma.membership.findUnique({
-      where: {
-        userId_householdId: {
-          userId: input.actorId,
-          householdId: input.householdId,
+    return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(
+        tx,
+        input.actorId,
+        input.householdId,
+        'ADMIN',
+      );
+      const membership = await tx.membership.findUnique({
+        where: {
+          userId_householdId: {
+            userId: input.actorId,
+            householdId: input.householdId,
+          },
         },
-      },
-      select: { role: true },
-    });
-    if (membership?.role !== 'ADMIN') {
-      throw new ForbiddenException(
-        'Household Admin membership is required to change stock settings.',
-      );
-    }
-    const item = await this.prisma.inventoryItem.findFirst({
-      where: { id: input.itemId, householdId: input.householdId },
-      select: { trackingMode: true, archivedAt: true },
-    });
-    if (!item)
-      throw new NotFoundException(
-        'Inventory item was not found in this household.',
-      );
-    if (item.archivedAt) throw new ConflictException('ITEM_ARCHIVED');
-    if (item.trackingMode !== 'QUANTITY') {
-      throw new BadRequestException(
-        'Quantity stock settings require QUANTITY tracking.',
-      );
-    }
-    const result = await this.prisma.inventoryItem.updateMany({
-      where: {
-        id: input.itemId,
-        householdId: input.householdId,
-        archivedAt: null,
-      },
-      data: {
-        minimumStock,
-        lowStockThreshold,
-        buyThreshold,
-        targetStock,
-        neverRunOut: input.neverRunOut,
-        predictionEnabled: input.predictionEnabled,
-      },
-    });
-    if (result.count !== 1) {
-      throw new NotFoundException(
-        'Inventory item was not found in this household.',
-      );
-    }
-    return this.prisma.inventoryItem.findUniqueOrThrow({
-      where: { id: input.itemId },
+        select: { role: true },
+      });
+      if (membership?.role !== 'ADMIN') {
+        throw new ForbiddenException(
+          'Household Admin membership is required to change stock settings.',
+        );
+      }
+      const item = await tx.inventoryItem.findFirst({
+        where: { id: input.itemId, householdId: input.householdId },
+        select: { trackingMode: true, archivedAt: true },
+      });
+      if (!item)
+        throw new NotFoundException(
+          'Inventory item was not found in this household.',
+        );
+      if (item.archivedAt) throw new ConflictException('ITEM_ARCHIVED');
+      if (item.trackingMode !== 'QUANTITY') {
+        throw new BadRequestException(
+          'Quantity stock settings require QUANTITY tracking.',
+        );
+      }
+      const result = await tx.inventoryItem.updateMany({
+        where: {
+          id: input.itemId,
+          householdId: input.householdId,
+          archivedAt: null,
+        },
+        data: {
+          minimumStock,
+          lowStockThreshold,
+          buyThreshold,
+          targetStock,
+          neverRunOut: input.neverRunOut as boolean,
+          predictionEnabled: input.predictionEnabled as boolean,
+          ...(safetyBuffer !== undefined
+            ? { safetyBuffer: new Prisma.Decimal(safetyBuffer as string) }
+            : {}),
+          ...(expiryReminderDays !== undefined
+            ? { expiryReminderDays: expiryReminderDays as number }
+            : {}),
+        },
+      });
+      if (result.count !== 1) {
+        throw new NotFoundException(
+          'Inventory item was not found in this household.',
+        );
+      }
+      return tx.inventoryItem.findUniqueOrThrow({
+        where: { id: input.itemId },
+      });
     });
   }
 
@@ -454,6 +573,7 @@ export class InventoryService {
         'Confirm that one package equals one primary unit.',
       );
     return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId, 'ADMIN');
       const member = await tx.membership.findUnique({
         where: { userId_householdId: { userId: actorId, householdId } },
         select: { role: true },
@@ -544,6 +664,8 @@ export class InventoryService {
         locationId: source.locationId,
         quantity: transfer.openedQuantity,
         expiryDate: source.expiryDate,
+        purchaseDate: source.purchaseDate,
+        freezeDate: source.freezeDate,
         openedAt: input.at,
         openedUseByDate:
           input.days === null
@@ -579,6 +701,7 @@ export class InventoryService {
 
   async openQuantity(actorId: string, householdId: string, itemId: string) {
     return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       const member = await tx.membership.findUnique({
         where: { userId_householdId: { userId: actorId, householdId } },
         select: { userId: true },
@@ -632,6 +755,7 @@ export class InventoryService {
 
   async finishOpened(actorId: string, householdId: string, itemId: string) {
     return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       const member = await tx.membership.findUnique({
         where: { userId_householdId: { userId: actorId, householdId } },
         select: { userId: true },
@@ -709,6 +833,7 @@ export class InventoryService {
     const requestedQuantity = parseQuantity(quantity, 'Use');
 
     return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
       const membership = await tx.membership.findUnique({
         where: { userId_householdId: { userId: actorId, householdId } },
         select: { userId: true },
@@ -852,19 +977,24 @@ export class InventoryService {
     itemId,
     quantity,
     expiryDate,
+    purchaseDate,
+    freezeDate,
     locationId,
   }: RestockQuantityInput) {
     parseQuantity(quantity, 'Restock');
-    return this.prisma.$transaction((tx) =>
-      this.restockInTransaction(tx, {
+    return this.prisma.$transaction(async (tx) => {
+      await requireActiveHousehold(tx, actorId, householdId);
+      return this.restockInTransaction(tx, {
         actorId,
         householdId,
         itemId,
         quantity,
         expiryDate,
+        purchaseDate,
+        freezeDate,
         locationId,
-      }),
-    );
+      });
+    });
   }
 
   async restockInTransaction(
@@ -883,6 +1013,8 @@ export class InventoryService {
       itemId,
       quantity,
       expiryDate,
+      purchaseDate,
+      freezeDate,
       locationId,
     }: RestockQuantityInput,
   ) {
@@ -933,6 +1065,8 @@ export class InventoryService {
       itemId,
       quantity,
       expiryDate,
+      purchaseDate,
+      freezeDate,
       locationId: await resolveRestockLocation(tx, {
         householdId,
         itemId,
@@ -956,6 +1090,8 @@ export class InventoryService {
         itemId: input.itemId,
         quantity: actualQuantity,
         expiryDate: input.expiryDate ?? null,
+        purchaseDate: input.purchaseDate ?? null,
+        freezeDate: input.freezeDate ?? null,
         locationId: input.locationId,
       },
       include: { location: true },
