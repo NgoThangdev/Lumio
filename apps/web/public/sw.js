@@ -199,11 +199,8 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin || request.method !== 'GET') return;
 
-  // Authenticated API data and mutations always go to the network. Never cache or queue them.
-  if (url.pathname === '/api' || url.pathname.startsWith('/api/')) {
-    event.respondWith(fetch(request));
-    return;
-  }
+  // Let the browser send API requests directly. Never cache or queue them.
+  if (url.pathname === '/api' || url.pathname.startsWith('/api/')) return;
 
   const isNavigation = request.mode === 'navigate';
   const isVersionedAsset = versionedAsset(url.pathname);
