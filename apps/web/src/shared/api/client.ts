@@ -5,6 +5,7 @@ export class ApiError extends Error {
   readonly tripIds: string[];
   readonly references: Record<string, number> | null;
   readonly impact: unknown;
+  readonly responseHeaders: Readonly<Record<string, string>>;
 
   constructor(
     message: string,
@@ -14,6 +15,7 @@ export class ApiError extends Error {
     tripIds: string[] = [],
     references: Record<string, number> | null = null,
     impact: unknown = null,
+    responseHeaders: Readonly<Record<string, string>> = {},
   ) {
     super(message);
     this.name = 'ApiError';
@@ -23,6 +25,7 @@ export class ApiError extends Error {
     this.tripIds = tripIds;
     this.references = references;
     this.impact = impact;
+    this.responseHeaders = responseHeaders;
   }
 }
 
@@ -64,6 +67,7 @@ export async function api<T>(
   path: string,
   method = 'GET',
   body?: object,
+  options?: { signal?: AbortSignal },
 ): Promise<T> {
   const normalizedMethod = method.toUpperCase();
   if (
@@ -80,6 +84,7 @@ export async function api<T>(
       credentials: 'same-origin',
       headers: body ? { 'Content-Type': 'application/json' } : undefined,
       body: body ? JSON.stringify(body) : undefined,
+      signal: options?.signal,
     });
   } catch (cause) {
     if (normalizedMethod !== 'GET') throw new MutationOutcomeUnknownError(path);
@@ -87,12 +92,16 @@ export async function api<T>(
   }
   let data: unknown = null;
   if (response.status !== 204) {
+    const responseText = await response.text();
     try {
-      data = await response.json();
+      data = JSON.parse(responseText);
     } catch (cause) {
-      if (normalizedMethod !== 'GET')
-        throw new MutationOutcomeUnknownError(path);
-      throw cause;
+      if (response.ok) {
+        if (normalizedMethod !== 'GET')
+          throw new MutationOutcomeUnknownError(path);
+        throw cause;
+      }
+      data = responseText;
     }
   }
   if (!response.ok) {
@@ -103,7 +112,9 @@ export async function api<T>(
     const raw =
       body && 'message' in body
         ? body.message
-        : `The server could not complete this request (${response.status}).`;
+        : typeof data === 'string' && data.trim()
+          ? data.trim()
+          : `The server could not complete this request (${response.status}).`;
     if (
       response.status === 401 &&
       !['/auth/me', '/auth/sign-in', '/auth/register'].includes(path)
@@ -116,6 +127,11 @@ export async function api<T>(
         : typeof raw === 'string' && /^[A-Z][A-Z0-9_]+$/.test(raw)
           ? raw
           : null;
+    const responseHeaders: Record<string, string> = {};
+    for (const name of ['content-type', 'retry-after', 'x-render-routing']) {
+      const value = response.headers.get(name);
+      if (value) responseHeaders[name] = value;
+    }
     throw new ApiError(
       typeof raw === 'string'
         ? raw
@@ -137,6 +153,7 @@ export async function api<T>(
           )
         : null,
       body?.impact ?? null,
+      responseHeaders,
     );
   }
   return data as T;
