@@ -127,8 +127,8 @@ switch ($Service) {
   'web' {
     $hostname = Get-TailscaleHostname
     $env:__VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS = $hostname
-    Write-Host 'Starting Lumio Vite on 127.0.0.1:5174. Press Ctrl+C to stop.'
-    & npm.cmd run dev -w @lumio/web -- --host 127.0.0.1 --port 5174 --strictPort
+    Write-Host 'Starting Lumio Vite on 127.0.0.1:5173. Press Ctrl+C to stop.'
+    & npm.cmd run dev -w @lumio/web -- --host 127.0.0.1 --port 5173 --strictPort
     exit $LASTEXITCODE
   }
   'funnel' {
@@ -139,16 +139,16 @@ switch ($Service) {
     }
     Assert-NoExistingFunnelRoute ($rawStatus -join [Environment]::NewLine)
     try {
-      $web = Invoke-WebRequest -Uri 'http://127.0.0.1:5174/' -UseBasicParsing -TimeoutSec 5
-      $ready = Invoke-RestMethod -Uri 'http://127.0.0.1:5174/api/ready' -TimeoutSec 5
+      $web = Invoke-WebRequest -Uri 'http://127.0.0.1:5173/' -UseBasicParsing -TimeoutSec 5
+      $ready = Invoke-RestMethod -Uri 'http://127.0.0.1:5173/api/ready' -TimeoutSec 5
       if ($web.StatusCode -ne 200 -or $web.Headers['Content-Type'] -notmatch 'text/html' -or $ready.status -ne 'ok') {
         throw 'Unexpected web or API readiness response.'
       }
     } catch {
       throw 'Local Vite page or proxied API readiness check failed; Funnel was not started.'
     }
-    Write-Host 'Starting foreground Tailscale Funnel HTTPS 443 -> 127.0.0.1:5174. Press Ctrl+C to stop.'
-    & $tailscale funnel --https=443 http://127.0.0.1:5174
+    Write-Host 'Starting foreground Tailscale Funnel HTTPS 443 -> 127.0.0.1:5173. Press Ctrl+C to stop.'
+    & $tailscale funnel --https=443 http://127.0.0.1:5173
     exit $LASTEXITCODE
   }
 }
